@@ -45,6 +45,7 @@ namespace BurageSnap
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OptionDialog));
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxFolder = new System.Windows.Forms.TextBox();
@@ -58,6 +59,8 @@ namespace BurageSnap
             this.checkBoxTopMost = new System.Windows.Forms.CheckBox();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.comboBoxWindowTitle = new System.Windows.Forms.ComboBox();
+            this.errorProvider = new System.Windows.Forms.ErrorProvider(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).BeginInit();
             this.SuspendLayout();
             // 
             // label3
@@ -84,6 +87,7 @@ namespace BurageSnap
             // 
             resources.ApplyResources(this.textBoxInterval, "textBoxInterval");
             this.textBoxInterval.Name = "textBoxInterval";
+            this.textBoxInterval.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxInterval_Validating);
             // 
             // label1
             // 
@@ -124,6 +128,10 @@ namespace BurageSnap
             resources.ApplyResources(this.comboBoxWindowTitle, "comboBoxWindowTitle");
             this.comboBoxWindowTitle.Name = "comboBoxWindowTitle";
             // 
+            // errorProvider
+            // 
+            this.errorProvider.ContainerControl = this;
+            // 
             // OptionDialog
             // 
             this.AcceptButton = this.buttonOk;
@@ -146,6 +154,7 @@ namespace BurageSnap
             this.Name = "OptionDialog";
             this.ShowIcon = false;
             this.Load += new System.EventHandler(this.OptionDialog_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -165,5 +174,6 @@ namespace BurageSnap
         private System.Windows.Forms.CheckBox checkBoxTopMost;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.ComboBox comboBoxWindowTitle;
+        private System.Windows.Forms.ErrorProvider errorProvider;
     }
 }

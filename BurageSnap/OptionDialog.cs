@@ -16,8 +16,10 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
+using BurageSnap.Properties;
 
 namespace BurageSnap
 {
@@ -66,6 +68,18 @@ namespace BurageSnap
                 return;
             textBoxFolder.Text = folderBrowserDialog.SelectedPath;
             textBoxFolder.Select(textBoxFolder.TextLength, 0);
+        }
+
+        private void textBoxInterval_Validating(object sender, CancelEventArgs e)
+        {
+            int interval;
+            if (int.TryParse(textBoxInterval.Text, out interval) && 0 < interval && interval < 1000 * 1000)
+            {
+                errorProvider.SetError(textBoxInterval, "");
+                return;
+            }
+            e.Cancel = true;
+            errorProvider.SetError(textBoxInterval, Resources.OptionDialog_textBoxInterval_Validating_Interval);
         }
     }
 }

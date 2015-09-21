@@ -136,4 +136,7 @@
   <data name="FormMain_checkBoxContinuous_CheckedChanged_Capture" xml:space="preserve">
     <value>Capture</value>
   </data>
+  <data name="OptionDialog_textBoxInterval_Validating_Interval" xml:space="preserve">
+    <value>Interval must be in the range of 1 ms to 1000 sec.</value>
+  </data>
 </root>
