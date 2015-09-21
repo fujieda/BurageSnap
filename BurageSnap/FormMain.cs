@@ -153,7 +153,7 @@ namespace BurageSnap
                     _rectangle = DetectGameScreen(bmp);
                 if (_rectangle.IsEmpty)
                     return;
-                var dir = now.ToString(DateFormat);
+                var dir = Path.Combine(_config.Folder, now.ToString(DateFormat));
                 try
                 {
                     Directory.CreateDirectory(dir);
