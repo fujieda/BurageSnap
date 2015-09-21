@@ -33,11 +33,14 @@ namespace BurageSnap
     {
         private IntPtr _hWnd;
         private Rectangle _rectangle;
-        private Thread _captureThread;
         private readonly Config _config;
         private readonly OptionDialog _optionDialog;
         private const int WidthMin = 600, HeightMin = 400;
         private const string DateFormat = "yyyy-MM-dd";
+        private bool _captureing;
+        private readonly object _lockObj = new object();
+        private uint _timerId;
+        private TimeProc _timeProc;
 
         public FormMain()
         {
@@ -81,19 +84,39 @@ namespace BurageSnap
                 SingleShot();
                 return;
             }
-            if (_captureThread == null)
+            if (!_captureing)
             {
                 buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Stop;
-                _captureThread = new Thread(ContinuousShot);
-                _captureThread.Start();
+                SingleShot();
+                var dummy = 0u;
+                _timeProc = TimerCallback; // avoid to be collected by GC
+                _timerId = timeSetEvent(_config.Interval == 0 ? 1u : (uint)_config.Interval, 0, _timeProc, ref dummy, 1);
+                _captureing = true;
             }
             else
             {
-                _captureThread.Interrupt();
-                _captureThread.Join();
-                _captureThread = null;
+                if (_timerId != 0)
+                    timeKillEvent(_timerId);
                 buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Start;
+                _captureing = false;
             }
+        }
+
+        [DllImport("winmm.dll")]
+        private static extern uint timeSetEvent(uint delay, uint resolution, TimeProc timeProc,
+            ref uint user, uint eventType);
+
+        private delegate void TimeProc(uint timerId, uint msg, ref uint user, ref uint rsv1, uint rsv2);
+
+        [DllImport("winmm.dll")]
+        private static extern uint timeKillEvent(uint timerId);
+
+        private void TimerCallback(uint timerId, uint msg, ref uint user, ref uint rsv1, uint rsv2)
+        {
+            if (!Monitor.TryEnter(_lockObj))
+                return;
+            SingleShot();
+            Monitor.Exit(_lockObj);
         }
 
         private void checkBoxContinuous_CheckedChanged(object sender, EventArgs e)
@@ -122,22 +145,6 @@ namespace BurageSnap
         {
             _hWnd = IntPtr.Zero;
             _rectangle = new Rectangle();
-        }
-
-        private void ContinuousShot()
-        {
-            while (true)
-            {
-                SingleShot();
-                try
-                {
-                    Thread.Sleep(_config.Interval);
-                }
-                catch (ThreadInterruptedException)
-                {
-                    return;
-                }
-            }
         }
 
         private void SingleShot()
