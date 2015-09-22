@@ -169,10 +169,11 @@ namespace BurageSnap
                 {
                     return;
                 }
-                var path = Path.Combine(dir, now.ToString("yyyy-MM-dd HH-mm-ss.fff") + ".jpg");
+                var path = Path.Combine(dir, now.ToString("yyyy-MM-dd HH-mm-ss.fff") +
+                                             (_config.Format == OutputFormat.Jpg ? ".jpg" : ".png"));
                 using (var crop = bmp.Clone(_rectangle, bmp.PixelFormat))
                 using (var fs = File.OpenWrite(path))
-                    crop.Save(fs, ImageFormat.Jpeg);
+                    crop.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
                 BeginInvoke(new Action(() => { labelTimeStamp.Text = now.ToString("HH:mm:ss.fff"); }));
             }
         }

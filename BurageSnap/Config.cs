@@ -22,6 +22,12 @@ using System.Xml.Serialization;
 
 namespace BurageSnap
 {
+    public enum OutputFormat
+    {
+        Jpg,
+        Png
+    }
+
     public class Config
     {
         private static readonly string BaseDir = Path.GetDirectoryName(Application.ExecutablePath);
@@ -30,6 +36,7 @@ namespace BurageSnap
         public int Interval { get; set; } = 1000;
         public string[] TitleHistory { get; set; } = {"艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com"};
         public string Folder { get; set; }
+        public OutputFormat Format { get; set; } = OutputFormat.Jpg;
 
         public Config()
         {

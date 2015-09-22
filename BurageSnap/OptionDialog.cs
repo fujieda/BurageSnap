@@ -47,6 +47,7 @@ namespace BurageSnap
             }
             _config.TitleHistory = (from object item in comboBoxWindowTitle.Items select item.ToString()).ToArray();
             _config.Folder = textBoxFolder.Text;
+            _config.Format = radioButtonJpg.Checked ? OutputFormat.Jpg : OutputFormat.Png;
         }
 
         private void OptionDialog_Load(object sender, EventArgs e)
@@ -59,6 +60,8 @@ namespace BurageSnap
             comboBoxWindowTitle.Text = _config.TitleHistory[0];
             textBoxFolder.Text = _config.Folder;
             textBoxFolder.Select(textBoxFolder.TextLength, 0);
+            radioButtonJpg.Checked = _config.Format == OutputFormat.Jpg;
+            radioButtonPng.Checked = _config.Format == OutputFormat.Png;
         }
 
         private void buttonBrowse_Click(object sender, EventArgs e)
