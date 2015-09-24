@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 
 namespace BurageSnap
@@ -30,7 +30,7 @@ namespace BurageSnap
 
     public class Config
     {
-        private static readonly string BaseDir = Path.GetDirectoryName(Application.ExecutablePath);
+        private static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
         public Point Location { get; set; }
         public bool TopMost { get; set; }
         public int Interval { get; set; } = 1000;
