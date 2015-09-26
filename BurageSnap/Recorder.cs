@@ -21,7 +21,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Threading;
 
 namespace BurageSnap
@@ -32,6 +34,7 @@ namespace BurageSnap
         private readonly Config _config;
         private readonly Capture _screenCapture = new Capture();
         private readonly RingBuffer _ringBuffer = new RingBuffer();
+        private byte[] _prevHash;
         private uint _timerId;
         private TimeProc _timeProc;
         private readonly object _lockObj = new object();
@@ -54,6 +57,8 @@ namespace BurageSnap
             else
             {
                 _ringBuffer.Size = _config.RingBuffer;
+                var frame = CaptureFrame(true);
+                _prevHash = ComputeHash(frame);
                 AddFrame(CaptureFrame(true));
             }
             var dummy = 0u;
@@ -95,6 +100,10 @@ namespace BurageSnap
             if (!Monitor.TryEnter(_lockObj))
                 return;
             var frame = CaptureFrame();
+            var hash = ComputeHash(frame);
+            if (_prevHash != null && hash.SequenceEqual(_prevHash))
+                return;
+            _prevHash = hash;
             if (frame == null)
             {
                 timeKillEvent(timerId);
@@ -105,6 +114,13 @@ namespace BurageSnap
             else
                 AddFrame(frame);
             Monitor.Exit(_lockObj);
+        }
+
+        private byte[] ComputeHash(Frame frame)
+        {
+            var bmp = frame.Bitmap;
+            var array = (byte[])new ImageConverter().ConvertTo(bmp, typeof(byte[]));
+            return array == null ? null : MD5.Create().ComputeHash(array);
         }
 
         private Frame CaptureFrame(bool initial = false)
