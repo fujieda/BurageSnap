@@ -41,11 +41,26 @@ namespace BurageSnap
         private readonly object _lockObj = new object();
         private uint _timerId;
         private TimeProc _timeProc;
+        private readonly Frame[] _ringBuffer = new Frame[128];
+        private int _ringMask = 128 - 1;
+        private int _ringTop, _ringBottom, _ringSize;
+
+        private class Frame : IDisposable
+        {
+            public DateTime Time { get; set; }
+            public Bitmap Bitmap { get; set; }
+
+            public void Dispose()
+            {
+                Bitmap.Dispose();
+            }
+        }
 
         public FormMain()
         {
             InitializeComponent();
             _config = Config.Load();
+            _ringSize = _config.RingBuffer;
             _optionDialog = new OptionDialog(_config);
         }
 
@@ -72,8 +87,10 @@ namespace BurageSnap
 
         private void buttonOption_Click(object sender, EventArgs e)
         {
-            if (_optionDialog.ShowDialog(this) == DialogResult.OK)
-                TopMost = _config.TopMost;
+            if (_optionDialog.ShowDialog(this) != DialogResult.OK)
+                return;
+            TopMost = _config.TopMost;
+            _ringSize = _config.RingBuffer;
         }
 
         private void buttonCapture_Click(object sender, EventArgs e)
@@ -81,13 +98,16 @@ namespace BurageSnap
             RedetectWindow();
             if (!checkBoxContinuous.Checked)
             {
-                SingleShot();
+                SaveFrame(SingleShot());
                 return;
             }
             if (!_captureing)
             {
                 buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Stop;
-                SingleShot();
+                if (_ringSize == 0)
+                    SaveFrame(SingleShot());
+                else
+                    AddFrame(SingleShot());
                 var dummy = 0u;
                 _timeProc = TimerCallback; // avoid to be collected by GC
                 _timerId = timeSetEvent(_config.Interval == 0 ? 1u : (uint)_config.Interval, 0, _timeProc, ref dummy, 1);
@@ -97,8 +117,37 @@ namespace BurageSnap
             {
                 if (_timerId != 0)
                     timeKillEvent(_timerId);
+                if (_ringSize != 0)
+                    SaveRingBuffer();
                 buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Start;
                 _captureing = false;
+            }
+        }
+
+        private void AddFrame(Frame frame)
+        {
+            var n = _ringBottom - _ringTop;
+            if (n < 0)
+                n += _ringBuffer.Length;
+            if (n >= _ringSize)
+            {
+                if (_ringBuffer[_ringTop] != null)
+                {
+                    _ringBuffer[_ringTop].Dispose();
+                    _ringBuffer[_ringTop] = null;
+                }
+                _ringTop = (_ringTop + 1) & _ringMask;
+            }
+            _ringBuffer[_ringBottom] = frame;
+            _ringBottom = (_ringBottom + 1) & _ringMask;
+        }
+
+        private void SaveRingBuffer()
+        {
+            for (var i = _ringTop; i != _ringBottom; i = (i + 1) % _ringMask)
+            {
+                SaveFrame(_ringBuffer[i]);
+                _ringBuffer[i] = null;
             }
         }
 
@@ -115,7 +164,16 @@ namespace BurageSnap
         {
             if (!Monitor.TryEnter(_lockObj))
                 return;
-            SingleShot();
+            var frame = SingleShot();
+            if (frame == null)
+            {
+                timeKillEvent(timerId);
+                return;
+            }
+            if (_ringSize == 0)
+                SaveFrame(frame);
+            else
+                AddFrame(frame);
             Monitor.Exit(_lockObj);
         }
 
@@ -147,35 +205,47 @@ namespace BurageSnap
             _rectangle = new Rectangle();
         }
 
-        private void SingleShot()
+        private Frame SingleShot()
         {
             if (_hWnd == IntPtr.Zero)
                 _hWnd = FindWindow(_config.TitleHistory[0]);
             if (_hWnd == IntPtr.Zero)
-                return;
+                return null;
             using (var bmp = CaptureWindow(_hWnd))
             {
-                var now = DateTime.Now;
                 if (_rectangle.IsEmpty)
                     _rectangle = DetectGameScreen(bmp);
                 if (_rectangle.IsEmpty)
-                    return;
-                var dir = Path.Combine(_config.Folder, now.ToString(DateFormat));
-                try
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                catch
-                {
-                    return;
-                }
-                var path = Path.Combine(dir, now.ToString("yyyy-MM-dd HH-mm-ss.fff") +
-                                             (_config.Format == OutputFormat.Jpg ? ".jpg" : ".png"));
-                using (var crop = bmp.Clone(_rectangle, bmp.PixelFormat))
-                using (var fs = File.OpenWrite(path))
-                    crop.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
-                BeginInvoke(new Action(() => { labelTimeStamp.Text = now.ToString("HH:mm:ss.fff"); }));
+                    return null;
+                return new Frame { Time = ReportCaptureTime(DateTime.Now), Bitmap = bmp.Clone(_rectangle, bmp.PixelFormat) };
             }
+        }
+
+        private DateTime ReportCaptureTime(DateTime time)
+        {
+            BeginInvoke(new Action(() => { labelTimeStamp.Text = time.ToString("HH:mm:ss.fff"); }));
+            return time;
+        }
+
+        private void SaveFrame(Frame frame)
+        {
+            if (frame == null)
+                return;
+            var dir = Path.Combine(_config.Folder, frame.Time.ToString(DateFormat));
+            try
+            {
+                Directory.CreateDirectory(dir);
+            }
+            catch
+            {
+                return;
+            }
+            var path = Path.Combine(dir, frame.Time.ToString("yyyy-MM-dd HH-mm-ss.fff") +
+                                         (_config.Format == OutputFormat.Jpg ? ".jpg" : ".png"));
+            using (var fs = File.OpenWrite(path))
+                frame.Bitmap.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
+            frame.Dispose();
+
         }
 
         private IntPtr FindWindow(string title)

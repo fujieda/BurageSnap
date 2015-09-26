@@ -122,10 +122,16 @@
   <data name="buttonCancel.Text" xml:space="preserve">
     <value>キャンセル</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="label7.Text" xml:space="preserve">
+    <value>枚</value>
+  </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>リングバッファ:</value>
+  </data>
   <data name="label5.Text" xml:space="preserve">
     <value>形式:</value>
   </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="checkBoxTopMost.Text" xml:space="preserve">
     <value>最前面</value>
   </data>
@@ -133,7 +139,7 @@
     <value>出力先:</value>
   </data>
   <data name="label1.Text" xml:space="preserve">
-    <value>間隔:</value>
+    <value>撮影間隔:</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>BurageSnap 1.0 - オプション</value>

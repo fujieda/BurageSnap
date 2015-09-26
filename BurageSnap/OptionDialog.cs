@@ -26,6 +26,7 @@ namespace BurageSnap
     public partial class OptionDialog : Form
     {
         private readonly Config _config;
+        private readonly ErrorProvider _errorProvider = new ErrorProvider();
 
         public OptionDialog(Config config)
         {
@@ -37,6 +38,7 @@ namespace BurageSnap
         {
             _config.TopMost = checkBoxTopMost.Checked;
             _config.Interval = int.Parse(textBoxInterval.Text);
+            _config.RingBuffer = int.Parse(textBoxRingBuffer.Text);
             var title = comboBoxWindowTitle.Text;
             if (title != "")
             {
@@ -54,6 +56,7 @@ namespace BurageSnap
         {
             checkBoxTopMost.Checked = _config.TopMost;
             textBoxInterval.Text = _config.Interval.ToString();
+            textBoxRingBuffer.Text = _config.RingBuffer.ToString();
             comboBoxWindowTitle.Items.Clear();
             // ReSharper disable once CoVariantArrayConversion
             comboBoxWindowTitle.Items.AddRange(_config.TitleHistory);
@@ -78,11 +81,23 @@ namespace BurageSnap
             int interval;
             if (int.TryParse(textBoxInterval.Text, out interval) && 0 < interval && interval < 1000 * 1000)
             {
-                errorProvider.SetError(textBoxInterval, "");
+                _errorProvider.SetError(textBoxInterval, "");
                 return;
             }
             e.Cancel = true;
-            errorProvider.SetError(textBoxInterval, Resources.OptionDialog_textBoxInterval_Validating_Interval);
+            _errorProvider.SetError(textBoxInterval, Resources.OptionDialog_textBoxInterval_Validating_Interval);
+        }
+
+        private void textBoxRingBuffer_Validating(object sender, CancelEventArgs e)
+        {
+            int frames;
+            if (int.TryParse(textBoxRingBuffer.Text, out frames) && 0 <= frames && frames <= 100)
+            {
+                _errorProvider.SetError(textBoxRingBuffer, "");
+                return;
+            }
+            e.Cancel = true;
+            _errorProvider.SetError(textBoxRingBuffer, Resources.OptionDialog_textBoxRingBuffer_Validating);
         }
     }
 }

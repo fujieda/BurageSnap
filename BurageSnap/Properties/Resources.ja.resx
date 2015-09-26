@@ -129,4 +129,7 @@
   <data name="OptionDialog_textBoxInterval_Validating_Interval" xml:space="preserve">
     <value>間隔は1msから1000秒の間で指定してください。</value>
   </data>
+  <data name="OptionDialog_textBoxRingBuffer_Validating" xml:space="preserve">
+    <value>フレームバッファのサイズは0から100の間で指定してください。</value>
+  </data>
 </root>

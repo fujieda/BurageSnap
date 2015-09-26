@@ -34,6 +34,7 @@ namespace BurageSnap
         public Point Location { get; set; }
         public bool TopMost { get; set; }
         public int Interval { get; set; } = 1000;
+        public int RingBuffer { get; set; }
         public string[] TitleHistory { get; set; } = {"艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com"};
         public string Folder { get; set; }
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
