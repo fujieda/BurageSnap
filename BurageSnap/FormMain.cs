@@ -47,6 +47,7 @@ namespace BurageSnap
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            checkBoxContinuous.Checked = _config.Continuous;
             if (_config.Location.IsEmpty)
                 return;
             var newb = Bounds;
@@ -57,6 +58,7 @@ namespace BurageSnap
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            _config.Continuous = checkBoxContinuous.Checked;
             _config.Location = Location;
             _config.Save();
         }
@@ -83,6 +85,8 @@ namespace BurageSnap
             if (!_captureing)
             {
                 buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Stop;
+                checkBoxContinuous.Enabled = false;
+                buttonOption.Enabled = false;
                 _recorder.Start();
                 _captureing = true;
             }
@@ -90,6 +94,8 @@ namespace BurageSnap
             {
                 _recorder.Stop();
                 buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Start;
+                checkBoxContinuous.Enabled = true;
+                buttonOption.Enabled = true;
                 _captureing = false;
             }
         }

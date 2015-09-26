@@ -38,6 +38,7 @@ namespace BurageSnap
         public string[] TitleHistory { get; set; } = {"艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com"};
         public string Folder { get; set; }
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
+        public bool Continuous { get; set; }
 
         public Config()
         {
