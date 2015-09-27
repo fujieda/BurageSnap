@@ -58,6 +58,8 @@ namespace BurageSnap
             {
                 _ringBuffer.Size = _config.RingBuffer;
                 var frame = CaptureFrame(true);
+                if (frame == null)
+                    return;
                 _prevHash = ComputeHash(frame);
                 AddFrame(CaptureFrame(true));
             }
@@ -100,15 +102,15 @@ namespace BurageSnap
             if (!Monitor.TryEnter(_lockObj))
                 return;
             var frame = CaptureFrame();
-            var hash = ComputeHash(frame);
-            if (_prevHash != null && hash.SequenceEqual(_prevHash))
-                return;
-            _prevHash = hash;
             if (frame == null)
             {
                 timeKillEvent(timerId);
                 return;
             }
+            var hash = ComputeHash(frame);
+            if (hash.SequenceEqual(_prevHash))
+                return;
+            _prevHash = hash;
             if (_config.RingBuffer == 0)
                 SaveFrame(frame);
             else
@@ -128,6 +130,11 @@ namespace BurageSnap
             var bmp = initial
                 ? _screenCapture.CaptureGameScreen(_config.TitleHistory[0])
                 : _screenCapture.CaptureGameScreen();
+            if (bmp == null)
+            {
+                ReportCaptureTime(DateTime.MinValue);
+                return null;
+            }
             var now = DateTime.Now;
             ReportCaptureTime(now);
             return new Frame {Time = now, Bitmap = bmp};

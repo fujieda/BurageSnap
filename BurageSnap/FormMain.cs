@@ -42,7 +42,12 @@ namespace BurageSnap
 
         private void ReportCaptureTime(DateTime time)
         {
-            BeginInvoke(new Action(() => { labelTimeStamp.Text = time.ToString("HH:mm:ss.fff"); }));
+            BeginInvoke(new Action(() =>
+            {
+                labelTimeStamp.Text = time.ToString("HH:mm:ss.fff");
+                if (time == DateTime.MinValue && _captureing)
+                    buttonCapture.PerformClick();
+            }));
         }
 
         private void FormMain_Load(object sender, EventArgs e)
