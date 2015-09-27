@@ -33,8 +33,8 @@ namespace BurageSnap
         private static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
         public Point Location { get; set; }
         public bool TopMost { get; set; }
-        public int Interval { get; set; } = 1000;
-        public int RingBuffer { get; set; }
+        public int Interval { get; set; } = 200;
+        public int RingBuffer { get; set; } = 25;
         public string[] TitleHistory { get; set; } = {"艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com"};
         public string Folder { get; set; }
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;

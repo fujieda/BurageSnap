@@ -236,9 +236,6 @@
   <data name="textBoxInterval.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
   </data>
-  <data name="textBoxInterval.Text" xml:space="preserve">
-    <value>1000</value>
-  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="textBoxInterval.TextAlign" type="System.Windows.Forms.HorizontalAlignment, System.Windows.Forms">
     <value>Right</value>
@@ -546,9 +543,6 @@
   </data>
   <data name="textBoxRingBuffer.TabIndex" type="System.Int32, mscorlib">
     <value>26</value>
-  </data>
-  <data name="textBoxRingBuffer.Text" xml:space="preserve">
-    <value>0</value>
   </data>
   <data name="textBoxRingBuffer.TextAlign" type="System.Windows.Forms.HorizontalAlignment, System.Windows.Forms">
     <value>Right</value>
