@@ -1,4 +1,4 @@
-BurageSnap allows you to take a screenshot of browser games a.k.a ブラゲ [burʌgɛ] in Japan with just one click. It finds a window with the specified title, recognizes a game screen, and save it as a JPEG file. BurageSnap recognizes a large rectangle even with rounded or vague corners surrounded by white pixels as a game screen.
+BurageSnap allows you to take a screenshot of browser games a.k.a ブラゲ [burʌgɛ] in Japan with just one click. It finds a window with the specified title, recognizes a game screen, and save it as a JPEG or PNG file. It can also continuously capture the game screen and save as an animation GIF file. BurageSnap recognizes a large rectangle even with rounded or vague corners surrounded by white pixels as a game screen.
 
 BurageSnap can work on Vista or later versions of Windows with .NET Framework 4.5.2 or later. If your Windows version is Vista or 7, you need to install [.NET Framework 4.5.2](http://www.microsoft.com/ja-JP/download/details.aspx?id=42642).
 

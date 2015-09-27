@@ -203,8 +203,7 @@
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>274, 202</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="$this.Text" xml:space="preserve">
-    <value>BurageSnap 1.0 - オプション</value>
+    <value>BurageSnap 1.1 - オプション</value>
   </data>
 </root>
