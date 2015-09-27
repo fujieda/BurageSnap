@@ -36,9 +36,17 @@ namespace BurageSnap
 
         private void buttonOk_Click(object sender, EventArgs e)
         {
+            var ringbuffer = int.Parse(textBoxRingBuffer.Text);
+            if (checkBoxAnimationGif.Checked && ringbuffer == 0)
+            {
+                DialogResult = DialogResult.None;
+                _errorProvider.SetError(textBoxRingBuffer,
+                    Resources.OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF);
+                return;
+            }
             _config.TopMost = checkBoxTopMost.Checked;
             _config.Interval = int.Parse(textBoxInterval.Text);
-            _config.RingBuffer = int.Parse(textBoxRingBuffer.Text);
+            _config.RingBuffer = ringbuffer;
             var title = comboBoxWindowTitle.Text;
             if (title != "")
             {
@@ -50,6 +58,7 @@ namespace BurageSnap
             _config.TitleHistory = (from object item in comboBoxWindowTitle.Items select item.ToString()).ToArray();
             _config.Folder = textBoxFolder.Text;
             _config.Format = radioButtonJpg.Checked ? OutputFormat.Jpg : OutputFormat.Png;
+            _config.AnimationGif = checkBoxAnimationGif.Checked;
         }
 
         private void OptionDialog_Load(object sender, EventArgs e)
@@ -65,6 +74,7 @@ namespace BurageSnap
             textBoxFolder.Select(textBoxFolder.TextLength, 0);
             radioButtonJpg.Checked = _config.Format == OutputFormat.Jpg;
             radioButtonPng.Checked = _config.Format == OutputFormat.Png;
+            checkBoxAnimationGif.Checked = _config.AnimationGif;
         }
 
         private void buttonBrowse_Click(object sender, EventArgs e)

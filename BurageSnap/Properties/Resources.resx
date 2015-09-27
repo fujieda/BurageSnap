@@ -142,4 +142,7 @@
   <data name="OptionDialog_textBoxRingBuffer_Validating" xml:space="preserve">
     <value>The size of the ring buffer must be in the range of 0 to 100.</value>
   </data>
+  <data name="OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF" xml:space="preserve">
+    <value>The size of the ring buffer must be grater than 0 to generate animation GIF.</value>
+  </data>
 </root>

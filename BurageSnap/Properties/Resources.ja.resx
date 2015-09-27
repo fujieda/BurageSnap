@@ -132,4 +132,7 @@
   <data name="OptionDialog_textBoxRingBuffer_Validating" xml:space="preserve">
     <value>フレームバッファのサイズは0から100の間で指定してください。</value>
   </data>
+  <data name="OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF" xml:space="preserve">
+    <value>アニメーションGIFを出力するにはリングバッファのサイズを0より大きくしてください。</value>
+  </data>
 </root>

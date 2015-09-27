@@ -117,34 +117,94 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="buttonCancel.Text" xml:space="preserve">
-    <value>キャンセル</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="label7.Text" xml:space="preserve">
-    <value>枚</value>
+  <data name="label3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>42, 12</value>
   </data>
-  <data name="label6.Text" xml:space="preserve">
-    <value>リングバッファ:</value>
+  <data name="label3.Text" xml:space="preserve">
+    <value>タイトル:</value>
   </data>
-  <data name="label5.Text" xml:space="preserve">
-    <value>形式:</value>
-  </data>
-  <data name="checkBoxTopMost.Text" xml:space="preserve">
-    <value>最前面</value>
+  <data name="label4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>43, 12</value>
   </data>
   <data name="label4.Text" xml:space="preserve">
     <value>出力先:</value>
   </data>
+  <data name="label1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>55, 12</value>
+  </data>
   <data name="label1.Text" xml:space="preserve">
     <value>撮影間隔:</value>
   </data>
+  <data name="buttonBrowse.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADrwAAA68AZW8ckkAAAJaSURBVDhPbdLrT1JxHMdxtv6MHvVn1NOyZm2suUZbeKGs
+        1FXKLDLdXFqtpM3ZelBrbj1pui4uwRlqkYAgyVVQELkdQLkIOyF3B2Kfjj9OR0/63b6Pznm9z1WwP6X4
+        iKqYGK4WosPIheXIUkPIBuXY9j9H2vsUtGcAKXc/tlb7qISzR0bQoTnBYOyWlNjbTaKQeoffoRcI2HpR
+        KaqxV1ngtlxQIbYso1h3MCSwM00WqJINWzrgNj5GKf0V1bKGOfYDlcIMorZusOxgDgdqESC4dBNO7SPE
+        VgYJLOeU2NmewIZVekwg/n+gCp+hBY75B9hc7iewSI8hn3yPiLnzaCAfe8nhclGBP3sFeLTXYFd3ImJ9
+        SGAu9haZjVcIme4cDeQ2hzi8k/2MamULrp8i2ObaETZJCUxTctC+J8wjdCFobH/D0tpkws84XKA/oJQ1
+        YuV7Ayyq66CMHQSmPH3MZ7yPuOMeAou3+HeRpgY5nEmMgo68hmNGCNOUGIGFVg5GbbdB0zT8+lZ+gPb3
+        8/CWXw779EUsTV6BT9NI4KZZgsgvMQn4Fm7wA8n1Xh6OugZgnboA44QQXrWIwPCiCCF9Awl4dRJ+IOGS
+        8XDY3gOzog6GT/VYZ97FPqR0QrJNc0Gsa5v5gahTysNBUxfMk+dg+FgHz2wN/tv6sVV4NE38QMR+l4d9
+        hjYS0I+fPRII6i5jbb7Rz9LahExtaq++BWvaJqxpmpmVkIBu/BJcsyLmp2omV2Ugs2I/s90sPRj3/NWT
+        zKdrtSjPKxmc/zZ6ZunLyOl2h0J4ij3lmBEI/gJyIHBmuwLNjQAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="buttonOk.Location" type="System.Drawing.Point, System.Drawing">
+    <value>106, 167</value>
+  </data>
+  <data name="buttonCancel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>187, 167</value>
+  </data>
+  <data name="buttonCancel.Text" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="checkBoxTopMost.Size" type="System.Drawing.Size, System.Drawing">
+    <value>60, 16</value>
+  </data>
+  <data name="checkBoxTopMost.Text" xml:space="preserve">
+    <value>最前面</value>
+  </data>
+  <data name="label5.Size" type="System.Drawing.Size, System.Drawing">
+    <value>31, 12</value>
+  </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>形式:</value>
+  </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>リングバッファ:</value>
+  </data>
+  <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
+    <value>17, 12</value>
+  </data>
+  <data name="label7.Text" xml:space="preserve">
+    <value>枚</value>
+  </data>
+  <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
+    <value>12, 140</value>
+  </data>
+  <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
+    <value>31, 12</value>
+  </data>
+  <data name="label8.Text" xml:space="preserve">
+    <value>連射:</value>
+  </data>
+  <data name="checkBoxAnimationGif.Location" type="System.Drawing.Point, System.Drawing">
+    <value>60, 139</value>
+  </data>
+  <data name="checkBoxAnimationGif.Size" type="System.Drawing.Size, System.Drawing">
+    <value>131, 16</value>
+  </data>
+  <data name="checkBoxAnimationGif.Text" xml:space="preserve">
+    <value>アニメーションGIFにする</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>274, 202</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="$this.Text" xml:space="preserve">
     <value>BurageSnap 1.0 - オプション</value>
-  </data>
-  <data name="label3.Text" xml:space="preserve">
-    <value>タイトル:</value>
   </data>
 </root>

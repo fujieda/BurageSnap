@@ -64,6 +64,8 @@ namespace BurageSnap
             this.label6 = new System.Windows.Forms.Label();
             this.textBoxRingBuffer = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.checkBoxAnimationGif = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label3
@@ -166,12 +168,25 @@ namespace BurageSnap
             resources.ApplyResources(this.label7, "label7");
             this.label7.Name = "label7";
             // 
+            // label8
+            // 
+            resources.ApplyResources(this.label8, "label8");
+            this.label8.Name = "label8";
+            // 
+            // checkBoxAnimationGif
+            // 
+            resources.ApplyResources(this.checkBoxAnimationGif, "checkBoxAnimationGif");
+            this.checkBoxAnimationGif.Name = "checkBoxAnimationGif";
+            this.checkBoxAnimationGif.UseVisualStyleBackColor = true;
+            // 
             // OptionDialog
             // 
             this.AcceptButton = this.buttonOk;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
+            this.Controls.Add(this.checkBoxAnimationGif);
+            this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.textBoxRingBuffer);
             this.Controls.Add(this.label6);
@@ -219,5 +234,7 @@ namespace BurageSnap
         private System.Windows.Forms.TextBox textBoxRingBuffer;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.CheckBox checkBoxAnimationGif;
     }
 }

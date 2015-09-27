@@ -19,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -74,18 +75,6 @@ namespace BurageSnap
                 timeKillEvent(_timerId);
             if (_config.RingBuffer != 0)
                 SaveRingBuffer();
-        }
-
-        private void AddFrame(Frame frame)
-        {
-            _ringBuffer.Add(frame);
-        }
-
-        private void SaveRingBuffer()
-        {
-            foreach (var frame in _ringBuffer)
-                SaveFrame(frame);
-            _ringBuffer.Clear();
         }
 
         [DllImport("winmm.dll")]
@@ -144,20 +133,75 @@ namespace BurageSnap
         {
             if (frame == null)
                 return;
-            var dir = Path.Combine(_config.Folder, frame.Time.ToString(DateFormat));
+            using (var fs = OpenFile(frame.Time, _config.Format == OutputFormat.Jpg ? ".jpg" : ".png"))
+                frame.Bitmap.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
+            frame.Dispose();
+        }
+
+        private void AddFrame(Frame frame)
+        {
+            _ringBuffer.Add(frame);
+        }
+
+        private void SaveRingBuffer()
+        {
+            if (_config.AnimationGif)
+            {
+                SaveRingBufferAsAnimattionGif();
+                return;
+            }
+            foreach (var frame in _ringBuffer)
+                SaveFrame(frame);
+            _ringBuffer.Clear();
+        }
+
+        private void SaveRingBufferAsAnimattionGif()
+        {
+            var encoder = new AnimationGifEncoder();
+            Frame prev = null;
+            foreach (var frame in _ringBuffer)
+            {
+                var bmp = frame.Bitmap;
+                frame.Bitmap = ReduceSize(bmp);
+                bmp.Dispose();
+                if (prev == null)
+                    encoder.Start(OpenFile(frame.Time, ".gif"));
+                if (prev != null)
+                    encoder.AddFrame(prev.Bitmap, (int)((frame.Time - prev.Time).TotalMilliseconds / 10.0));
+                prev = frame;
+            }
+            if (prev != null)
+                encoder.AddFrame(prev.Bitmap, 0);
+            encoder.Finish();
+            _ringBuffer.Clear();
+        }
+
+        private Stream OpenFile(DateTime time, string ext)
+        {
+            var dir = Path.Combine(_config.Folder, time.ToString(DateFormat));
             try
             {
                 Directory.CreateDirectory(dir);
             }
             catch
             {
-                return;
+                return null;
             }
-            var path = Path.Combine(dir, frame.Time.ToString("yyyy-MM-dd HH-mm-ss.fff") +
-                                         (_config.Format == OutputFormat.Jpg ? ".jpg" : ".png"));
-            using (var fs = File.OpenWrite(path))
-                frame.Bitmap.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
-            frame.Dispose();
+            return File.OpenWrite(Path.Combine(dir, time.ToString("yyyy-MM-dd HH-mm-ss.fff") + ext));
+        }
+
+        private Bitmap ReduceSize(Bitmap bmp)
+        {
+            var half = new Bitmap(bmp.Width / 2, bmp.Height / 2, PixelFormat.Format24bppRgb);
+            using (var g = Graphics.FromImage(half))
+            {
+                g.CompositingQuality = CompositingQuality.HighQuality;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.DrawImage(bmp, 0, 0, half.Width, half.Height);
+            }
+            return half;
         }
 
         private class RingBuffer : IEnumerable<Frame>

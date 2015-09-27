@@ -39,6 +39,7 @@ namespace BurageSnap
         public string Folder { get; set; }
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
         public bool Continuous { get; set; }
+        public bool AnimationGif { get; set; }
 
         public Config()
         {
