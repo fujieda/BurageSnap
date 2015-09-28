@@ -134,74 +134,76 @@ namespace BurageSnap
                 }
             }
             bmp.UnlockBits(data);
-            const int corner = 40;
-            for (var y = 0; y < height; y++)
+            var rect = new Rectangle();
+            for (var y = 0; y < height - 1; y++)
             {
                 var n = 0;
                 for (var x = 0; x < width; x++)
                 {
-                    if ((map[y, x] & 1) == 1)
-                    {
-                        if (++n >= corner)
-                            map[y, x - corner + 1] |= 2;
-                    }
-                    else
-                    {
-                        n = 0;
-                    }
+                    if (!(map[y, x] == 1 && map[y + 1, x] == 0))
+                        continue;
+                    if (++n < WidthMin * 2 / 3)
+                        continue;
+                    rect.Y = y + 1;
+                    break;
                 }
+                if (rect.Y != 0)
+                    break;
             }
-            for (var x = 0; x < width; x++)
+            if (rect.Y == 0)
+                return Rectangle.Empty;
+            for (var y = rect.Y; y < height - 1; y++)
+            {
+                var n = 0;
+                for (var x = 0; x < width; x++)
+                {
+                    if (!(map[y, x] == 0 && map[y + 1, x] == 1))
+                        continue;
+                    if (++n < WidthMin * 2 / 3)
+                        continue;
+                    rect.Height = y - rect.Y + 1;
+                    break;
+                }
+                if (rect.Height != 0)
+                    break;
+            }
+            if (rect.Height == 0)
+                return Rectangle.Empty;
+            for (var x = 0; x < width - 1; x++)
             {
                 var n = 0;
                 for (var y = 0; y < height; y++)
                 {
-                    if ((map[y, x] & 1) == 1)
-                    {
-                        if (++n >= corner)
-                            map[y - corner + 1, x] |= 4;
-                    }
-                    else
-                    {
-                        n = 0;
-                    }
-                }
-            }
-            var rect = new Rectangle();
-            var found = false;
-            for (var y = 0; y < height - corner; y++)
-            {
-                for (var x = 0; x < height - corner; x++)
-                {
-                    if (!(map[y, x] == 7 && map[y + 1, x + 1] == 0))
+                    if (!(map[y, x] == 1 && map[y, x + 1] == 0))
+                        continue;
+                    if (++n < HeightMin * 2 / 3)
                         continue;
                     rect.X = x + 1;
-                    rect.Y = y + 1;
-                    for (var x1 = rect.X; x1 < width; x1++)
-                    {
-                        if ((map[rect.Y, x1] & 4) == 0)
-                            continue;
-                        rect.Width = x1 - rect.X;
-                        break;
-                    }
-                    if (rect.Width < WidthMin)
-                        continue;
-                    for (var y1 = rect.Y; y1 < height; y1++)
-                    {
-                        if ((map[y1, rect.X] & 2) == 0)
-                            continue;
-                        rect.Height = y1 - rect.Y;
-                        break;
-                    }
-                    if (rect.Height < HeightMin)
-                        continue;
-                    found = true;
                     break;
                 }
-                if (found)
+                if (rect.X != 0)
                     break;
             }
-            return found ? rect : Rectangle.Empty;
+            if (rect.X == 0)
+                return Rectangle.Empty;
+            for (var x = rect.X; x < width - 1; x++)
+            {
+                var n = 0;
+                for (var y = 0; y < height; y++)
+                {
+                    if (!(map[y, x] == 0 && map[y, x + 1] == 1))
+                        continue;
+                    if (++n < HeightMin * 2 / 3)
+                        continue;
+                    rect.Width = x - rect.X + 1;
+                    break;
+                }
+                if (rect.Width != 0)
+                    break;
+            }
+            if (rect.Width < WidthMin || rect.Height < HeightMin)
+                return Rectangle.Empty;
+            return rect;
         }
     }
 }
