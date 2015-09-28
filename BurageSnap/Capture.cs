@@ -91,31 +91,16 @@ namespace BurageSnap
 
         public static Bitmap CaptureWindow(IntPtr hWnd)
         {
-            var winDC = GetWindowDC(hWnd);
             var rect = new Rect();
             GetWindowRect(hWnd, ref rect);
-            var bmp = new Bitmap(rect.Right - rect.Left, rect.Bottom - rect.Top, PixelFormat.Format32bppArgb);
-            var g = Graphics.FromImage(bmp);
-            var hDC = g.GetHdc();
-            BitBlt(hDC, 0, 0, bmp.Width, bmp.Height, winDC, 0, 0, SRCCOPY);
-            g.ReleaseHdc(hDC);
-            g.Dispose();
-            ReleaseDC(hWnd, winDC);
+            var width = rect.Right - rect.Left;
+            var height = rect.Bottom - rect.Top;
+            var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            using (var g = Graphics.FromImage(bmp))
+                g.CopyFromScreen(rect.Left, rect.Top, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
+            bmp.Save("debug.jpg", ImageFormat.Jpeg);
             return bmp;
         }
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetWindowDC(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr ReleaseDC(IntPtr hWnd, IntPtr hDC);
-
-        // ReSharper disable once InconsistentNaming
-        private const int SRCCOPY = 0xcc0020;
-
-        [DllImport("gdi32.dll")]
-        private static extern int BitBlt(IntPtr hDestDC, int x, int y, int nWidth, int nHeight,
-            IntPtr hSrcDC, int xSrc, int ySrc, int dwRop);
 
         [DllImport("user32.dll")]
         private static extern int GetWindowRect(IntPtr hWnd, ref Rect lpRec);
