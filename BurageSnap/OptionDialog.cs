@@ -44,6 +44,7 @@ namespace BurageSnap
                     Resources.OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF);
                 return;
             }
+            _errorProvider.SetError(textBoxRingBuffer, "");
             _config.TopMost = checkBoxTopMost.Checked;
             _config.Interval = int.Parse(textBoxInterval.Text);
             _config.RingBuffer = ringbuffer;
