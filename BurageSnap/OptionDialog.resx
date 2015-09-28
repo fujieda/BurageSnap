@@ -653,7 +653,7 @@
     <value>274, 200</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>BurageSnap 1.1 - Options</value>
+    <value>BurageSnap 1.2 - Options</value>
   </data>
   <data name="&gt;&gt;folderBrowserDialog.Name" xml:space="preserve">
     <value>folderBrowserDialog</value>
