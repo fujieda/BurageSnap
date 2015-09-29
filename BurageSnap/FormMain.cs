@@ -115,7 +115,7 @@ namespace BurageSnap
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
             var now = DateTime.Now;
-            var dir = now.ToString(Recorder.DateFormat);
+            var dir = Path.Combine(_config.Folder, now.ToString(Recorder.DateFormat));
             try
             {
                 Directory.CreateDirectory(dir);
