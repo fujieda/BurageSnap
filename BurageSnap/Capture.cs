@@ -98,7 +98,6 @@ namespace BurageSnap
             var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
             using (var g = Graphics.FromImage(bmp))
                 g.CopyFromScreen(rect.Left, rect.Top, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
-            bmp.Save("debug.jpg", ImageFormat.Jpeg);
             return bmp;
         }
 
