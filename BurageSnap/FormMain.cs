@@ -52,6 +52,7 @@ namespace BurageSnap
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            TopMost = _config.TopMost;
             checkBoxContinuous.Checked = _config.Continuous;
             if (_config.Location.IsEmpty)
                 return;
