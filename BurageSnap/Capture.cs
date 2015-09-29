@@ -133,76 +133,110 @@ namespace BurageSnap
                 }
             }
             bmp.UnlockBits(data);
-            var rect = new Rectangle();
             for (var y = 0; y < height - 1; y++)
             {
-                var n = 0;
-                for (var x = 0; x < width; x++)
+                var rect = Rectangle.Empty;
+                if (!CheckEdge(map, 0, width, y, y, Edge.HorizontalTop))
+                    continue;
+                rect.Y = y + 1;
+                for (var x = 0; x < width - 1; x++)
                 {
-                    if (!(map[y, x] == 1 && map[y + 1, x] == 0))
-                        continue;
-                    if (++n < WidthMin * 2 / 3)
-                        continue;
-                    rect.Y = y + 1;
-                    break;
-                }
-                if (rect.Y != 0)
-                    break;
-            }
-            if (rect.Y == 0)
-                return Rectangle.Empty;
-            for (var y = rect.Y; y < height - 1; y++)
-            {
-                var n = 0;
-                for (var x = 0; x < width; x++)
-                {
-                    if (!(map[y, x] == 0 && map[y + 1, x] == 1))
-                        continue;
-                    if (++n < WidthMin * 2 / 3)
-                        continue;
-                    rect.Height = y - rect.Y + 1;
-                    break;
-                }
-                if (rect.Height != 0)
-                    break;
-            }
-            if (rect.Height == 0)
-                return Rectangle.Empty;
-            for (var x = 0; x < width - 1; x++)
-            {
-                var n = 0;
-                for (var y = 0; y < height; y++)
-                {
-                    if (!(map[y, x] == 1 && map[y, x + 1] == 0))
-                        continue;
-                    if (++n < HeightMin * 2 / 3)
+                    if (!CheckEdge(map, x, x, rect.Y, height, Edge.VerticalLeft))
                         continue;
                     rect.X = x + 1;
-                    break;
-                }
-                if (rect.X != 0)
-                    break;
-            }
-            if (rect.X == 0)
-                return Rectangle.Empty;
-            for (var x = rect.X; x < width - 1; x++)
-            {
-                var n = 0;
-                for (var y = 0; y < height; y++)
-                {
-                    if (!(map[y, x] == 0 && map[y, x + 1] == 1))
+                    rect = FindBottomAndRight(map, rect);
+                    if (rect == Rectangle.Empty)
                         continue;
-                    if (++n < HeightMin * 2 / 3)
+                    if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalTop))
+                        break;
+                    if (CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
+                        return rect;
+                }
+            }
+            return Rectangle.Empty;
+        }
+
+        private Rectangle FindBottomAndRight(byte[,] map, Rectangle rect)
+        {
+            var height = map.GetLength(0);
+            var width = map.GetLength(1);
+            for (var y = rect.Y; y < height - 1; y++)
+            {
+                if (!CheckEdge(map, rect.X, width, y, y, Edge.HorizontalBottom))
+                    continue;
+                rect.Height = y - rect.Y + 1;
+                rect.Width = 0;
+                for (var x = rect.X; x < width - 1; x++)
+                {
+                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight))
                         continue;
                     rect.Width = x - rect.X + 1;
                     break;
                 }
-                if (rect.Width != 0)
-                    break;
+                if (rect.Width == 0)
+                    return Rectangle.Empty;
+                if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom))
+                    continue;
+                return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
             }
-            if (rect.Width < WidthMin || rect.Height < HeightMin)
-                return Rectangle.Empty;
-            return rect;
+            return Rectangle.Empty;
+        }
+
+        private bool CheckEdge(byte[,] map, int left, int right, int top, int bottom, Edge edge)
+        {
+            var n = 0;
+            switch (edge)
+            {
+                case Edge.HorizontalTop:
+                    for (; left < right; left++)
+                    {
+                        if (!(map[top, left] == 1 && map[top + 1, left] == 0))
+                            continue;
+                        if (++n < WidthMin * 2 / 3)
+                            continue;
+                        return true;
+                    }
+                    return false;
+                case Edge.VerticalLeft:
+                    for (; top < bottom; top++)
+                    {
+                        if (!(map[top, left] == 1 && map[top, left + 1] == 0))
+                            continue;
+                        if (++n < HeightMin * 2 / 3)
+                            continue;
+                        return true;
+                    }
+                    return false;
+                case Edge.HorizontalBottom:
+                    for (; left < right; left++)
+                    {
+                        if (!(map[bottom, left] == 0 && map[bottom + 1, left] == 1))
+                            continue;
+                        if (++n < WidthMin * 2 / 3)
+                            continue;
+                        return true;
+                    }
+                    return false;
+                case Edge.VerticalRight:
+                    for (; top < bottom; top++)
+                    {
+                        if (!(map[top, right] == 0 && map[top, right + 1] == 1))
+                            continue;
+                        if (++n < HeightMin * 2 / 3)
+                            continue;
+                        return true;
+                    }
+                    return false;
+            }
+            return false;
+        }
+
+        private enum Edge
+        {
+            HorizontalTop,
+            VerticalLeft,
+            HorizontalBottom,
+            VerticalRight
         }
     }
 }
