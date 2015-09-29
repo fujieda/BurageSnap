@@ -105,6 +105,8 @@ namespace BurageSnap
             this.Controls.Add(this.buttonBrowse);
             this.Controls.Add(this.buttonOption);
             this.Controls.Add(this.buttonCapture);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "FormMain";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.Load += new System.EventHandler(this.FormMain_Load);
