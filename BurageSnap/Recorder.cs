@@ -74,7 +74,8 @@ namespace BurageSnap
             }
             var dummy = 0u;
             _timeProc = TimerCallback; // avoid to be collected by GC
-            _timerId = timeSetEvent(_config.Interval == 0 ? 1u : (uint)_config.Interval, 0, _timeProc, ref dummy, 1);
+            _timerId = timeSetEvent(_config.Interval == 0 ? 1u : (uint)_config.Interval, 0, _timeProc, ref dummy,
+                TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
         }
 
         public void Stop()
@@ -94,6 +95,11 @@ namespace BurageSnap
         [DllImport("winmm.dll")]
         private static extern uint timeKillEvent(uint timerId);
 
+        // ReSharper disable InconsistentNaming
+        private const int TIME_PERIODIC = 0x0001;
+        private const int TIME_KILL_SYNCHRONOUS = 0x0100;
+        // ReSharper restore InconsistentNaming
+
         private void TimerCallback(uint timerId, uint msg, ref uint user, ref uint rsv1, uint rsv2)
         {
             if (!Monitor.TryEnter(_lockObj))
@@ -102,9 +108,8 @@ namespace BurageSnap
             if (frame == null)
             {
                 timeKillEvent(timerId);
-                return;
             }
-            if (_config.RingBuffer == 0)
+            else if (_config.RingBuffer == 0)
             {
                 if (!SaveFrame(frame))
                 {
