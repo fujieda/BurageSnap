@@ -127,7 +127,7 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
-        ///   Interval must be in the range of 1 ms to 1000 sec. に類似しているローカライズされた文字列を検索します。
+        ///   Interval must be in the range of 10 ms to 1000 sec. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string OptionDialog_textBoxInterval_Validating_Interval {
             get {

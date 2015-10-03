@@ -137,7 +137,7 @@
     <value>Capture</value>
   </data>
   <data name="OptionDialog_textBoxInterval_Validating_Interval" xml:space="preserve">
-    <value>Interval must be in the range of 1 ms to 1000 sec.</value>
+    <value>Interval must be in the range of 10 ms to 1000 sec.</value>
   </data>
   <data name="OptionDialog_textBoxRingBuffer_Validating" xml:space="preserve">
     <value>The size of the ring buffer must be in the range of 0 to 100.</value>

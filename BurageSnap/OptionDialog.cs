@@ -90,7 +90,7 @@ namespace BurageSnap
         private void textBoxInterval_Validating(object sender, CancelEventArgs e)
         {
             int interval;
-            if (int.TryParse(textBoxInterval.Text, out interval) && 0 < interval && interval < 1000 * 1000)
+            if (int.TryParse(textBoxInterval.Text, out interval) && 10 <= interval && interval < 1000 * 1000)
             {
                 _errorProvider.SetError(textBoxInterval, "");
                 return;
