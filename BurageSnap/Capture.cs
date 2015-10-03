@@ -119,7 +119,7 @@ namespace BurageSnap
             var width = bmp.Width;
             var map = new byte[height, width];
             var data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppArgb);
+                PixelFormat.Format24bppRgb);
             unsafe
             {
                 var ptr = (byte*)data.Scan0;
@@ -127,7 +127,7 @@ namespace BurageSnap
                 {
                     for (var x = 0; x < data.Width; x++)
                     {
-                        var p = ptr + y * data.Stride + x * 4;
+                        var p = ptr + y * data.Stride + x * 3;
                         map[y, x] = (byte)(p[0] == 255 && p[1] == 255 && p[2] == 255 ? 1 : 0);
                     }
                 }
