@@ -145,4 +145,7 @@
   <data name="OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF" xml:space="preserve">
     <value>The size of the ring buffer must be grater than 0 to generate animation GIF.</value>
   </data>
+  <data name="Recorder_IO_Error" xml:space="preserve">
+    <value>I/O Error</value>
+  </data>
 </root>

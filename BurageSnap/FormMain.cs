@@ -37,16 +37,27 @@ namespace BurageSnap
             InitializeComponent();
             _config = Config.Load();
             _optionDialog = new OptionDialog(_config);
-            _recorder = new Recorder(_config) {ReportCaptureTime = ReportCaptureTime};
+            _recorder = new Recorder(_config) {ReportCaptureResult = ReportCaptureResult};
         }
 
-        private void ReportCaptureTime(DateTime time)
+        private void ReportCaptureResult(object obj)
         {
             BeginInvoke(new Action(() =>
             {
-                labelTimeStamp.Text = time.ToString("HH:mm:ss.fff");
-                if (time == DateTime.MinValue && _captureing)
-                    buttonCapture.PerformClick();
+                if (obj is DateTime)
+                {
+                    var time = (DateTime)obj;
+                    labelTimeStamp.Text = time.ToString("HH:mm:ss.fff");
+                    if (time == DateTime.MinValue && _captureing)
+                        buttonCapture.PerformClick();
+                }
+                // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
+                else if (obj is string)
+                {
+                    labelTimeStamp.Text = (string)obj;
+                    if (_captureing)
+                        buttonCapture.PerformClick();
+                }
             }));
         }
 

@@ -143,5 +143,14 @@ namespace BurageSnap.Properties {
                 return ResourceManager.GetString("OptionDialog_textBoxRingBuffer_Validating", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   I/O Error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Recorder_IO_Error {
+            get {
+                return ResourceManager.GetString("Recorder_IO_Error", resourceCulture);
+            }
+        }
     }
 }

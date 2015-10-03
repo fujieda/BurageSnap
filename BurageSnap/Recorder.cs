@@ -22,8 +22,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using BurageSnap.Properties;
 
 namespace BurageSnap
 {
@@ -36,7 +38,7 @@ namespace BurageSnap
         private uint _timerId;
         private TimeProc _timeProc;
         private readonly object _lockObj = new object();
-        public Action<DateTime> ReportCaptureTime { private get; set; }
+        public Action<object> ReportCaptureResult { private get; set; }
 
         public Recorder(Config config)
         {
@@ -45,7 +47,8 @@ namespace BurageSnap
 
         public void OneShot()
         {
-            SaveFrame(CaptureFrame(true));
+            if (!SaveFrame(CaptureFrame(true)))
+                ReportCaptureResult(Resources.Recorder_IO_Error);
         }
 
         public void Start()
@@ -55,7 +58,11 @@ namespace BurageSnap
                 var frame = CaptureFrame(true);
                 if (frame == null)
                     return;
-                SaveFrame(frame);
+                if (!SaveFrame(frame))
+                {
+                    ReportCaptureResult(Resources.Recorder_IO_Error);
+                    return;
+                }
             }
             else
             {
@@ -74,8 +81,8 @@ namespace BurageSnap
         {
             if (_timerId != 0)
                 timeKillEvent(_timerId);
-            if (_config.RingBuffer != 0)
-                SaveRingBuffer();
+            if (_config.RingBuffer != 0 && !SaveRingBuffer())
+                ReportCaptureResult(Resources.Recorder_IO_Error);
         }
 
         [DllImport("winmm.dll")]
@@ -98,7 +105,13 @@ namespace BurageSnap
                 return;
             }
             if (_config.RingBuffer == 0)
-                SaveFrame(frame);
+            {
+                if (!SaveFrame(frame))
+                {
+                    timeKillEvent(timerId);
+                    ReportCaptureResult(Resources.Recorder_IO_Error);
+                }
+            }
             else
                 AddFrame(frame);
             Monitor.Exit(_lockObj);
@@ -111,21 +124,32 @@ namespace BurageSnap
                 : _screenCapture.CaptureGameScreen();
             if (bmp == null)
             {
-                ReportCaptureTime(DateTime.MinValue);
+                ReportCaptureResult(DateTime.MinValue);
                 return null;
             }
             var now = DateTime.Now;
-            ReportCaptureTime(now);
+            ReportCaptureResult(now);
             return new Frame {Time = now, Bitmap = bmp};
         }
 
-        private void SaveFrame(Frame frame)
+        private bool SaveFrame(Frame frame)
         {
             if (frame == null)
-                return;
-            using (var fs = OpenFile(frame.Time, _config.Format == OutputFormat.Jpg ? ".jpg" : ".png"))
-                frame.Bitmap.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
-            frame.Dispose();
+                return true;
+            try
+            {
+                using (var fs = OpenFile(frame.Time, _config.Format == OutputFormat.Jpg ? ".jpg" : ".png"))
+                    frame.Bitmap.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            finally
+            {
+                frame.Dispose();
+            }
+            return true;
         }
 
         private void AddFrame(Frame frame)
@@ -133,50 +157,58 @@ namespace BurageSnap
             _ringBuffer.Add(frame);
         }
 
-        private void SaveRingBuffer()
+        private bool SaveRingBuffer()
         {
             if (_config.AnimationGif)
+                return SaveRingBufferAsAnimattionGif();
+            try
             {
-                SaveRingBufferAsAnimattionGif();
-                return;
+                if (_ringBuffer.Any(frame => !SaveFrame(frame)))
+                    return false;
             }
-            foreach (var frame in _ringBuffer)
-                SaveFrame(frame);
-            _ringBuffer.Clear();
+            finally
+            {
+                _ringBuffer.Clear();
+            }
+            return true;
         }
 
-        private void SaveRingBufferAsAnimattionGif()
+        private bool SaveRingBufferAsAnimattionGif()
         {
             var encoder = new AnimationGifEncoder();
-            Frame prev = null;
-            foreach (var frame in _ringBuffer)
+            try
             {
-                var bmp = frame.Bitmap;
-                frame.Bitmap = ReduceSize(bmp);
-                bmp.Dispose();
-                if (prev == null)
-                    encoder.Start(OpenFile(frame.Time, ".gif"));
+                Frame prev = null;
+                foreach (var frame in _ringBuffer)
+                {
+                    var bmp = frame.Bitmap;
+                    frame.Bitmap = ReduceSize(bmp);
+                    bmp.Dispose();
+                    if (prev == null)
+                        encoder.Start(OpenFile(frame.Time, ".gif"));
+                    if (prev != null)
+                        encoder.AddFrame(prev.Bitmap, (int)((frame.Time - prev.Time).TotalMilliseconds / 10.0));
+                    prev = frame;
+                }
                 if (prev != null)
-                    encoder.AddFrame(prev.Bitmap, (int)((frame.Time - prev.Time).TotalMilliseconds / 10.0));
-                prev = frame;
+                    encoder.AddFrame(prev.Bitmap, 0);
             }
-            if (prev != null)
-                encoder.AddFrame(prev.Bitmap, 0);
-            encoder.Finish();
-            _ringBuffer.Clear();
+            catch (IOException)
+            {
+                return false;
+            }
+            finally
+            {
+                encoder.Finish();
+                _ringBuffer.Clear();
+            }
+            return true;
         }
 
         private Stream OpenFile(DateTime time, string ext)
         {
             var dir = Path.Combine(_config.Folder, time.ToString(DateFormat));
-            try
-            {
-                Directory.CreateDirectory(dir);
-            }
-            catch
-            {
-                return null;
-            }
+            Directory.CreateDirectory(dir);
             return File.OpenWrite(Path.Combine(dir, time.ToString("yyyy-MM-dd HH-mm-ss.fff") + ext));
         }
 

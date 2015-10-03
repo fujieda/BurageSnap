@@ -135,4 +135,7 @@
   <data name="OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF" xml:space="preserve">
     <value>アニメーションGIFを出力するにはリングバッファのサイズを0より大きくしてください。</value>
   </data>
+  <data name="Recorder_IO_Error" xml:space="preserve">
+    <value>I/Oエラー</value>
+  </data>
 </root>
