@@ -78,11 +78,18 @@ namespace BurageSnap
                 TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
         }
 
-        public void Stop()
+        public void Stop(bool discard = false)
         {
             if (_timerId != 0)
                 timeKillEvent(_timerId);
-            if (_config.RingBuffer != 0 && !SaveRingBuffer())
+            if (_config.RingBuffer == 0)
+                return;
+            if (discard)
+            {
+                _ringBuffer.Clear();
+                return;
+            }
+            if (!SaveRingBuffer())
                 ReportCaptureResult(Resources.Recorder_IO_Error);
         }
 

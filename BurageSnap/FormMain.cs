@@ -29,6 +29,7 @@ namespace BurageSnap
     {
         private readonly Config _config;
         private readonly OptionDialog _optionDialog;
+        private readonly ConfirmDialog _confirmDialog = new ConfirmDialog();
         private readonly Recorder _recorder;
         private bool _captureing;
 
@@ -49,14 +50,14 @@ namespace BurageSnap
                     var time = (DateTime)obj;
                     labelTimeStamp.Text = time.ToString("HH:mm:ss.fff");
                     if (time == DateTime.MinValue && _captureing)
-                        buttonCapture.PerformClick();
+                        AbortRecording();
                 }
                 // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
                 else if (obj is string)
                 {
                     labelTimeStamp.Text = (string)obj;
                     if (_captureing)
-                        buttonCapture.PerformClick();
+                        AbortRecording();
                 }
             }));
         }
@@ -109,12 +110,17 @@ namespace BurageSnap
             }
             else
             {
-                _recorder.Stop();
-                buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Start;
-                checkBoxContinuous.Enabled = true;
-                buttonOption.Enabled = true;
-                _captureing = false;
+                _recorder.Stop(_config.RingBuffer == 0 || _confirmDialog.ShowDialog(this) != DialogResult.Yes);
+                AbortRecording();
             }
+        }
+
+        private void AbortRecording()
+        {
+            buttonCapture.Text = Resources.FormMain_buttonCapture_Click_Start;
+            checkBoxContinuous.Enabled = true;
+            buttonOption.Enabled = true;
+            _captureing = false;
         }
 
         private void checkBoxContinuous_CheckedChanged(object sender, EventArgs e)
