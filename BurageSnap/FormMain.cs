@@ -110,7 +110,14 @@ namespace BurageSnap
             }
             else
             {
-                _recorder.Stop(_config.RingBuffer == 0 || _confirmDialog.ShowDialog(this) != DialogResult.Yes);
+                _recorder.Stop();
+                if (_config.RingBuffer > 0)
+                {
+                   if (_confirmDialog.ShowDialog(this) == DialogResult.Yes)
+                        _recorder.SaveBuffer();
+                   else
+                        _recorder.DiscardBuffer();
+                }
                 AbortRecording();
             }
         }
