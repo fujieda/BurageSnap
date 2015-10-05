@@ -124,7 +124,7 @@
     <value>停止</value>
   </data>
   <data name="FormMain_checkBoxContinuous_CheckedChanged_Capture" xml:space="preserve">
-    <value>キャプチャ</value>
+    <value>撮影</value>
   </data>
   <data name="OptionDialog_textBoxInterval_Validating_Interval" xml:space="preserve">
     <value>間隔は10msから1000秒の間で指定してください。</value>
