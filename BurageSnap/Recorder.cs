@@ -22,7 +22,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using BurageSnap.Properties;
@@ -47,8 +46,7 @@ namespace BurageSnap
 
         public void OneShot()
         {
-            if (!SaveFrame(CaptureFrame(true)))
-                ReportCaptureResult(Resources.Recorder_IO_Error);
+            SaveFrame(CaptureFrame(true));
         }
 
         public void Start()
@@ -59,10 +57,7 @@ namespace BurageSnap
                 if (frame == null)
                     return;
                 if (!SaveFrame(frame))
-                {
-                    ReportCaptureResult(Resources.Recorder_IO_Error);
                     return;
-                }
             }
             else
             {
@@ -82,12 +77,6 @@ namespace BurageSnap
         {
             if (_timerId != 0)
                 timeKillEvent(_timerId);
-        }
-
-        public void SaveBuffer()
-        {
-            if (!SaveRingBuffer())
-                ReportCaptureResult(Resources.Recorder_IO_Error);
         }
 
         public void DiscardBuffer()
@@ -121,13 +110,12 @@ namespace BurageSnap
             else if (_config.RingBuffer == 0)
             {
                 if (!SaveFrame(frame))
-                {
                     timeKillEvent(timerId);
-                    ReportCaptureResult(Resources.Recorder_IO_Error);
-                }
             }
             else
+            {
                 AddFrame(frame);
+            }
             Monitor.Exit(_lockObj);
         }
 
@@ -157,6 +145,7 @@ namespace BurageSnap
             }
             catch (IOException)
             {
+                ReportCaptureResult(Resources.Recorder_IO_Error);
                 return false;
             }
             finally
@@ -171,23 +160,22 @@ namespace BurageSnap
             _ringBuffer.Add(frame);
         }
 
-        private bool SaveRingBuffer()
+        public void SaveBuffer()
         {
             if (_config.AnimationGif)
-                return SaveRingBufferAsAnimattionGif();
-            try
             {
-                if (_ringBuffer.Any(frame => !SaveFrame(frame)))
-                    return false;
+                SaveRingBufferAsAnimattionGif();
             }
-            finally
+            else
             {
-                _ringBuffer.Clear();
+                foreach (var frame in _ringBuffer)
+                    if (!SaveFrame(frame))
+                        break;
             }
-            return true;
+            _ringBuffer.Clear();
         }
 
-        private bool SaveRingBufferAsAnimattionGif()
+        private void SaveRingBufferAsAnimattionGif()
         {
             var encoder = new AnimationGifEncoder();
             try
@@ -209,14 +197,13 @@ namespace BurageSnap
             }
             catch (IOException)
             {
-                return false;
+                ReportCaptureResult(Resources.Recorder_IO_Error);
             }
             finally
             {
                 encoder.Finish();
                 _ringBuffer.Clear();
             }
-            return true;
         }
 
         private Stream OpenFile(DateTime time, string ext)
