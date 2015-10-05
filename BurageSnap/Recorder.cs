@@ -51,21 +51,18 @@ namespace BurageSnap
 
         public void Start()
         {
+            var frame = CaptureFrame(true);
+            if (frame == null)
+                return;
             if (_config.RingBuffer == 0)
             {
-                var frame = CaptureFrame(true);
-                if (frame == null)
-                    return;
                 if (!SaveFrame(frame))
                     return;
             }
             else
             {
                 _ringBuffer.Size = _config.RingBuffer;
-                var frame = CaptureFrame(true);
-                if (frame == null)
-                    return;
-                AddFrame(CaptureFrame(true));
+                AddFrame(frame);
             }
             var dummy = 0u;
             _timeProc = TimerCallback; // avoid to be collected by GC
