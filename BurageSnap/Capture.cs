@@ -149,8 +149,10 @@ namespace BurageSnap
                         continue;
                     if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalTop))
                         break;
-                    if (CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
-                        return rect;
+                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
+                        continue;
+                    RoundUpRectangle(map, ref rect);
+                    return rect;
                 }
             }
             return Rectangle.Empty;
@@ -237,6 +239,42 @@ namespace BurageSnap
             VerticalLeft,
             HorizontalBottom,
             VerticalRight
+        }
+
+        public void RoundUpRectangle(byte[,] map, ref Rectangle rect)
+        {
+            var r = rect.Height % 10;
+            if (r != 0)
+            {
+                var top = 0;
+                var bottom = 0;
+                for (var x = rect.X; x < rect.Right; x++)
+                {
+                    if (map[rect.Top - 1, x] == 1)
+                        top++;
+                    if (map[rect.Bottom + 1, x] == 1)
+                        bottom++;
+                }
+                rect.Height += 10 - r;
+                if (top <= bottom) // expand unbiguous edge
+                    rect.Y -= 10 - r;
+            }
+            r = rect.Width % 10;
+            if (r != 0)
+            {
+                var left = 0;
+                var right = 0;
+                for (var y = rect.Y; y < rect.Bottom; y++)
+                {
+                    if (map[y, rect.Left - 1] == 1)
+                        left++;
+                    if (map[y, rect.Right + 1] == 1)
+                        right++;
+                }
+                rect.Width += 10 - r;
+                if (right <= left) // expand unbiguous edge
+                    rect.X -= 10 - r;
+            }
         }
     }
 }
