@@ -192,7 +192,7 @@ namespace BurageSnap
                     {
                         if (!(map[top, left] == 1 && map[top + 1, left] == 0))
                             continue;
-                        if (++n < WidthMin * 2 / 3)
+                        if (++n < WidthMin / 3)
                             continue;
                         return true;
                     }
@@ -202,7 +202,7 @@ namespace BurageSnap
                     {
                         if (!(map[top, left] == 1 && map[top, left + 1] == 0))
                             continue;
-                        if (++n < HeightMin * 2 / 3)
+                        if (++n < HeightMin / 3)
                             continue;
                         return true;
                     }
@@ -212,7 +212,7 @@ namespace BurageSnap
                     {
                         if (!(map[bottom, left] == 0 && map[bottom + 1, left] == 1))
                             continue;
-                        if (++n < WidthMin * 2 / 3)
+                        if (++n < WidthMin / 3)
                             continue;
                         return true;
                     }
@@ -222,7 +222,7 @@ namespace BurageSnap
                     {
                         if (!(map[top, right] == 0 && map[top, right + 1] == 1))
                             continue;
-                        if (++n < HeightMin * 2 / 3)
+                        if (++n < HeightMin / 3)
                             continue;
                         return true;
                     }
