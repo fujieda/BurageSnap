@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -201,6 +202,20 @@ namespace BurageSnap
                 encoder.Finish();
                 _ringBuffer.Clear();
             }
+        }
+
+        public void GenerateAnimationGifFromFiles()
+        {
+            _ringBuffer.Size = _config.RingBuffer;
+            foreach (var path in Directory.EnumerateFiles(DateTime.Now.ToString(DateFormat)))
+            {
+                if (!path.EndsWith(".png"))
+                    continue;
+                var name = Path.GetFileNameWithoutExtension(path);
+                var date = DateTime.ParseExact(name, "yyyy-MM-dd HH-mm-ss.fff", CultureInfo.InvariantCulture);
+                _ringBuffer.Add(new Frame {Time = date, Bitmap = new Bitmap(path)});
+            }
+            SaveRingBufferAsAnimattionGif();
         }
 
         private Stream OpenFile(DateTime time, string ext)
