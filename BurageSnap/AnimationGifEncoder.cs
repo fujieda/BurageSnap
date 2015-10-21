@@ -39,7 +39,8 @@ namespace BurageSnap
         public void AddFrame(Bitmap bmp, int delay)
         {
             var gif = new MemoryStream();
-            bmp.Save(gif, ImageFormat.Gif);
+            using (var quant = OctreeQuantizer.Quantize(bmp))
+                quant.Save(gif, ImageFormat.Gif);
             gif.Position = 6; // skip header
             var lsd = new byte[7];
             gif.Read(lsd, 0, 7); // read LSD

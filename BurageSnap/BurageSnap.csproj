@@ -59,6 +59,7 @@
     <Compile Include="ConfirmDialog.Designer.cs">
       <DependentUpon>ConfirmDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="OctreeQuantizer.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="OptionDialog.cs">
