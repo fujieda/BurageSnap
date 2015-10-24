@@ -47,7 +47,7 @@ namespace BurageSnap
     public class NeuQuant
     {
         private const int Cycles = 100; // learning cycles
-        private const int NetSize = 256; // colors used
+        private const int NetSize = 255; // colors used
         private const int Specials = 2; // reserved colors
         private const int CutNetSize = NetSize - Specials;
         private const int MaxNetPos = NetSize - 1;
@@ -102,8 +102,9 @@ namespace BurageSnap
             var height = bmp.Height;
             var bmp8 = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
             var palette = bmp8.Palette;
+            palette.Entries[0] = Color.FromArgb(0, 0, 0, 0); // 0 is the transparent index
             for (var i = 0; i < NetSize; i++)
-                palette.Entries[i] = nq.GetColor(i);
+                palette.Entries[i + 1] = nq.GetColor(i);
             bmp8.Palette = palette;
             var data8 = bmp8.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp8.PixelFormat);
             Parallel.For(0, height, h =>
@@ -114,7 +115,7 @@ namespace BurageSnap
                     {
                         var pix = nq._pixels[h * width + x];
                         var ptr = (byte*)data8.Scan0 + h * data8.Stride + x;
-                        *ptr = (byte)nq.Lookup(pix);
+                        *ptr = pix == 0 ? (byte)0 : (byte)(nq.Lookup(pix) + 1);
                     }
                 }
             });
@@ -222,7 +223,8 @@ namespace BurageSnap
                 while (pos >= lengthCount)
                     pos -= lengthCount;
 
-                if (delta == 0 || ++i % delta != 0)
+                i++;
+                if (delta == 0 || i % delta != 0)
                     continue;
                 alpha -= alpha / alphadec;
                 biasRadius -= biasRadius / RadiusDec;

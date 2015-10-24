@@ -15,7 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
@@ -25,12 +27,15 @@ namespace BurageSnap
     public class AnimationGifEncoder
     {
         private BinaryWriter _stream;
+        private double _scale;
         private bool _firstFrame;
+        private int[,] _prevFrame;
 
         public bool IsLoop { get; set; } = true;
 
-        public void Start(Stream stream)
+        public void Start(Stream stream, double scale = 1.0)
         {
+            _scale = scale;
             _stream = new BinaryWriter(stream);
             _stream.Write(Encoding.ASCII.GetBytes("GIF89a"));
             _firstFrame = true;
@@ -38,15 +43,54 @@ namespace BurageSnap
 
         public void AddFrame(Bitmap bmp, int delay)
         {
-            var gif = new MemoryStream();
-            using (var quant = NeuQuant.Quantize(bmp, 10))
-                quant.Save(gif, ImageFormat.Gif);
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            var scaled = _scale == 1.0 ? bmp : ScaleImage(bmp, _scale);
+            if (_prevFrame == null)
+            {
+                _prevFrame = ConvertBitmapToArray(scaled);
+                AddFrame(scaled, new Rectangle(0, 0, scaled.Width, scaled.Height), delay);
+            }
+            else
+            {
+                var cur = ConvertBitmapToArray(scaled);
+                AddOptimizedFrame(cur, _prevFrame, delay);
+                _prevFrame = cur;
+            }
+            if (scaled != bmp)
+                scaled.Dispose();
+        }
+
+        private Bitmap ScaleImage(Bitmap bmp, double scale)
+        {
+            var scaled = new Bitmap(
+                (int)Math.Ceiling(bmp.Width * scale),
+                (int)Math.Ceiling(bmp.Height * scale), PixelFormat.Format24bppRgb);
+            using (var g = Graphics.FromImage(scaled))
+            {
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.DrawImage(bmp, 0, 0, scaled.Width, scaled.Height);
+            }
+            return scaled;
+        }
+
+        private void AddFrame(Bitmap bmp, Rectangle rect, int delay)
+        {
+            using (var gif = new MemoryStream())
+            using (var bmp8 = NeuQuant.Quantize(bmp, 10))
+            {
+                bmp8.Save(gif, ImageFormat.Gif);
+                AddFrame(gif, rect, delay);
+            }
+        }
+
+        private void AddFrame(MemoryStream gif, Rectangle rect, int delay)
+        {
             gif.Position = 6; // skip header
             var lsd = new byte[7];
             gif.Read(lsd, 0, 7); // read LSD
             var colorTable = new byte[0];
             var tableSize = 0;
-            if ((lsd[4] & 0x80) != 0)
+            if ((lsd[4] & 0x80) != 0) // have global color table
             {
                 tableSize = lsd[4] & 7;
                 colorTable = new byte[(1 << tableSize + 1) * 3];
@@ -61,19 +105,22 @@ namespace BurageSnap
             }
             if (gif.GetBuffer()[gif.Position] == 0x21)
                 gif.Position += 8; // skip graphic control extension
-            WriteGce(delay);
             var idc = new byte[10];
             gif.Read(idc, 0, 10);
             if ((idc[9] & 0x80) == 0)
             {
                 idc[9] = (byte)(0x80 | idc[9] & 0x78 | tableSize);
-                _stream.Write(idc);
-                _stream.Write(colorTable); // set global color table
             }
             else
             {
-                _stream.Write(idc);
+                tableSize = idc[9] & 7;
+                colorTable = new byte[(1 << tableSize + 1) * 3];
+                gif.Read(colorTable, 0, colorTable.Length);
             }
+            WriteGce(delay);
+            SetRectangle(idc, rect);
+            _stream.Write(idc);
+            _stream.Write(colorTable);
             _stream.Write(gif.GetBuffer(), (int)gif.Position, (int)(gif.Length - gif.Position - 1));
             _firstFrame = false;
         }
@@ -90,9 +137,124 @@ namespace BurageSnap
 
         public void WriteGce(int delay)
         {
-            _stream.Write(new byte[] {0x21, 0xf9, 0x04, 0x00});
+            _stream.Write(new byte[] {0x21, 0xf9, 0x04});
+            _stream.Write((byte)0x01); // have transparent index
             _stream.Write((short)delay);
-            _stream.Write((short)0x00);
+            _stream.Write((byte)0x00); // 0 is the transparent index
+            _stream.Write((byte)0x00);
+        }
+
+        private void SetRectangle(byte[] idc, Rectangle rect)
+        {
+            var s = new BinaryWriter(new MemoryStream(idc));
+            s.Seek(1, SeekOrigin.Begin);
+            s.Write((ushort)rect.X);
+            s.Write((ushort)rect.Y);
+            s.Write((ushort)rect.Width);
+            s.Write((ushort)rect.Height);
+        }
+
+        private int[,] ConvertBitmapToArray(Bitmap bmp)
+        {
+            var width = bmp.Width;
+            var height = bmp.Height;
+            var data = bmp.LockBits(new Rectangle(0, 0, width, height),
+                ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            var array = new int[height, width];
+            unsafe
+            {
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        var ptr = (byte*)data.Scan0 + y * data.Stride + x * 3;
+                        array[y, x] = ptr[0] | ptr[1] << 8 | ptr[2] << 16 | 0xff << 24;
+                    }
+                }
+            }
+            bmp.UnlockBits(data);
+            return array;
+        }
+
+        private void AddOptimizedFrame(int[,] cur, int[,] prev, int delay)
+        {
+            var rect = FindDifferentBounds(cur, prev);
+            if (rect.IsEmpty)
+                rect = new Rectangle(0, 0, 1, 1);
+            using (var bmp = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb))
+            {
+                var data = bmp.LockBits(new Rectangle(0, 0, rect.Width, rect.Height),
+                    ImageLockMode.WriteOnly, bmp.PixelFormat);
+                for (var y = 0; y < rect.Height; y++)
+                {
+                    var y1 = y + rect.Y;
+                    for (var x = 0; x < rect.Width; x++)
+                    {
+                        var x1 = x + rect.X;
+                        unsafe
+                        {
+                            var ptr = (int*)((byte*)data.Scan0 + y * data.Stride + x * 4);
+                            var col = cur[y1, x1];
+                            *ptr = col != prev[y1, x1] ? col : 0;
+                        }
+                    }
+                }
+                bmp.UnlockBits(data);
+                AddFrame(bmp, rect, delay);
+            }
+        }
+
+        private Rectangle FindDifferentBounds(int[,] cur, int[,] prev)
+        {
+            var width = cur.GetUpperBound(1);
+            var height = cur.GetUpperBound(0);
+            var r = Rectangle.Empty;
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    if (cur[y, x] == prev[y, x])
+                        continue;
+                    r.Y = y;
+                    goto foundY;
+                }
+            }
+            return Rectangle.Empty;
+            foundY:
+            for (var x = 0; x < width; x++)
+            {
+                for (var y = r.Y; y < height; y++)
+                {
+                    if (cur[y, x] == prev[y, x])
+                        continue;
+                    r.X = x;
+                    goto foundX;
+                }
+            }
+            foundX:
+            for (var x = width - 1; x >= r.X; x--)
+            {
+                for (var y = r.Y; y < height; y++)
+                {
+                    if (cur[y, x] == prev[y, x])
+                        continue;
+                    r.Width = x + 1 - r.X;
+                    goto foundWidth;
+                }
+            }
+            foundWidth:
+            for (var y = height - 1; y >= r.Y; y--)
+            {
+                for (var x = r.X; x < r.X + r.Width; x++)
+                {
+                    if (cur[y, x] == prev[y, x])
+                        continue;
+                    r.Height = y + 1 - r.Y;
+                    goto foundHeight;
+                }
+            }
+            foundHeight:
+            return r;
         }
 
         public void Finish()

@@ -19,7 +19,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
@@ -181,11 +180,8 @@ namespace BurageSnap
                 Frame prev = null;
                 foreach (var frame in _ringBuffer)
                 {
-                    var bmp = frame.Bitmap;
-                    frame.Bitmap = ReduceSize(bmp);
-                    bmp.Dispose();
                     if (prev == null)
-                        encoder.Start(OpenFile(frame.Time, ".gif"));
+                        encoder.Start(OpenFile(frame.Time, ".gif"), 560.0 / frame.Bitmap.Width);
                     if (prev != null)
                         encoder.AddFrame(prev.Bitmap, (int)((frame.Time - prev.Time).TotalMilliseconds / 10.0));
                     prev = frame;
@@ -223,20 +219,6 @@ namespace BurageSnap
             var dir = Path.Combine(_config.Folder, time.ToString(DateFormat));
             Directory.CreateDirectory(dir);
             return File.OpenWrite(Path.Combine(dir, time.ToString("yyyy-MM-dd HH-mm-ss.fff") + ext));
-        }
-
-        private Bitmap ReduceSize(Bitmap bmp)
-        {
-            var half = new Bitmap(bmp.Width / 2, bmp.Height / 2, PixelFormat.Format24bppRgb);
-            using (var g = Graphics.FromImage(half))
-            {
-                g.CompositingQuality = CompositingQuality.HighQuality;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.SmoothingMode = SmoothingMode.HighQuality;
-                g.DrawImage(bmp, 0, 0, half.Width, half.Height);
-            }
-            return half;
         }
 
         private class RingBuffer : IEnumerable<Frame>

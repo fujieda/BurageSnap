@@ -26,7 +26,7 @@ namespace BurageSnap
     public class OctreeQuantizer
     {
         private const int Depth = 6;
-        private const int Colors = 256;
+        private const int Colors = 255;
         private readonly OctreeNode _root = new OctreeNode();
         private int _leafCount;
         private readonly List<OctreeNode>[] _depth = new List<OctreeNode>[Depth - 1];
@@ -55,7 +55,8 @@ namespace BurageSnap
                     for (var x = 0; x < width; x++)
                     {
                         var p32 = (byte*)data32.Scan0 + y * data32.Stride + x * 4;
-                        oq.AddPixcel(p32[2], p32[1], p32[0]);
+                        if (p32[3] != 0)
+                            oq.AddPixcel(p32[2], p32[1], p32[0]);
                     }
                 }
                 oq.Reduce();
@@ -68,7 +69,7 @@ namespace BurageSnap
                     {
                         var p32 = (byte*)data32.Scan0 + y * data32.Stride + x * 4;
                         var p8 = (byte*)data8.Scan0 + y * data8.Stride + x;
-                        *p8 = (byte)oq.GetIndex(p32[2], p32[1], p32[0]);
+                        *p8 = p32[3] == 0 ? (byte)0 : (byte)oq.GetIndex(p32[2], p32[1], p32[0]);
                     }
                 }
             }
@@ -142,6 +143,7 @@ namespace BurageSnap
         private void SetPalette(Color[] palette)
         {
             var idx = 0;
+            palette[idx++] = Color.FromArgb(0, 0, 0, 0); // 0 is the transparent index
             foreach (var leaf in
                 from node in _full from child in node.Children where child != null && child.Leaf select child)
             {
