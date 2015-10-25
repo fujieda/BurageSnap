@@ -141,4 +141,7 @@
   <data name="Recorder_CaptureFrame_detect_error" xml:space="preserve">
     <value>検出エラー</value>
   </data>
+  <data name="OptionDialog_OptionDialog_Load_Options" xml:space="preserve">
+    <value> - オプション</value>
+  </data>
 </root>

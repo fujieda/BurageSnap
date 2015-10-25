@@ -127,6 +127,15 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///    - Options に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string OptionDialog_OptionDialog_Load_Options {
+            get {
+                return ResourceManager.GetString("OptionDialog_OptionDialog_Load_Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Interval must be in the range of 10 ms to 1000 sec. に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string OptionDialog_textBoxInterval_Validating_Interval {

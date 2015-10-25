@@ -64,6 +64,9 @@ namespace BurageSnap
 
         private void OptionDialog_Load(object sender, EventArgs e)
         {
+            Text = Application.ProductName + @" " +
+                   string.Join(".", Application.ProductVersion.Split('.').Take(2)) +
+                   Resources.OptionDialog_OptionDialog_Load_Options;
             checkBoxTopMost.Checked = _config.TopMost;
             textBoxInterval.Text = _config.Interval.ToString();
             textBoxRingBuffer.Text = _config.RingBuffer.ToString();
