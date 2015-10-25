@@ -216,7 +216,9 @@ namespace BurageSnap
 
         private Stream OpenFile(DateTime time, string ext)
         {
-            var dir = Path.Combine(_config.Folder, time.ToString(DateFormat));
+            var dir = _config.Folder;
+            if (_config.DailyFolder)
+                dir = Path.Combine(_config.Folder, time.ToString(DateFormat));
             Directory.CreateDirectory(dir);
             return File.OpenWrite(Path.Combine(dir, time.ToString("yyyy-MM-dd HH-mm-ss.fff") + ext));
         }

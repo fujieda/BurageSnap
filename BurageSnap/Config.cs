@@ -37,6 +37,7 @@ namespace BurageSnap
         public int RingBuffer { get; set; } = 25;
         public string[] TitleHistory { get; set; } = {"艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com"};
         public string Folder { get; set; }
+        public bool DailyFolder { get; set; } = true;
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
         public bool Continuous { get; set; }
         public bool AnimationGif { get; set; }

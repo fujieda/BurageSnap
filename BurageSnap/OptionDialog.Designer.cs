@@ -66,6 +66,7 @@ namespace BurageSnap
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.checkBoxAnimationGif = new System.Windows.Forms.CheckBox();
+            this.checkBoxDailyFolder = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label3
@@ -179,12 +180,19 @@ namespace BurageSnap
             this.checkBoxAnimationGif.Name = "checkBoxAnimationGif";
             this.checkBoxAnimationGif.UseVisualStyleBackColor = true;
             // 
+            // checkBoxDailyFolder
+            // 
+            resources.ApplyResources(this.checkBoxDailyFolder, "checkBoxDailyFolder");
+            this.checkBoxDailyFolder.Name = "checkBoxDailyFolder";
+            this.checkBoxDailyFolder.UseVisualStyleBackColor = true;
+            // 
             // OptionDialog
             // 
             this.AcceptButton = this.buttonOk;
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
+            this.Controls.Add(this.checkBoxDailyFolder);
             this.Controls.Add(this.checkBoxAnimationGif);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
@@ -236,5 +244,6 @@ namespace BurageSnap
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox checkBoxAnimationGif;
+        private System.Windows.Forms.CheckBox checkBoxDailyFolder;
     }
 }

@@ -139,16 +139,13 @@ namespace BurageSnap
 
         private void buttonBrowse_Click(object sender, EventArgs e)
         {
-            var now = DateTime.Now;
-            var dir = Path.Combine(_config.Folder, now.ToString(Recorder.DateFormat));
-            try
+            var dir = _config.Folder;
+            if (_config.DailyFolder)
             {
-                Directory.CreateDirectory(dir);
+                var now = DateTime.Now;
+                dir = Path.Combine(_config.Folder, now.ToString(Recorder.DateFormat));
             }
-            catch
-            {
-                return;
-            }
+            Directory.CreateDirectory(dir);
             Process.Start(dir);
         }
     }

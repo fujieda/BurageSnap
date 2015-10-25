@@ -152,12 +152,6 @@
         zKdrtSjPKxmc/zZ6ZunLyOl2h0J4ij3lmBEI/gJyIHBmuwLNjQAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="buttonOk.Location" type="System.Drawing.Point, System.Drawing">
-    <value>106, 167</value>
-  </data>
-  <data name="buttonCancel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>187, 167</value>
-  </data>
   <data name="buttonCancel.Text" xml:space="preserve">
     <value>キャンセル</value>
   </data>
@@ -183,7 +177,7 @@
     <value>枚</value>
   </data>
   <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 140</value>
+    <value>12, 162</value>
   </data>
   <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
     <value>31, 12</value>
@@ -192,7 +186,7 @@
     <value>連射:</value>
   </data>
   <data name="checkBoxAnimationGif.Location" type="System.Drawing.Point, System.Drawing">
-    <value>60, 139</value>
+    <value>60, 161</value>
   </data>
   <data name="checkBoxAnimationGif.Size" type="System.Drawing.Size, System.Drawing">
     <value>131, 16</value>
@@ -200,8 +194,12 @@
   <data name="checkBoxAnimationGif.Text" xml:space="preserve">
     <value>アニメーションGIFにする</value>
   </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>274, 202</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="checkBoxDailyFolder.Size" type="System.Drawing.Size, System.Drawing">
+    <value>127, 16</value>
+  </data>
+  <data name="checkBoxDailyFolder.Text" xml:space="preserve">
+    <value>日ごとにフォルダを作る</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>BurageSnap 1.4 - オプション</value>

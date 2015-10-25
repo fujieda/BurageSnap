@@ -58,6 +58,7 @@ namespace BurageSnap
             }
             _config.TitleHistory = (from object item in comboBoxWindowTitle.Items select item.ToString()).ToArray();
             _config.Folder = textBoxFolder.Text;
+            _config.DailyFolder = checkBoxDailyFolder.Checked;
             _config.Format = radioButtonJpg.Checked ? OutputFormat.Jpg : OutputFormat.Png;
             _config.AnimationGif = checkBoxAnimationGif.Checked;
         }
@@ -76,6 +77,7 @@ namespace BurageSnap
             comboBoxWindowTitle.Text = _config.TitleHistory[0];
             textBoxFolder.Text = _config.Folder;
             textBoxFolder.Select(textBoxFolder.TextLength, 0);
+            checkBoxDailyFolder.Checked = _config.DailyFolder;
             radioButtonJpg.Checked = _config.Format == OutputFormat.Jpg;
             radioButtonPng.Checked = _config.Format == OutputFormat.Png;
             checkBoxAnimationGif.Checked = _config.AnimationGif;
