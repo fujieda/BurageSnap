@@ -123,7 +123,7 @@ namespace BurageSnap
                 : _screenCapture.CaptureGameScreen();
             if (bmp == null)
             {
-                ReportCaptureResult(DateTime.MinValue);
+                ReportCaptureResult(Resources.Recorder_CaptureFrame_detect_error);
                 return null;
             }
             var now = DateTime.Now;

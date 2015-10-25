@@ -145,6 +145,15 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   detect error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Recorder_CaptureFrame_detect_error {
+            get {
+                return ResourceManager.GetString("Recorder_CaptureFrame_detect_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   I/O Error に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Recorder_IO_Error {

@@ -148,4 +148,7 @@
   <data name="Recorder_IO_Error" xml:space="preserve">
     <value>I/O Error</value>
   </data>
+  <data name="Recorder_CaptureFrame_detect_error" xml:space="preserve">
+    <value>detect error</value>
+  </data>
 </root>
