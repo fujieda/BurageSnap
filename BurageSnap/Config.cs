@@ -35,7 +35,14 @@ namespace BurageSnap
         public bool TopMost { get; set; }
         public int Interval { get; set; } = 200;
         public int RingBuffer { get; set; } = 25;
-        public string[] TitleHistory { get; set; } = {"艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com"};
+
+        public string[] TitleHistory { get; set; } = {
+            "艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com",
+            "千年戦争アイギス - オンラインゲーム - DMM.com",
+            "FLOWER KNIGHT GIRL - オンラインゲーム - DMM.com",
+            "刀剣乱舞-ONLINE- - オンラインゲーム - DMM.com"
+        };
+
         public string Folder { get; set; }
         public bool DailyFolder { get; set; } = true;
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
