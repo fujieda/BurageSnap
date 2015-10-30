@@ -16,11 +16,13 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BurageSnap
 {
@@ -30,6 +32,21 @@ namespace BurageSnap
         private double _scale;
         private bool _firstFrame;
         private int[,] _prevFrame;
+        private readonly BlockingCollection<Frame> _originalFrame = new BlockingCollection<Frame>();
+        private readonly BlockingCollection<Frame> _scaledFrame = new BlockingCollection<Frame>();
+        private readonly BlockingCollection<Frame> _optimizedFrame = new BlockingCollection<Frame>();
+        private readonly BlockingCollection<Frame> _learnedNeuQuant = new BlockingCollection<Frame>();
+        private readonly BlockingCollection<Frame> _bpp8Frame = new BlockingCollection<Frame>();
+        private readonly Task[] _tasks = new Task[5];
+
+        private class Frame
+        {
+            public Bitmap Bitmap;
+            public NeuQuant NeuQuant;
+            public int Delay;
+            public Rectangle Rectangle;
+            public int[] Pixels;
+        }
 
         public bool IsLoop { get; set; } = true;
 
@@ -39,25 +56,115 @@ namespace BurageSnap
             _stream = new BinaryWriter(stream);
             _stream.Write(Encoding.ASCII.GetBytes("GIF89a"));
             _firstFrame = true;
+            StartPipeline();
+        }
+
+        private void StartPipeline()
+        {
+            _tasks[0] = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var frame = _originalFrame.Take();
+                        frame.Bitmap = ScaleImage(frame.Bitmap, _scale);
+                        _scaledFrame.Add(frame);
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    _scaledFrame.CompleteAdding();
+                }
+            });
+            _tasks[1] = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var frame = _scaledFrame.Take();
+                        _optimizedFrame.Add(OptimizeFrame(frame));
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    _optimizedFrame.CompleteAdding();
+                }
+            });
+            _tasks[2] = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var frame = _optimizedFrame.Take();
+                        frame.NeuQuant = frame.Pixels == null
+                            ? new NeuQuant(frame.Bitmap, 10)
+                            : new NeuQuant(frame.Pixels, frame.Rectangle.Width, frame.Rectangle.Height, 10);
+                        frame.NeuQuant.Init();
+                        _learnedNeuQuant.Add(frame);
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    _learnedNeuQuant.CompleteAdding();
+                }
+            });
+            _tasks[3] = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var frame = _learnedNeuQuant.Take();
+                        frame.Bitmap.Dispose();
+                        frame.Bitmap = frame.NeuQuant.CreateBitmap();
+                        _bpp8Frame.Add(frame);
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    _bpp8Frame.CompleteAdding();
+                }
+            });
+            _tasks[4] = Task.Run(() =>
+            {
+                try
+                {
+                    while (true)
+                    {
+                        var frame = _bpp8Frame.Take();
+                        AddFrame(frame.Bitmap, frame.Rectangle, frame.Delay);
+                        frame.Bitmap.Dispose();
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                }
+            });
         }
 
         public void AddFrame(Bitmap bmp, int delay)
         {
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            var scaled = _scale == 1.0 ? bmp : ScaleImage(bmp, _scale);
+            _originalFrame.Add(new Frame {Bitmap = bmp, Delay = delay});
+        }
+
+        private Frame OptimizeFrame(Frame frame)
+        {
             if (_prevFrame == null)
             {
-                _prevFrame = ConvertBitmapToArray(scaled);
-                AddFrame(scaled, new Rectangle(0, 0, scaled.Width, scaled.Height), delay);
+                _prevFrame = ConvertBitmapToArray(frame.Bitmap);
+                frame.Rectangle = new Rectangle(0, 0, frame.Bitmap.Width, frame.Bitmap.Height);
             }
             else
             {
-                var cur = ConvertBitmapToArray(scaled);
-                AddOptimizedFrame(cur, _prevFrame, delay);
+                var cur = ConvertBitmapToArray(frame.Bitmap);
+                frame.Bitmap.Dispose();
+                frame = DifferentialFrame(cur, _prevFrame, frame);
                 _prevFrame = cur;
             }
-            if (scaled != bmp)
-                scaled.Dispose();
+            return frame;
         }
 
         private Bitmap ScaleImage(Bitmap bmp, double scale)
@@ -76,11 +183,11 @@ namespace BurageSnap
         private void AddFrame(Bitmap bmp, Rectangle rect, int delay)
         {
             using (var gif = new MemoryStream())
-            using (var bmp8 = NeuQuant.Quantize(bmp, 10))
             {
-                bmp8.Save(gif, ImageFormat.Gif);
+                bmp.Save(gif, ImageFormat.Gif);
                 AddFrame(gif, rect, delay);
             }
+            bmp.Dispose();
         }
 
         private void AddFrame(MemoryStream gif, Rectangle rect, int delay)
@@ -176,32 +283,24 @@ namespace BurageSnap
             return array;
         }
 
-        private void AddOptimizedFrame(int[,] cur, int[,] prev, int delay)
+        private Frame DifferentialFrame(int[,] cur, int[,] prev, Frame frame)
         {
             var rect = FindDifferentBounds(cur, prev);
             if (rect.IsEmpty)
                 rect = new Rectangle(0, 0, 1, 1);
-            using (var bmp = new Bitmap(rect.Width, rect.Height, PixelFormat.Format32bppArgb))
+            frame.Pixels = new int[rect.Width * rect.Height];
+            for (var y = 0; y < rect.Height; y++)
             {
-                var data = bmp.LockBits(new Rectangle(0, 0, rect.Width, rect.Height),
-                    ImageLockMode.WriteOnly, bmp.PixelFormat);
-                for (var y = 0; y < rect.Height; y++)
+                var y1 = y + rect.Y;
+                for (var x = 0; x < rect.Width; x++)
                 {
-                    var y1 = y + rect.Y;
-                    for (var x = 0; x < rect.Width; x++)
-                    {
-                        var x1 = x + rect.X;
-                        unsafe
-                        {
-                            var ptr = (int*)((byte*)data.Scan0 + y * data.Stride + x * 4);
-                            var col = cur[y1, x1];
-                            *ptr = col != prev[y1, x1] ? col : 0;
-                        }
-                    }
+                    var x1 = x + rect.X;
+                    var col = cur[y1, x1];
+                    frame.Pixels[y * rect.Width + x] = col != prev[y1, x1] ? col : 0;
                 }
-                bmp.UnlockBits(data);
-                AddFrame(bmp, rect, delay);
             }
+            frame.Rectangle = rect;
+            return frame;
         }
 
         private Rectangle FindDifferentBounds(int[,] cur, int[,] prev)
@@ -261,6 +360,8 @@ namespace BurageSnap
         {
             if (_stream == null)
                 return;
+            _originalFrame.CompleteAdding();
+            Task.WaitAll(_tasks);
             _stream.Write((byte)0x3b);
             _stream.Close();
         }

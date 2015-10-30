@@ -75,47 +75,55 @@ namespace BurageSnap
         private const int Prime3 = 487;
         private const int Prime4 = 503;
 
-        private int[] _pixels;
+        private readonly int[] _pixels;
         private readonly int _sampleFac;
+        private readonly int _width;
+        private readonly int _height;
 
-        public NeuQuant(Bitmap bmp)
-        {
-            _sampleFac = 1;
-            SetPixels(bmp);
-            SetUpArrays();
-        }
-
-        public NeuQuant(Bitmap bmp, int sample)
+        public NeuQuant(int[] pixels, int width, int height, int sample)
         {
             if (sample < 1 || 30 < sample)
                 throw new ArgumentException();
             _sampleFac = sample;
-            SetPixels(bmp);
+            _width = width;
+            _height = height;
+            _pixels = pixels;
             SetUpArrays();
+        }
+
+        public NeuQuant(Bitmap bmp) : this(bmp, 1)
+        {
+        }
+
+        public NeuQuant(Bitmap bmp, int sample) : this(GetPixels(bmp), bmp.Width, bmp.Height, sample)
+        {
         }
 
         public static Bitmap Quantize(Bitmap bmp, int sample)
         {
             var nq = new NeuQuant(bmp, sample);
             nq.Init();
-            var width = bmp.Width;
-            var height = bmp.Height;
-            var bmp8 = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
+            return nq.CreateBitmap();
+        }
+
+        public Bitmap CreateBitmap()
+        {
+            var bmp8 = new Bitmap(_width, _height, PixelFormat.Format8bppIndexed);
             var palette = bmp8.Palette;
             palette.Entries[0] = Color.FromArgb(0, 0, 0, 0); // 0 is the transparent index
             for (var i = 0; i < NetSize; i++)
-                palette.Entries[i + 1] = nq.GetColor(i);
+                palette.Entries[i + 1] = GetColor(i);
             bmp8.Palette = palette;
-            var data8 = bmp8.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp8.PixelFormat);
-            Parallel.For(0, height, h =>
+            var data8 = bmp8.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp8.PixelFormat);
+            Parallel.For(0, _height, h =>
             {
-                for (var x = 0; x < width; x++)
+                for (var x = 0; x < _width; x++)
                 {
                     unsafe
                     {
-                        var pix = nq._pixels[h * width + x];
+                        var pix = _pixels[h * _width + x];
                         var ptr = (byte*)data8.Scan0 + h * data8.Stride + x;
-                        *ptr = pix == 0 ? (byte)0 : (byte)(nq.Lookup(pix) + 1);
+                        *ptr = pix == 0 ? (byte)0 : (byte)(Lookup(pix) + 1);
                     }
                 }
             });
@@ -157,15 +165,16 @@ namespace BurageSnap
                 _colormap[i] = new int[4];
         }
 
-        private void SetPixels(Bitmap bmp)
+        private static int[] GetPixels(Bitmap bmp)
         {
             var width = bmp.Width;
             var height = bmp.Height;
-            _pixels = new int[width * height];
+            var pixels = new int[width * height];
             var data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
                 PixelFormat.Format32bppArgb);
-            Marshal.Copy(data.Scan0, _pixels, 0, width * height);
+            Marshal.Copy(data.Scan0, pixels, 0, width * height);
             bmp.UnlockBits(data);
+            return pixels;
         }
 
         public void Init()
