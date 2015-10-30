@@ -3,3 +3,5 @@ BurageSnap allows you to take a screenshot of browser games a.k.a ブラゲ [bur
 BurageSnap can work on Vista or later versions of Windows with .NET Framework 4.5.2 or later. If your Windows version is Vista or 7, you need to install [.NET Framework 4.5.2](http://www.microsoft.com/ja-JP/download/details.aspx?id=42642).
 
 BurageSnap is licensed under the term of GNU General Public License version 3 or later. You can access the source code via [our Git repository](https://osdn.jp/projects/buragesnap/scm/git/BurageSnap/).
+
+The web site is the following: https://osdn.jp/projects/buragesnap/ In case of reporting bugs, requesting features, or else, please submit a ticket as follows: https://osdn.jp/projects/buragesnap/ticket/
