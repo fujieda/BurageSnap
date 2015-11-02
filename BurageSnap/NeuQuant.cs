@@ -115,7 +115,7 @@ namespace BurageSnap
                 palette.Entries[i + 1] = GetColor(i);
             bmp8.Palette = palette;
             var data8 = bmp8.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp8.PixelFormat);
-            Parallel.For(0, _height, h =>
+            for (var h = 0; h < _height; h++)
             {
                 for (var x = 0; x < _width; x++)
                 {
@@ -126,7 +126,7 @@ namespace BurageSnap
                         *ptr = pix == 0 ? (byte)0 : (byte)(Lookup(pix) + 1);
                     }
                 }
-            });
+            };
             bmp8.UnlockBits(data8);
             return bmp8;
         }
