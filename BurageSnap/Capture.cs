@@ -147,9 +147,11 @@ namespace BurageSnap
                     rect = FindBottomAndRight(map, rect);
                     if (rect == Rectangle.Empty)
                         continue;
-                    if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalTop))
+                    if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalTop) ||
+                        !CheckEitherEndClean(map, rect.X, rect.Right, y, y, Edge.HorizontalTop))
                         break;
-                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
+                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft) ||
+                        !CheckEitherEndClean(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
                         continue;
                     RoundUpRectangle(map, ref rect);
                     return rect;
@@ -170,18 +172,28 @@ namespace BurageSnap
                 rect.Width = 0;
                 for (var x = rect.X; x < width - 1; x++)
                 {
-                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight))
+                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight) ||
+                        !CheckEitherEndClean(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight))
                         continue;
                     rect.Width = x - rect.X + 1;
                     break;
                 }
                 if (rect.Width == 0)
-                    return Rectangle.Empty;
-                if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom))
                     continue;
-                return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
+                if (CheckEitherEndClean(map, rect.X, rect.Right, rect.Bottom, rect.Bottom, Edge.HorizontalBottom))
+                    break;
             }
-            return Rectangle.Empty;
+            if (rect.Width == 0)
+                return Rectangle.Empty;
+            // check a smaller rectangle
+            for (var y = rect.Y; y < rect.Height - 1; y++)
+            {
+                if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom) ||
+                    !CheckEitherEndClean(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom))
+                    continue;
+                rect.Height = y - rect.Y + 1;
+            }
+            return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
         }
 
         private bool CheckEdge(byte[,] map, int left, int right, int top, int bottom, Edge edge)
@@ -229,6 +241,70 @@ namespace BurageSnap
                         return true;
                     }
                     return false;
+            }
+            return false;
+        }
+
+        private bool CheckEitherEndClean(byte[,] map, int left, int right, int top, int bottom, Edge edge)
+        {
+            switch (edge)
+            {
+                case Edge.HorizontalTop:
+                    for (var x = left; x <= left + WidthMin / 10; x++)
+                    {
+                        if (map[top - 1, x] == 0)
+                            goto tright;
+                    }
+                    return true;
+                    tright:
+                    for (var x = right; x >= right - WidthMin / 10; x--)
+                    {
+                        if (map[top - 1, x] == 0)
+                            return false;
+                    }
+                    return true;
+                case Edge.VerticalLeft:
+                    for (var y = top; y <= top + HeightMin / 10; y++)
+                    {
+                        if (map[y, left - 1] == 0)
+                            goto lbottom;
+                    }
+                    return true;
+                    lbottom:
+                    for (var y = bottom; y >= bottom - HeightMin / 10; y--)
+                    {
+                        if (map[y, left - 1] == 0)
+                            return false;
+                    }
+                    return true;
+                case Edge.HorizontalBottom:
+                    for (var x = left; x <= left + WidthMin / 10; x++)
+                    {
+                        if (map[bottom + 1, x] == 0)
+                            goto bright;
+                    }
+                    return true;
+                    bright:
+                    for (var x = right; x >= right - WidthMin / 10; x--)
+                    {
+                        if (map[bottom + 1, x] == 0)
+                            return false;
+                    }
+                    return true;
+                case Edge.VerticalRight:
+                    for (var y = top; y <= top + HeightMin / 10; y++)
+                    {
+                        if (map[y, right + 1] == 0)
+                            goto rbottom;
+                    }
+                    return true;
+                    rbottom:
+                    for (var y = bottom; y >= bottom - HeightMin / 10; y--)
+                    {
+                        if (map[y, right + 1] == 0)
+                            return false;
+                    }
+                    return true;
             }
             return false;
         }
