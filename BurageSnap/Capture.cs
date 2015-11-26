@@ -18,6 +18,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -46,7 +47,11 @@ namespace BurageSnap
             {
                 _rectangle = DetectGameScreen(bmp);
                 if (_rectangle.IsEmpty)
+                {
+                    using (var file = File.Create("debug.png"))
+                        bmp.Save(file, ImageFormat.Png);
                     return null;
+                }
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
             }
         }
