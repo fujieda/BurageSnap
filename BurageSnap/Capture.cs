@@ -28,13 +28,15 @@ namespace BurageSnap
     {
         private const int WidthMin = 600, HeightMin = 400;
         private IntPtr _hWnd;
+        private Rect _rect;
         private Rectangle _rectangle;
+        private string _title;
 
         public Bitmap CaptureGameScreen()
         {
             if (_hWnd == IntPtr.Zero || _rectangle.IsEmpty)
                 return null;
-            using (var bmp = CaptureWindow(_hWnd))
+            using (var bmp = CaptureWindow(_hWnd, _rect))
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
         }
 
@@ -43,14 +45,23 @@ namespace BurageSnap
             _hWnd = FindWindow(title);
             if (_hWnd == IntPtr.Zero)
                 return null;
-            using (var bmp = CaptureWindow(_hWnd))
+            var rect = new Rect();
+            GetWindowRect(_hWnd, ref rect);
+            using (var bmp = CaptureWindow(_hWnd, rect))
             {
-                _rectangle = DetectGameScreen(bmp);
-                if (_rectangle.IsEmpty)
+                var rectangle = DetectGameScreen(bmp);
+                if (!rectangle.IsEmpty)
+                {
+                    _rect = rect;
+                    _rectangle = rectangle;
+                    _title = title;
+                }
+                else
                 {
                     using (var file = File.Create("debug.png"))
                         bmp.Save(file, ImageFormat.Png);
-                    return null;
+                    if (_rectangle.IsEmpty || !_rect.Equals(rect) || _title != title)
+                        return null;
                 }
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
             }
@@ -94,10 +105,8 @@ namespace BurageSnap
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
 
-        public static Bitmap CaptureWindow(IntPtr hWnd)
+        public static Bitmap CaptureWindow(IntPtr hWnd, Rect rect)
         {
-            var rect = new Rect();
-            GetWindowRect(hWnd, ref rect);
             var width = rect.Right - rect.Left;
             var height = rect.Bottom - rect.Top;
             var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
@@ -110,12 +119,17 @@ namespace BurageSnap
         private static extern int GetWindowRect(IntPtr hWnd, ref Rect lpRec);
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct Rect
+        public struct Rect : IEquatable<Rect>
         {
             public int Left;
             public int Top;
             public int Right;
             public int Bottom;
+
+            public bool Equals(Rect other)
+            {
+                return Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
+            }
         }
 
         private Rectangle DetectGameScreen(Bitmap bmp)
