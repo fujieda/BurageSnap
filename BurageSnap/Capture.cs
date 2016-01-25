@@ -149,25 +149,23 @@ namespace BurageSnap
                 }
             }
             bmp.UnlockBits(data);
-            for (var y = 0; y < height - 1; y++)
+            for (var y = 1; y < height - 1; y++)
             {
-                var rect = Rectangle.Empty;
-                if (!CheckEdge(map, 0, width, y, y, Edge.HorizontalTop))
+                if (!CheckEdge(map, 0, width - 1, y, y, Edge.HorizontalTop))
                     continue;
-                rect.Y = y + 1;
-                for (var x = 0; x < width - 1; x++)
+                for (var x = 1; x < width - 1; x++)
                 {
-                    if (!CheckEdge(map, x, x, rect.Y, height, Edge.VerticalLeft))
+                    var rect = Rectangle.Empty;
+                    rect.Y = y;
+                    if (!CheckEdge(map, x, x, rect.Y, height - 1, Edge.VerticalLeft))
                         continue;
-                    rect.X = x + 1;
+                    rect.X = x;
                     rect = FindBottomAndRight(map, rect);
                     if (rect == Rectangle.Empty)
                         continue;
-                    if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalTop) ||
-                        !CheckEitherEndClean(map, rect.X, rect.Right, y, y, Edge.HorizontalTop))
+                    if (!CheckEdgeStrict(map, rect.X, rect.Right, y, y, Edge.HorizontalTop))
                         break;
-                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft) ||
-                        !CheckEitherEndClean(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
+                    if (!CheckEdgeStrict(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
                         continue;
                     RoundUpRectangle(map, ref rect);
                     return rect;
@@ -182,32 +180,32 @@ namespace BurageSnap
             var width = map.GetLength(1);
             for (var y = rect.Y; y < height - 1; y++)
             {
-                if (!CheckEdge(map, rect.X, width, y, y, Edge.HorizontalBottom))
+                if (!CheckEdge(map, rect.X, width - 1, y, y, Edge.HorizontalBottom))
                     continue;
                 rect.Height = y - rect.Y + 1;
                 rect.Width = 0;
                 for (var x = rect.X; x < width - 1; x++)
                 {
-                    if (!CheckEdge(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight) ||
-                        !CheckEitherEndClean(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight))
+                    if (!CheckEdgeStrict(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight))
                         continue;
                     rect.Width = x - rect.X + 1;
                     break;
                 }
                 if (rect.Width == 0)
                     continue;
-                if (CheckEitherEndClean(map, rect.X, rect.Right, rect.Bottom, rect.Bottom, Edge.HorizontalBottom))
+                if (CheckEdgeStrict(map, rect.X, rect.Right, rect.Bottom, rect.Bottom, Edge.HorizontalBottom))
                     break;
             }
             if (rect.Width == 0)
                 return Rectangle.Empty;
             // check a smaller rectangle
-            for (var y = rect.Y; y < rect.Height - 1; y++)
+            for (var y = rect.Y; y <= rect.Bottom; y++)
             {
-                if (!CheckEdge(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom) ||
-                    !CheckEitherEndClean(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom))
-                    continue;
-                rect.Height = y - rect.Y + 1;
+                if (CheckEdgeStrict(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom))
+                {
+                    rect.Height = y - rect.Y + 1;
+                    break;
+                }
             }
             return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
         }
@@ -218,9 +216,9 @@ namespace BurageSnap
             switch (edge)
             {
                 case Edge.HorizontalTop:
-                    for (; left < right; left++)
+                    for (var x = left; x <= right; x++)
                     {
-                        if (!(map[top, left] == 1 && map[top + 1, left] == 0))
+                        if (!(map[top - 1, x] == 1 && map[top, x] == 0))
                             continue;
                         if (++n < WidthMin / 3)
                             continue;
@@ -228,9 +226,9 @@ namespace BurageSnap
                     }
                     return false;
                 case Edge.VerticalLeft:
-                    for (; top < bottom; top++)
+                    for (var y = top; y <= bottom; y++)
                     {
-                        if (!(map[top, left] == 1 && map[top, left + 1] == 0))
+                        if (!(map[y, left - 1] == 1 && map[y, left] == 0))
                             continue;
                         if (++n < HeightMin / 3)
                             continue;
@@ -238,9 +236,9 @@ namespace BurageSnap
                     }
                     return false;
                 case Edge.HorizontalBottom:
-                    for (; left < right; left++)
+                    for (var x = left; x <= right; x++)
                     {
-                        if (!(map[bottom, left] == 0 && map[bottom + 1, left] == 1))
+                        if (!(map[bottom, x] == 0 && map[bottom + 1, x] == 1))
                             continue;
                         if (++n < WidthMin / 3)
                             continue;
@@ -248,9 +246,9 @@ namespace BurageSnap
                     }
                     return false;
                 case Edge.VerticalRight:
-                    for (; top < bottom; top++)
+                    for (var y = top; y <= bottom; y++)
                     {
-                        if (!(map[top, right] == 0 && map[top, right + 1] == 1))
+                        if (!(map[y, right] == 0 && map[y, right + 1] == 1))
                             continue;
                         if (++n < HeightMin / 3)
                             continue;
@@ -259,6 +257,13 @@ namespace BurageSnap
                     return false;
             }
             return false;
+        }
+
+        private bool CheckEdgeStrict(byte[,] map, int left, int right, int top, int bottom, Edge edge)
+        {
+            return CheckEdge(map, left, right, top, bottom, edge) &&
+                   CheckEitherEndClean(map, left, right, top, bottom, edge) &&
+                   CheckEnoughLength(map, left, right, top, bottom, edge);
         }
 
         private bool CheckEitherEndClean(byte[,] map, int left, int right, int top, int bottom, Edge edge)
@@ -321,6 +326,45 @@ namespace BurageSnap
                             return false;
                     }
                     return true;
+            }
+            return false;
+        }
+
+        private bool CheckEnoughLength(byte[,] map, int left, int right, int top, int bottom, Edge edge)
+        {
+            var n = 0;
+            var hlen = (right - left + 1) * 0.7;
+            var vlen = (bottom - top + 1) * 0.7;
+            switch (edge)
+            {
+                case Edge.HorizontalTop:
+                    for (var x = left; x <= right; x++)
+                    {
+                        if (map[top - 1, x] == 1)
+                            n++;
+                    }
+                    return n >= hlen;
+                case Edge.VerticalLeft:
+                    for (var y = top; y <= bottom; y++)
+                    {
+                        if (map[y, left - 1] == 1)
+                            n++;
+                    }
+                    return n >= vlen;
+                case Edge.HorizontalBottom:
+                    for (var x = left; x <= right; x++)
+                    {
+                        if (map[bottom + 1, x] == 1)
+                            n++;
+                    }
+                    return n >= hlen;
+                case Edge.VerticalRight:
+                    for (var y = top; y <= bottom; y++)
+                    {
+                        if (map[y, right + 1] == 1)
+                            n++;
+                    }
+                    return n >= vlen;
             }
             return false;
         }
