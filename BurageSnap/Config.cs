@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Drawing;
 using System.IO;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace BurageSnap
@@ -27,8 +27,9 @@ namespace BurageSnap
 
     public class Config
     {
+
         private static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
-        public Point Location { get; set; }
+        public Point Location { get; set; } = new Point(double.MinValue, double.MinValue);
         public bool TopMost { get; set; }
         public int Interval { get; set; } = 200;
         public int RingBuffer { get; set; } = 25;

@@ -117,23 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FormMain_buttonCapture_Click_Start" xml:space="preserve">
+  <data name="MainWindow_Start" xml:space="preserve">
     <value>開始</value>
   </data>
-  <data name="FormMain_buttonCapture_Click_Stop" xml:space="preserve">
+  <data name="MainWindow_Stop" xml:space="preserve">
     <value>停止</value>
   </data>
-  <data name="FormMain_checkBoxContinuous_CheckedChanged_Capture" xml:space="preserve">
+  <data name="MainWindow_Capture" xml:space="preserve">
     <value>撮影</value>
-  </data>
-  <data name="OptionDialog_textBoxInterval_Validating_Interval" xml:space="preserve">
-    <value>間隔は10msから1000秒の間で指定してください。</value>
-  </data>
-  <data name="OptionDialog_textBoxRingBuffer_Validating" xml:space="preserve">
-    <value>フレームバッファのサイズは0から100の間で指定してください。</value>
-  </data>
-  <data name="OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF" xml:space="preserve">
-    <value>アニメーションGIFを出力するにはリングバッファのサイズを0より大きくしてください。</value>
   </data>
   <data name="Recorder_IO_Error" xml:space="preserve">
     <value>I/Oエラー</value>
@@ -141,7 +132,22 @@
   <data name="Recorder_CaptureFrame_detect_error" xml:space="preserve">
     <value>検出エラー</value>
   </data>
-  <data name="OptionDialog_OptionDialog_Load_Options" xml:space="preserve">
-    <value> - オプション</value>
+  <data name="ConfirmView_Message" xml:space="preserve">
+    <value>画像を出力しますか？</value>
+  </data>
+  <data name="ConfirmView_No" xml:space="preserve">
+    <value>いいえ</value>
+  </data>
+  <data name="ConfirmView_Title" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="ConfirmView_Yes" xml:space="preserve">
+    <value>はい</value>
+  </data>
+  <data name="MainWindow_Continuous" xml:space="preserve">
+    <value>連射</value>
+  </data>
+  <data name="MainWindow_Last_snap" xml:space="preserve">
+    <value>撮影時刻</value>
   </data>
 </root>

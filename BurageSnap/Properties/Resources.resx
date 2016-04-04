@@ -127,23 +127,14 @@
   <data name="cogs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\cogs.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="FormMain_buttonCapture_Click_Stop" xml:space="preserve">
+  <data name="MainWindow_Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
-  <data name="FormMain_buttonCapture_Click_Start" xml:space="preserve">
+  <data name="MainWindow_Start" xml:space="preserve">
     <value>Start</value>
   </data>
-  <data name="FormMain_checkBoxContinuous_CheckedChanged_Capture" xml:space="preserve">
+  <data name="MainWindow_Capture" xml:space="preserve">
     <value>Capture</value>
-  </data>
-  <data name="OptionDialog_textBoxInterval_Validating_Interval" xml:space="preserve">
-    <value>Interval must be in the range of 10 ms to 1000 sec.</value>
-  </data>
-  <data name="OptionDialog_textBoxRingBuffer_Validating" xml:space="preserve">
-    <value>The size of the ring buffer must be in the range of 0 to 100.</value>
-  </data>
-  <data name="OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF" xml:space="preserve">
-    <value>The size of the ring buffer must be grater than 0 to generate animation GIF.</value>
   </data>
   <data name="Recorder_IO_Error" xml:space="preserve">
     <value>I/O Error</value>
@@ -151,7 +142,22 @@
   <data name="Recorder_CaptureFrame_detect_error" xml:space="preserve">
     <value>detect error</value>
   </data>
-  <data name="OptionDialog_OptionDialog_Load_Options" xml:space="preserve">
-    <value> - Options</value>
+  <data name="ConfirmView_Message" xml:space="preserve">
+    <value>Output the images?</value>
+  </data>
+  <data name="ConfirmView_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="ConfirmView_Title" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ConfirmView_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="MainWindow_Continuous" xml:space="preserve">
+    <value>Burst</value>
+  </data>
+  <data name="MainWindow_Last_snap" xml:space="preserve">
+    <value>Last snap</value>
   </data>
 </root>

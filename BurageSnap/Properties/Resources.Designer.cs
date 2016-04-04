@@ -22,7 +22,7 @@ namespace BurageSnap.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace BurageSnap.Properties {
         ///   このクラスで使用されているキャッシュされた ResourceManager インスタンスを返します。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BurageSnap.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace BurageSnap.Properties {
         ///   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace BurageSnap.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
-        internal static System.Drawing.Bitmap cogs {
+        public static System.Drawing.Bitmap cogs {
             get {
                 object obj = ResourceManager.GetObject("cogs", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -71,9 +71,45 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Output the images? に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConfirmView_Message {
+            get {
+                return ResourceManager.GetString("ConfirmView_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   No に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConfirmView_No {
+            get {
+                return ResourceManager.GetString("ConfirmView_No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Confirm に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConfirmView_Title {
+            get {
+                return ResourceManager.GetString("ConfirmView_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Yes に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string ConfirmView_Yes {
+            get {
+                return ResourceManager.GetString("ConfirmView_Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
-        internal static System.Drawing.Bitmap folder_open {
+        public static System.Drawing.Bitmap folder_open {
             get {
                 object obj = ResourceManager.GetObject("folder_open", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -83,7 +119,7 @@ namespace BurageSnap.Properties {
         /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
-        internal static System.Drawing.Bitmap folder_open_16 {
+        public static System.Drawing.Bitmap folder_open_16 {
             get {
                 object obj = ResourceManager.GetObject("folder_open_16", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -91,72 +127,54 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Capture に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Capture {
+            get {
+                return ResourceManager.GetString("MainWindow_Capture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Burst に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Continuous {
+            get {
+                return ResourceManager.GetString("MainWindow_Continuous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Last snap に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Last_snap {
+            get {
+                return ResourceManager.GetString("MainWindow_Last_snap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Start に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string FormMain_buttonCapture_Click_Start {
+        public static string MainWindow_Start {
             get {
-                return ResourceManager.GetString("FormMain_buttonCapture_Click_Start", resourceCulture);
+                return ResourceManager.GetString("MainWindow_Start", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Stop に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string FormMain_buttonCapture_Click_Stop {
+        public static string MainWindow_Stop {
             get {
-                return ResourceManager.GetString("FormMain_buttonCapture_Click_Stop", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Capture に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string FormMain_checkBoxContinuous_CheckedChanged_Capture {
-            get {
-                return ResourceManager.GetString("FormMain_checkBoxContinuous_CheckedChanged_Capture", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   The size of the ring buffer must be grater than 0 to generate animation GIF. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF {
-            get {
-                return ResourceManager.GetString("OptionDialog_buttonOk_Click_Ring_buffer_for_animation_GIF", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    - Options に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string OptionDialog_OptionDialog_Load_Options {
-            get {
-                return ResourceManager.GetString("OptionDialog_OptionDialog_Load_Options", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Interval must be in the range of 10 ms to 1000 sec. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string OptionDialog_textBoxInterval_Validating_Interval {
-            get {
-                return ResourceManager.GetString("OptionDialog_textBoxInterval_Validating_Interval", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   The size of the ring buffer must be in the range of 0 to 100. に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        internal static string OptionDialog_textBoxRingBuffer_Validating {
-            get {
-                return ResourceManager.GetString("OptionDialog_textBoxRingBuffer_Validating", resourceCulture);
+                return ResourceManager.GetString("MainWindow_Stop", resourceCulture);
             }
         }
         
         /// <summary>
         ///   detect error に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string Recorder_CaptureFrame_detect_error {
+        public static string Recorder_CaptureFrame_detect_error {
             get {
                 return ResourceManager.GetString("Recorder_CaptureFrame_detect_error", resourceCulture);
             }
@@ -165,7 +183,7 @@ namespace BurageSnap.Properties {
         /// <summary>
         ///   I/O Error に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        internal static string Recorder_IO_Error {
+        public static string Recorder_IO_Error {
             get {
                 return ResourceManager.GetString("Recorder_IO_Error", resourceCulture);
             }

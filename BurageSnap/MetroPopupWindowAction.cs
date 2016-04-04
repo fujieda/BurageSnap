@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2015 Kazuhiro Fujieda <fujieda@users.osdn.me>
+﻿// Copyright (C) 2016 Kazuhiro Fujieda <fujieda@users.osdn.me>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Windows.Forms;
+using System.Windows;
+using MahApps.Metro.Controls;
+using Prism.Interactivity;
 
 namespace BurageSnap
 {
-    public partial class ConfirmDialog : Form
+    internal class MetroPopupWindowAction : PopupWindowAction
     {
-        public ConfirmDialog()
+        protected override Window CreateWindow()
         {
-            InitializeComponent();
+            return new MetroWindow
+            {
+                Style = new Style(),
+                SizeToContent = SizeToContent.WidthAndHeight
+            };
         }
     }
 }
