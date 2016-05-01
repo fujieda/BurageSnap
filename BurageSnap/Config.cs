@@ -46,6 +46,8 @@ namespace BurageSnap
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
         public bool Continuous { get; set; }
         public bool AnimationGif { get; set; }
+        public int HotKeyModifier { get; set; }
+        public string HotKey { get; set; } = "";
 
         public Config()
         {

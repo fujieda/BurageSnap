@@ -7,7 +7,6 @@
              xmlns:proprties="clr-namespace:BurageSnap.Properties"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://www.codeplex.com/prism"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
              FocusManager.FocusedElement="{Binding ElementName=buttonOk}" FontFamily="Meiryo UI">
     <UserControl.Resources>
@@ -68,28 +67,24 @@
                     <Label x:Name="labelWindow" Content="{x:Static proprties:Resources.OptionView_Window}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0"/>
                     <CheckBox x:Name="checkBoxTopMost" Content="{x:Static proprties:Resources.OptionView_Top_most}" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Options.TopMost}"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label x:Name="labelHotkey" Content="{x:Static proprties:Resources.OptionView_Hot_key}" HorizontalAlignment="Left" Margin="0,0,5,0" VerticalAlignment="Top"/>
-                    <Grid HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0 0 5 0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox x:Name="checkBox" Content="Ctrl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0 0 5 1"/>
-                        <CheckBox x:Name="checkBox1" Content="Shift" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1" Margin="0 0 1 1"/>
-                        <CheckBox x:Name="checkBox2" Content="Alt" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="0" Margin="0 0 5 0"/>
-                        <CheckBox x:Name="checkBox3" Content="Win" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1"/>
-                    </Grid>
-                    <ComboBox x:Name="comboBox" HorizontalAlignment="Left" VerticalAlignment="Top" Width="52">
-                        <system:String>A</system:String>
-                        <system:String>B</system:String>
-                        <system:String>C</system:String>
-                    </ComboBox>
-                </StackPanel>
+                <Grid HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0 0 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label x:Name="labelHotkey" Content="{x:Static proprties:Resources.OptionView_Hot_key}" HorizontalAlignment="Left" Grid.RowSpan="2" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="checkBoxAlt" Content="Alt" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1" Margin="0 0 5 1" IsChecked="{Binding Modifier.Alt}" IsEnabled="{Binding IsKeySelected}"/>
+                    <CheckBox x:Name="checkBoxCtrl" Content="Ctrl" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Margin="0 0 5 1" IsChecked="{Binding Modifier.Control}" IsEnabled="{Binding IsKeySelected}"/>
+                    <CheckBox x:Name="checkBoxShift" Content="Shift" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0 0 5 0" IsChecked="{Binding Modifier.Shift}" IsEnabled="{Binding IsKeySelected}"/>
+                    <CheckBox x:Name="checkBoxWin" Content="Win" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="2" IsChecked="{Binding Modifier.Win}" IsEnabled="{Binding IsKeySelected}"/>
+                    <ComboBox x:Name="comboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75" Grid.Row="0" Grid.Column="3" Grid.RowSpan="2" IsReadOnly="True" ItemsSource="{Binding KeyList}" SelectedItem="{Binding HotKey}"/>
+                </Grid>
             </StackPanel>
             <StackPanel Margin="10 10 0 0" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <DockPanel Margin="0 0 0 5">

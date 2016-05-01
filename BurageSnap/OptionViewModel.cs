@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using Prism.Commands;
@@ -30,7 +31,9 @@ namespace BurageSnap
             get { return _notification; }
             set
             {
-                Options = value.Content as OptionContent;
+                Options = (OptionContent)value.Content;
+                Modifier = new KeyModifier {Value = Options.HotKeyModifier};
+                HotKey = Options.HotKey;
                 SetProperty(ref _notification, value);
             }
         }
@@ -53,6 +56,35 @@ namespace BurageSnap
             set { SetProperty(ref _title, value); }
         }
 
+        public IEnumerable<string> KeyList => GlobelHotKey.KeyList;
+
+        private KeyModifier _modifier;
+
+        public KeyModifier Modifier
+        {
+            get { return _modifier; }
+            set { SetProperty(ref _modifier, value); }
+        }
+
+        private string _hotKey;
+
+        public string HotKey
+        {
+            get { return _hotKey; }
+            set
+            {
+                SetProperty(ref _hotKey, value);
+                if (value == "")
+                {
+                    Modifier.Value = 0;
+                    OnPropertyChanged(() => Modifier);
+                }
+                OnPropertyChanged(() => IsKeySelected);
+            }
+        }
+
+        public bool IsKeySelected => HotKey != "";
+
         public ICommand OkCommand { get; private set; }
         public ICommand CancelCommand { get; private set; }
         public ICommand SelectedCommand { get; private set; }
@@ -63,13 +95,15 @@ namespace BurageSnap
         {
             OkCommand = new DelegateCommand(OkInteraction);
             CancelCommand = new DelegateCommand(CancelInteraction);
-            SelectedCommand= new DelegateCommand<object[]>(Selected);
+            SelectedCommand = new DelegateCommand<object[]>(Selected);
             AddTitleCommand = new DelegateCommand(AddTitle);
             RemoveTitleCommand = new DelegateCommand(RemoveTitle);
         }
 
         public void OkInteraction()
         {
+            Options.HotKeyModifier = Modifier.Value;
+            Options.HotKey = HotKey;
             ((IConfirmation)Notification).Confirmed = true;
             FinishInteraction();
         }
@@ -100,5 +134,4 @@ namespace BurageSnap
             Options.WindowTitles.Remove(Title);
         }
     }
-
 }

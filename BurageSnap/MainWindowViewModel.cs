@@ -73,6 +73,8 @@ namespace BurageSnap
         private void Loaded()
         {
             RestoreLocation();
+            SetHotKey();
+            _globelHotKey.HotKeyPressed += Capture;
         }
 
         private void RestoreLocation()
@@ -106,7 +108,16 @@ namespace BurageSnap
                     return;
                 ((OptionContent)c.Content).ToConfig(Main.Config);
                 Application.Current.MainWindow.Topmost = Main.Config.TopMost;
+                SetHotKey();
             });
+        }
+
+        private readonly GlobelHotKey _globelHotKey = new GlobelHotKey();
+
+        private void SetHotKey()
+        {
+            var config = Main.Config;
+            _globelHotKey.Register(Application.Current.MainWindow, config.HotKeyModifier, config.HotKey);
         }
 
         private void Closing()
@@ -117,6 +128,7 @@ namespace BurageSnap
                 ? new Point(main.Left, main.Top)
                 : new Point(main.RestoreBounds.Left, main.RestoreBounds.Top);
             config.Save();
+            _globelHotKey.Unregister();
         }
 
         public static bool IsVisibleOnScreen(Rect rect)
@@ -145,6 +157,7 @@ namespace BurageSnap
 
         private void ConfirmSaveBuffer()
         {
+            Application.Current.MainWindow.WindowState = WindowState.Normal;
             ConfirmationRequest.Raise(new Confirmation {Title = Resources.ConfirmView_Title}, c =>
             {
                 if (c.Confirmed)

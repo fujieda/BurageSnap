@@ -89,6 +89,8 @@
     </Compile>
     <Compile Include="ConfirmViewModel.cs" />
     <Compile Include="EnumBooleanConverter.cs" />
+    <Compile Include="GlobelHotKey.cs" />
+    <Compile Include="KeyModifier.cs" />
     <Compile Include="MetroPopupWindowAction.cs" />
     <Compile Include="NeuQuant.cs" />
     <Compile Include="OptionContent.cs" />

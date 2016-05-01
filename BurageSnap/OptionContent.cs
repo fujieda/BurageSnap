@@ -27,6 +27,8 @@ namespace BurageSnap
         public bool DailyFolder { get; set; }
         public OutputFormat Format { get; set; }
         public bool AnimationGif { get; set; }
+        public int HotKeyModifier { get; set; }
+        public string HotKey { get; set; } = "";
 
         public OptionContent(Config config)
         {
