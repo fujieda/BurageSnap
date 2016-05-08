@@ -94,6 +94,7 @@
     <Compile Include="KeyModifier.cs" />
     <Compile Include="MetroPopupWindowAction.cs" />
     <Compile Include="NeuQuant.cs" />
+    <Compile Include="NotifyIconWrapper.cs" />
     <Compile Include="OptionContent.cs" />
     <Compile Include="OptionView.xaml.cs">
       <DependentUpon>OptionView.xaml</DependentUpon>

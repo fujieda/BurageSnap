@@ -172,6 +172,24 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Exit に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NotifyIcon_Exit {
+            get {
+                return ResourceManager.GetString("NotifyIcon_Exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Open に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NotifyIcon_Open {
+            get {
+                return ResourceManager.GetString("NotifyIcon_Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Add に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string OptionView_Add {
@@ -276,6 +294,15 @@ namespace BurageSnap.Properties {
         public static string OptionView_Remove {
             get {
                 return ResourceManager.GetString("OptionView_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Reside in system tray に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Reside_in_system_tray {
+            get {
+                return ResourceManager.GetString("OptionView_Reside_in_system_tray", resourceCulture);
             }
         }
         

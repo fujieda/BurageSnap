@@ -63,10 +63,19 @@
                     <TextBox x:Name="textBoxRingBuffer" HorizontalAlignment="Left" Text="{Binding Options.RingBuffer}" VerticalAlignment="Center" Width="41" TextAlignment="Right"  Margin="0 0 5 0"/>
                     <Label x:Name="labelFrames" Content="{x:Static proprties:Resources.OptionView_Frames}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0 0 0 15">
-                    <Label x:Name="labelWindow" Content="{x:Static proprties:Resources.OptionView_Window}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                    <CheckBox x:Name="checkBoxTopMost" Content="{x:Static proprties:Resources.OptionView_Top_most}" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="{Binding Options.TopMost}"/>
-                </StackPanel>
+                <Grid Margin="0 0 0 15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label x:Name="labelWindow" Content="{x:Static proprties:Resources.OptionView_Window}" Margin="0 0 5 0"/>
+                    <CheckBox x:Name="checkBoxTopMost" Content="{x:Static proprties:Resources.OptionView_Top_most}" Grid.Row="0" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.TopMost}"/>
+                    <CheckBox x:Name="checkBoxHideOnMinimize" Content="{x:Static proprties:Resources.OptionView_Reside_in_system_tray}" Grid.Row="1" Grid.Column="1" IsChecked="{Binding Options.ResideInSystemTray}"/>
+                </Grid>
                 <Grid HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0 0 0 0">
                     <Grid.RowDefinitions>
                         <RowDefinition/>

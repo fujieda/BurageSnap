@@ -198,4 +198,13 @@
   <data name="OptionView_Option" xml:space="preserve">
     <value>オプション</value>
   </data>
+  <data name="NotifyIcon_Exit" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="NotifyIcon_Open" xml:space="preserve">
+    <value>開く</value>
+  </data>
+  <data name="OptionView_Reside_in_system_tray" xml:space="preserve">
+    <value>システムトレイに常駐する</value>
+  </data>
 </root>

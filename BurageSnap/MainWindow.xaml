@@ -10,7 +10,8 @@
         xmlns:properties="clr-namespace:BurageSnap.Properties"
         mc:Ignorable="d"
         Style="{StaticResource WindowStyle}"
-        Title="BurageSnap" Height="114" Width="169" ResizeMode="CanMinimize" Icon="app.ico">
+        Title="BurageSnap" Height="114" Width="169" ResizeMode="CanMinimize" Icon="app.ico"
+        ShowInTaskbar="{Binding ShowInTaskbar}" WindowState="{Binding WindowState}">
     <controls:MetroWindow.DataContext>
         <local:MainWindowViewModel/>
     </controls:MetroWindow.DataContext>
@@ -18,6 +19,16 @@
         <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}"/>
     </Window.Resources>
     <Grid>
+        <local:NotifyIconWrapper Text="BurageSnap">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="OpenSelected">
+                    <i:InvokeCommandAction Command="{Binding NotifyIconOpenCommand}"/>
+                </i:EventTrigger>
+                <i:EventTrigger EventName="ExitSelected">
+                    <i:InvokeCommandAction Command="{Binding NotifyIconExitCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </local:NotifyIconWrapper>
         <Button x:Name="buttonCapture" Content="{Binding CaptureButtonText}" HorizontalAlignment="Left" Margin="8,8,0,0" VerticalAlignment="Top" Width="77" Height="51" FontSize="12" Command="{Binding CaptureCommand}"/>
         <Button x:Name="buttonBrowse" HorizontalAlignment="Left" Margin="93,9,0,0" VerticalAlignment="Top" Width="31" Height="31" Command="{Binding BrowseCommand}">
             <Image Source="folder_open.ico"/>
@@ -31,10 +42,10 @@
     </Grid>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
+            <prism:InvokeCommandAction Command="{Binding LoadedCommand}"/>
         </i:EventTrigger>
         <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding ClosingCommand}"/>
+            <prism:InvokeCommandAction Command="{Binding ClosingCommand}"/>
         </i:EventTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding ConfirmationRequest, Mode=OneWay}">
             <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True" Owner="{Binding ElementName=mainWindow}">

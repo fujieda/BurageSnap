@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Reflection;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using BurageSnap.Properties;
@@ -32,6 +33,8 @@ namespace BurageSnap
         public ICommand CaptureCommand { get; private set; }
         public InteractionRequest<IConfirmation> ConfirmationRequest { get; } = new InteractionRequest<IConfirmation>();
         public InteractionRequest<IConfirmation> OptionViewRequest { get; } = new InteractionRequest<IConfirmation>();
+        public ICommand NotifyIconOpenCommand { get; private set; }
+        public ICommand NotifyIconExitCommand { get; private set; }
 
         public bool BurstMode
         {
@@ -52,6 +55,21 @@ namespace BurageSnap
                     : Resources.MainWindow_Start
                 : Resources.MainWindow_Capture;
 
+        public bool ShowInTaskbar => !(WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray);
+
+        public WindowState WindowState
+        {
+            get { return Main.Config.WindowState; }
+            set
+            {
+                if (Main.Config.WindowState == value)
+                    return;
+                Main.Config.WindowState = value;
+                OnPropertyChanged(() => WindowState);
+                OnPropertyChanged(() => ShowInTaskbar);
+            }
+        }
+
         public MainWindowViewModel()
         {
             Main = new Main();
@@ -64,10 +82,16 @@ namespace BurageSnap
                 }
             };
             LoadedCommand = new DelegateCommand(Loaded);
-            ClosingCommand = new DelegateCommand(Closing);
+            ClosingCommand = new DelegateCommand<CancelEventArgs>(Closing);
             BrowseCommand = new DelegateCommand(Main.OpenPictureFolder);
             OptionCommand = new DelegateCommand(SelectOption);
             CaptureCommand = new DelegateCommand(Capture);
+            NotifyIconOpenCommand = new DelegateCommand(() => { WindowState = WindowState.Normal; });
+            NotifyIconExitCommand = new DelegateCommand(() =>
+            {
+                Terminate();
+                Application.Current.Shutdown();
+            });
         }
 
         private void Loaded()
@@ -120,7 +144,26 @@ namespace BurageSnap
             _globelHotKey.Register(Application.Current.MainWindow, config.HotKeyModifier, config.HotKey);
         }
 
-        private void Closing()
+        private void Closing(CancelEventArgs e)
+        {
+            if (Main.Config.ResideInSystemTray)
+            {
+                e.Cancel = true;
+                WindowState = WindowState.Minimized;
+            }
+            else
+            {
+                Terminate();
+            }
+        }
+
+        public void Terminate()
+        {
+            SaveConfig();
+            _globelHotKey.Unregister();
+        }
+
+        private void SaveConfig()
         {
             var config = Main.Config;
             var main = Application.Current.MainWindow;
@@ -128,7 +171,6 @@ namespace BurageSnap
                 ? new Point(main.Left, main.Top)
                 : new Point(main.RestoreBounds.Left, main.RestoreBounds.Top);
             config.Save();
-            _globelHotKey.Unregister();
         }
 
         public static bool IsVisibleOnScreen(Rect rect)
@@ -157,7 +199,7 @@ namespace BurageSnap
 
         private void ConfirmSaveBuffer()
         {
-            Application.Current.MainWindow.WindowState = WindowState.Normal;
+            WindowState = WindowState.Normal;
             ConfirmationRequest.Raise(new Confirmation {Title = Resources.ConfirmView_Title}, c =>
             {
                 if (c.Confirmed)

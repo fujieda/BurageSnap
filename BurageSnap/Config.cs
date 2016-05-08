@@ -31,6 +31,8 @@ namespace BurageSnap
         private static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
         public Point Location { get; set; } = new Point(double.MinValue, double.MinValue);
         public bool TopMost { get; set; }
+        public bool ResideInSystemTray { get; set; }
+        public WindowState WindowState { get; set; }
         public int Interval { get; set; } = 200;
         public int RingBuffer { get; set; } = 25;
 

@@ -20,6 +20,7 @@ namespace BurageSnap
     public class OptionContent
     {
         public bool TopMost { get; set; }
+        public bool ResideInSystemTray { get; set; }
         public int Interval { get; set; }
         public int RingBuffer { get; set; }
         public ObservableCollection<string> WindowTitles { get; set; }
