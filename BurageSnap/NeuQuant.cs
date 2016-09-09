@@ -37,7 +37,6 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace BurageSnap
 {
@@ -123,7 +122,7 @@ namespace BurageSnap
                         *ptr = pix == 0 ? (byte)0 : (byte)(Lookup(pix) + 1);
                     }
                 }
-            };
+            }
             bmp8.UnlockBits(data8);
             return bmp8;
         }
@@ -151,9 +150,9 @@ namespace BurageSnap
             for (var i = Specials; i < NetSize; i++)
             {
                 var p = _network[i] = new double[3];
-                p[0] = (255.0 * (i - Specials)) / CutNetSize;
-                p[1] = (255.0 * (i - Specials)) / CutNetSize;
-                p[2] = (255.0 * (i - Specials)) / CutNetSize;
+                p[0] = 255.0 * (i - Specials) / CutNetSize;
+                p[1] = 255.0 * (i - Specials) / CutNetSize;
+                p[2] = 255.0 * (i - Specials) / CutNetSize;
                 _freq[i] = 1.0 / NetSize;
                 _freq[i] = 0.0;
             }
@@ -184,7 +183,7 @@ namespace BurageSnap
         private void Learn()
         {
             var biasRadius = InitBiasRadius;
-            var alphadec = 30 + ((_sampleFac - 1) / 3);
+            var alphadec = 30 + (_sampleFac - 1) / 3;
             var lengthCount = _pixels.Length;
             var samplepixels = lengthCount / _sampleFac;
             var delta = samplepixels / Cycles;
@@ -194,11 +193,11 @@ namespace BurageSnap
             if (rad <= 1)
                 rad = 0;
 
-            var step = (lengthCount % Prime1) != 0
+            var step = lengthCount % Prime1 != 0
                 ? Prime1
-                : (lengthCount % Prime2) != 0
+                : lengthCount % Prime2 != 0
                     ? Prime2
-                    : (lengthCount % Prime3) != 0 ? Prime3 : Prime4;
+                    : lengthCount % Prime3 != 0 ? Prime3 : Prime4;
 
             var pos = 0;
             var i = 0;
@@ -207,7 +206,7 @@ namespace BurageSnap
                 var p = _pixels[pos];
                 var red = (p >> 16) & 0xff;
                 var green = (p >> 8) & 0xff;
-                var blue = (p) & 0xff;
+                var blue = p & 0xff;
 
                 double b = blue;
                 double g = green;
@@ -244,9 +243,9 @@ namespace BurageSnap
         {
             // Move neuron i towards biased (b,g,r) by factor alpha
             var n = _network[i]; // alter hit neuron
-            n[0] -= (alpha * (n[0] - b));
-            n[1] -= (alpha * (n[1] - g));
-            n[2] -= (alpha * (n[2] - r));
+            n[0] -= alpha * (n[0] - b);
+            n[1] -= alpha * (n[1] - g);
+            n[2] -= alpha * (n[2] - r);
         }
 
         private void AlterNeigh(double alpha, int rad, int i, double b, double g, double r)
@@ -261,22 +260,22 @@ namespace BurageSnap
             var q = 0;
             while ((j < hi) || (k > lo))
             {
-                var a = (alpha * (rad * rad - q * q)) / (rad * rad);
+                var a = alpha * (rad * rad - q * q) / (rad * rad);
                 q++;
                 if (j < hi)
                 {
                     var p = _network[j];
-                    p[0] -= (a * (p[0] - b));
-                    p[1] -= (a * (p[1] - g));
-                    p[2] -= (a * (p[2] - r));
+                    p[0] -= a * (p[0] - b);
+                    p[1] -= a * (p[1] - g);
+                    p[2] -= a * (p[2] - r);
                     j++;
                 }
                 if (k > lo)
                 {
                     var p = _network[k];
-                    p[0] -= (a * (p[0] - b));
-                    p[1] -= (a * (p[1] - g));
-                    p[2] -= (a * (p[2] - r));
+                    p[0] -= a * (p[0] - b);
+                    p[1] -= a * (p[1] - g);
+                    p[2] -= a * (p[2] - r);
                     k--;
                 }
             }
@@ -396,7 +395,7 @@ namespace BurageSnap
         {
             var r = (pixel >> 16) & 0xff;
             var g = (pixel >> 8) & 0xff;
-            var b = (pixel) & 0xff;
+            var b = pixel & 0xff;
 
             // Search for BGR values 0..255 and return colour index
             var bestd = 1000; // biggest possible dist is 256*3

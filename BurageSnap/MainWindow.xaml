@@ -7,7 +7,6 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:prism="http://www.codeplex.com/prism"
         xmlns:local="clr-namespace:BurageSnap"
-        xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:BurageSnap.Properties"
         mc:Ignorable="d"
         Style="{StaticResource WindowStyle}"
