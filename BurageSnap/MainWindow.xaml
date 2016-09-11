@@ -1,4 +1,4 @@
-﻿<controls:MetroWindow x:Class="BurageSnap.MainWindow"
+﻿<controls:MetroWindow x:Name="mainWindow" x:Class="BurageSnap.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -37,7 +37,7 @@
             <i:InvokeCommandAction Command="{Binding ClosingCommand}"/>
         </i:EventTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding ConfirmationRequest, Mode=OneWay}">
-            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True">
+            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True" Owner="{Binding ElementName=mainWindow}">
                 <local:MetroPopupWindowAction.WindowContent>
                     <local:ConfirmView/>
                 </local:MetroPopupWindowAction.WindowContent>
@@ -49,7 +49,7 @@
             </local:MetroPopupWindowAction>
         </prism:InteractionRequestTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding OptionViewRequest, Mode=OneWay}">
-            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True">
+            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True" Owner="{Binding ElementName=mainWindow}">
                 <local:MetroPopupWindowAction.WindowContent>
                     <local:OptionView/>
                 </local:MetroPopupWindowAction.WindowContent>

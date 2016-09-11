@@ -72,18 +72,24 @@ namespace BurageSnap
 
         private void Loaded()
         {
+            RestoreLocation();
+        }
+
+        private void RestoreLocation()
+        {
+            var window = Application.Current.MainWindow;
+            window.Topmost = Main.Config.TopMost;
             var location = Main.Config.Location;
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (location.X == double.MinValue)
                 return;
-            var main = Application.Current.MainWindow;
-            var width = main.Width;
-            var height = main.Width;
+            var width = window.Width;
+            var height = window.Height;
             var newBounds = new Rect(location.X, location.Y, width, height);
             if (!IsVisibleOnScreen(newBounds))
                 return;
-            main.Left = location.X;
-            main.Top = location.Y;
+            window.Left = location.X;
+            window.Top = location.Y;
         }
 
         private void SelectOption()
@@ -99,6 +105,7 @@ namespace BurageSnap
                 if (!c.Confirmed)
                     return;
                 ((OptionContent)c.Content).ToConfig(Main.Config);
+                Application.Current.MainWindow.Topmost = Main.Config.TopMost;
             });
         }
 

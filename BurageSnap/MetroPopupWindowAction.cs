@@ -20,6 +20,18 @@ namespace BurageSnap
 {
     internal class MetroPopupWindowAction : PopupWindowAction
     {
+        public static Window GetOwner(DependencyObject obj)
+        {
+            return (Window)obj.GetValue(OwnerProperty);
+        }
+
+        public static void SetOwner(DependencyObject obj, Window value)
+        {
+            obj.SetValue(OwnerProperty, value);
+        }
+
+        public static readonly DependencyProperty OwnerProperty = DependencyProperty.RegisterAttached("Owner", typeof(Window), typeof(MetroPopupWindowAction), new PropertyMetadata());
+
         protected override Window CreateWindow()
         {
             return new MetroWindow
@@ -27,6 +39,7 @@ namespace BurageSnap
                 Style = (Style)Application.Current.FindResource("WindowStyle"),
                 ResizeMode = ResizeMode.NoResize,
                 SizeToContent = SizeToContent.WidthAndHeight,
+                Owner = GetOwner(this)
             };
         }
     }
