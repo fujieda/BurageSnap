@@ -88,8 +88,14 @@
       <DependentUpon>ConfirmView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConfirmViewModel.cs" />
+    <Compile Include="EnumBooleanConverter.cs" />
     <Compile Include="MetroPopupWindowAction.cs" />
     <Compile Include="NeuQuant.cs" />
+    <Compile Include="OptionContent.cs" />
+    <Compile Include="OptionView.xaml.cs">
+      <DependentUpon>OptionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OptionViewModel.cs" />
     <Compile Include="Recorder.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
@@ -114,6 +120,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="OptionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindowViewModel.cs" />

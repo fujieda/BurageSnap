@@ -162,4 +162,52 @@
   <data name="MainWindow_Last_snap" xml:space="preserve">
     <value>Last snap</value>
   </data>
+  <data name="OptionView_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="OptionView_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="OptionView_Animation_GIF" xml:space="preserve">
+    <value>Animation GIF (Burst)</value>
+  </data>
+  <data name="OptionView_Create_daily_folders" xml:space="preserve">
+    <value>Create daily folders</value>
+  </data>
+  <data name="OptionView_Folder" xml:space="preserve">
+    <value>Folder:</value>
+  </data>
+  <data name="OptionView_Format" xml:space="preserve">
+    <value>Format:</value>
+  </data>
+  <data name="OptionView_Frames" xml:space="preserve">
+    <value>frames</value>
+  </data>
+  <data name="OptionView_Hot_key" xml:space="preserve">
+    <value>Hot key:</value>
+  </data>
+  <data name="OptionView_Interval" xml:space="preserve">
+    <value>Interval:</value>
+  </data>
+  <data name="OptionView_Choose_window" xml:space="preserve">
+    <value>Choose window</value>
+  </data>
+  <data name="OptionView_Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="OptionView_Ring_buffer" xml:space="preserve">
+    <value>Ring buffer:</value>
+  </data>
+  <data name="OptionView_Target_windows" xml:space="preserve">
+    <value>Target windows:</value>
+  </data>
+  <data name="OptionView_Top_most" xml:space="preserve">
+    <value>Top most</value>
+  </data>
+  <data name="OptionView_Window" xml:space="preserve">
+    <value>Window:</value>
+  </data>
+  <data name="OptionView_Option" xml:space="preserve">
+    <value>Option</value>
+  </data>
 </root>

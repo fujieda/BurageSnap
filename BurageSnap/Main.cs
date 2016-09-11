@@ -91,11 +91,6 @@ namespace BurageSnap
             }
         }
 
-        public void SaveConfig()
-        {
-            Config.Save();
-        }
-
         public void OpenPictureFolder()
         {
             var dir = Config.Folder;

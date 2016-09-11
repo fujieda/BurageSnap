@@ -24,8 +24,9 @@ namespace BurageSnap
         {
             return new MetroWindow
             {
-                Style = new Style(),
-                SizeToContent = SizeToContent.WidthAndHeight
+                Style = (Style)Application.Current.FindResource("WindowStyle"),
+                ResizeMode = ResizeMode.NoResize,
+                SizeToContent = SizeToContent.WidthAndHeight,
             };
         }
     }

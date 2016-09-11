@@ -150,4 +150,52 @@
   <data name="MainWindow_Last_snap" xml:space="preserve">
     <value>撮影時刻</value>
   </data>
+  <data name="OptionView_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="OptionView_Add" xml:space="preserve">
+    <value>追加</value>
+  </data>
+  <data name="OptionView_Animation_GIF" xml:space="preserve">
+    <value>アニメーションGIF (連射時)</value>
+  </data>
+  <data name="OptionView_Create_daily_folders" xml:space="preserve">
+    <value>日ごとにフォルダーを作る</value>
+  </data>
+  <data name="OptionView_Folder" xml:space="preserve">
+    <value>出力先:</value>
+  </data>
+  <data name="OptionView_Format" xml:space="preserve">
+    <value>出力形式:</value>
+  </data>
+  <data name="OptionView_Frames" xml:space="preserve">
+    <value>枚</value>
+  </data>
+  <data name="OptionView_Hot_key" xml:space="preserve">
+    <value>ホットキー:</value>
+  </data>
+  <data name="OptionView_Interval" xml:space="preserve">
+    <value>連射間隔:</value>
+  </data>
+  <data name="OptionView_Choose_window" xml:space="preserve">
+    <value>ウィンドウの選択</value>
+  </data>
+  <data name="OptionView_Remove" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="OptionView_Ring_buffer" xml:space="preserve">
+    <value>リングバッファ:</value>
+  </data>
+  <data name="OptionView_Target_windows" xml:space="preserve">
+    <value>撮影対象のウィンドウ:</value>
+  </data>
+  <data name="OptionView_Top_most" xml:space="preserve">
+    <value>最前面に表示する</value>
+  </data>
+  <data name="OptionView_Window" xml:space="preserve">
+    <value>ウィンドウ:</value>
+  </data>
+  <data name="OptionView_Option" xml:space="preserve">
+    <value>オプション</value>
+  </data>
 </root>

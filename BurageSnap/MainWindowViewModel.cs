@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using BurageSnap.Properties;
@@ -27,8 +28,10 @@ namespace BurageSnap
         public ICommand LoadedCommand { get; private set; }
         public ICommand ClosingCommand { get; private set; }
         public ICommand BrowseCommand { get; private set; }
+        public ICommand OptionCommand { get; private set; }
         public ICommand CaptureCommand { get; private set; }
         public InteractionRequest<IConfirmation> ConfirmationRequest { get; } = new InteractionRequest<IConfirmation>();
+        public InteractionRequest<IConfirmation> OptionViewRequest { get; } = new InteractionRequest<IConfirmation>();
 
         public bool BurstMode
         {
@@ -63,6 +66,7 @@ namespace BurageSnap
             LoadedCommand = new DelegateCommand(Loaded);
             ClosingCommand = new DelegateCommand(Closing);
             BrowseCommand = new DelegateCommand(Main.OpenPictureFolder);
+            OptionCommand = new DelegateCommand(SelectOption);
             CaptureCommand = new DelegateCommand(Capture);
         }
 
@@ -80,6 +84,22 @@ namespace BurageSnap
                 return;
             main.Left = location.X;
             main.Top = location.Y;
+        }
+
+        private void SelectOption()
+        {
+            var assembly = Assembly.GetExecutingAssembly().GetName();
+            OptionViewRequest.Raise(new Confirmation
+            {
+                Title = assembly.Name + " " + assembly.Version.Major + "." + assembly.Version.Minor + " - " +
+                        Resources.OptionView_Option,
+                Content = new OptionContent(Main.Config)
+            }, c =>
+            {
+                if (!c.Confirmed)
+                    return;
+                ((OptionContent)c.Content).ToConfig(Main.Config);
+            });
         }
 
         private void Closing()

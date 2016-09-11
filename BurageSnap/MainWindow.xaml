@@ -22,7 +22,7 @@
         <Button x:Name="buttonBrowse" HorizontalAlignment="Left" Margin="93,9,0,0" VerticalAlignment="Top" Width="31" Height="31" Command="{Binding BrowseCommand}">
             <Image Source="folder_open.ico"/>
         </Button>
-        <Button x:Name="buttonOption" HorizontalAlignment="Left" Margin="130,9,0,0" VerticalAlignment="Top" Width="31" Height="31" IsEnabled="{Binding AllowChangeSettings}">
+        <Button x:Name="buttonOption" HorizontalAlignment="Left" Margin="130,9,0,0" VerticalAlignment="Top" Width="31" Height="31" IsEnabled="{Binding AllowChangeSettings}" Command="{Binding OptionCommand}">
             <Image Source="cogs.ico"/>
         </Button>
         <Label x:Name="labeLastSnap" Content="{x:Static properties:Resources.MainWindow_Last_snap}" HorizontalAlignment="Left" Margin="87,46,0,0" VerticalAlignment="Top"/>
@@ -43,10 +43,16 @@
                 </local:MetroPopupWindowAction.WindowContent>
                 <local:MetroPopupWindowAction.WindowStyle>
                     <Style TargetType="controls:MetroWindow" BasedOn="{StaticResource WindowStyle}">
-                        <Setter Property="ResizeMode" Value="NoResize"/>
                         <Setter Property="ShowInTaskbar" Value="False"/>
                     </Style>
                 </local:MetroPopupWindowAction.WindowStyle>
+            </local:MetroPopupWindowAction>
+        </prism:InteractionRequestTrigger>
+        <prism:InteractionRequestTrigger SourceObject="{Binding OptionViewRequest, Mode=OneWay}">
+            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True">
+                <local:MetroPopupWindowAction.WindowContent>
+                    <local:OptionView/>
+                </local:MetroPopupWindowAction.WindowContent>
             </local:MetroPopupWindowAction>
         </prism:InteractionRequestTrigger>
     </i:Interaction.Triggers>

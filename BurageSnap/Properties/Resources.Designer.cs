@@ -172,6 +172,150 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Add に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Add {
+            get {
+                return ResourceManager.GetString("OptionView_Add", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Animation GIF (Burst) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Animation_GIF {
+            get {
+                return ResourceManager.GetString("OptionView_Animation_GIF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cancel に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Cancel {
+            get {
+                return ResourceManager.GetString("OptionView_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Choose window に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Choose_window {
+            get {
+                return ResourceManager.GetString("OptionView_Choose_window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Create daily folders に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Create_daily_folders {
+            get {
+                return ResourceManager.GetString("OptionView_Create_daily_folders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Folder: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Folder {
+            get {
+                return ResourceManager.GetString("OptionView_Folder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Format: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Format {
+            get {
+                return ResourceManager.GetString("OptionView_Format", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   frames に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Frames {
+            get {
+                return ResourceManager.GetString("OptionView_Frames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Hot key: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Hot_key {
+            get {
+                return ResourceManager.GetString("OptionView_Hot_key", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Interval: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Interval {
+            get {
+                return ResourceManager.GetString("OptionView_Interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Option に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Option {
+            get {
+                return ResourceManager.GetString("OptionView_Option", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Remove に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Remove {
+            get {
+                return ResourceManager.GetString("OptionView_Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ring buffer: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Ring_buffer {
+            get {
+                return ResourceManager.GetString("OptionView_Ring_buffer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Target windows: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Target_windows {
+            get {
+                return ResourceManager.GetString("OptionView_Target_windows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Top most に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Top_most {
+            get {
+                return ResourceManager.GetString("OptionView_Top_most", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Window: に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Window {
+            get {
+                return ResourceManager.GetString("OptionView_Window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   detect error に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Recorder_CaptureFrame_detect_error {
