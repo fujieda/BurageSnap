@@ -116,7 +116,7 @@ namespace BurageSnap
         private Frame CaptureFrame(bool initial = false)
         {
             var bmp = initial
-                ? _screenCapture.CaptureGameScreen(_config.TitleHistory[0])
+                ? _screenCapture.CaptureGameScreen(_config.TitleHistory)
                 : _screenCapture.CaptureGameScreen();
             if (bmp == null)
             {

@@ -37,9 +37,10 @@ namespace BurageSnap
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
         }
 
-        public Bitmap CaptureGameScreen(string title)
+        public Bitmap CaptureGameScreen(string[] titles)
         {
-            _hWnd = FindWindow(title);
+            int index;
+            _hWnd = FindWindow(titles, out index);
             if (_hWnd == IntPtr.Zero)
                 return null;
             var rect = new Rect();
@@ -51,33 +52,40 @@ namespace BurageSnap
                 {
                     _rect = rect;
                     _rectangle = rectangle;
-                    _title = title;
+                    _title = titles[index];
                 }
                 else
                 {
                     using (var file = File.Create("debug.png"))
                         bmp.Save(file, ImageFormat.Png);
-                    if (_rectangle.IsEmpty || !_rect.Equals(rect) || _title != title)
+                    if (_rectangle.IsEmpty || !_rect.Equals(rect) || _title != titles[index])
                         return null;
                 }
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
             }
         }
 
-        private IntPtr FindWindow(string title)
+        private IntPtr FindWindow(string[] titles, out int index)
         {
             var found = IntPtr.Zero;
+            var idx = 0;
             EnumWindows((hWnd, lParam) =>
             {
                 var rect = new Rect();
                 if (GetWindowRect(hWnd, ref rect) == 0 || rect.Right - rect.Left < WidthMin ||
                     rect.Bottom - rect.Top < HeightMin)
                     return true;
-                if (!GetWindowText(hWnd).Contains(title))
-                    return true;
-                found = hWnd;
-                return false;
+                var text = GetWindowText(hWnd);
+                for (var i = 0; i < titles.Length; i++)
+                    if (text.Contains(titles[i]))
+                    {
+                        found = hWnd;
+                        idx = i;
+                        return false;
+                    }
+                return true;
             }, IntPtr.Zero);
+            index = idx;
             return found;
         }
 
@@ -97,7 +105,7 @@ namespace BurageSnap
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern int GetWindowTextLength(IntPtr hWnd);
 
-        public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
