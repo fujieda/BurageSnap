@@ -110,11 +110,16 @@
                 </ListBox>
                 <TextBox x:Name="textBoxWindowTitle" HorizontalAlignment="Stretch" Height="23" VerticalAlignment="Top" Text="{Binding Title, Mode=TwoWay}"/>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button x:Name="buttonChooseWindow" Content="{x:Static proprties:Resources.OptionView_Choose_window}" Margin="0 5 20 0"/>
+                    <Button x:Name="buttonChooseWindow" Content="{x:Static proprties:Resources.OptionView_Pick_window}" Margin="0 5 20 0" Command="{Binding ChooseWindowCommand}"/>
                     <Button x:Name="buttonAdd" Content="{x:Static proprties:Resources.OptionView_Add}" Margin="0 5 5 0" Command="{Binding AddTitleCommand}"/>
                     <Button x:Name="buttonRemove" Content="{x:Static proprties:Resources.OptionView_Remove}" Margin="0 5 0 0" Command="{Binding RemoveTitleCommand}"/>
                 </StackPanel>
             </StackPanel>
         </DockPanel>
     </Grid>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <prism:InvokeCommandAction Command="{Binding UnloadedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 </UserControl>

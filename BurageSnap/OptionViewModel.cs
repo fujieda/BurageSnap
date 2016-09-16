@@ -90,6 +90,8 @@ namespace BurageSnap
         public ICommand SelectedCommand { get; private set; }
         public ICommand AddTitleCommand { get; private set; }
         public ICommand RemoveTitleCommand { get; private set; }
+        public ICommand ChooseWindowCommand { get; private set; }
+        public ICommand UnloadedCommand { get; private set; }
 
         public OptionViewModel()
         {
@@ -98,6 +100,10 @@ namespace BurageSnap
             SelectedCommand = new DelegateCommand<object[]>(Selected);
             AddTitleCommand = new DelegateCommand(AddTitle);
             RemoveTitleCommand = new DelegateCommand(RemoveTitle);
+            ChooseWindowCommand = new DelegateCommand(ChooseWindow);
+            UnloadedCommand = new DelegateCommand(Unloaded);
+
+            WindowPicker.Picked += title => { Title = title; };
         }
 
         public void OkInteraction()
@@ -132,6 +138,16 @@ namespace BurageSnap
         public void RemoveTitle()
         {
             Options.WindowTitles.Remove(Title);
+        }
+
+        public void ChooseWindow()
+        {
+            WindowPicker.Start();
+        }
+
+        public void Unloaded()
+        {
+            WindowPicker.Stop();
         }
     }
 }

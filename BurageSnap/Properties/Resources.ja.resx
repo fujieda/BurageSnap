@@ -177,7 +177,7 @@
   <data name="OptionView_Interval" xml:space="preserve">
     <value>連射間隔:</value>
   </data>
-  <data name="OptionView_Choose_window" xml:space="preserve">
+  <data name="OptionView_Pick_window" xml:space="preserve">
     <value>ウィンドウの選択</value>
   </data>
   <data name="OptionView_Remove" xml:space="preserve">

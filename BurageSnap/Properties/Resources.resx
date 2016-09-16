@@ -189,8 +189,8 @@
   <data name="OptionView_Interval" xml:space="preserve">
     <value>Interval:</value>
   </data>
-  <data name="OptionView_Choose_window" xml:space="preserve">
-    <value>Choose window</value>
+  <data name="OptionView_Pick_window" xml:space="preserve">
+    <value>Pick window</value>
   </data>
   <data name="OptionView_Remove" xml:space="preserve">
     <value>Remove</value>

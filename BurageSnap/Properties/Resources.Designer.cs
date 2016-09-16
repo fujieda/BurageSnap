@@ -199,15 +199,6 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
-        ///   Choose window に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string OptionView_Choose_window {
-            get {
-                return ResourceManager.GetString("OptionView_Choose_window", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Create daily folders に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string OptionView_Create_daily_folders {
@@ -267,6 +258,15 @@ namespace BurageSnap.Properties {
         public static string OptionView_Option {
             get {
                 return ResourceManager.GetString("OptionView_Option", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Pick window に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Pick_window {
+            get {
+                return ResourceManager.GetString("OptionView_Pick_window", resourceCulture);
             }
         }
         
