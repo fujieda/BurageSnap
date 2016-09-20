@@ -126,11 +126,8 @@
   <data name="MainWindow_Capture" xml:space="preserve">
     <value>撮影</value>
   </data>
-  <data name="Recorder_IO_Error" xml:space="preserve">
+  <data name="Recorder_IO_error" xml:space="preserve">
     <value>I/Oエラー</value>
-  </data>
-  <data name="Recorder_CaptureFrame_detect_error" xml:space="preserve">
-    <value>検出エラー</value>
   </data>
   <data name="ConfirmView_Message" xml:space="preserve">
     <value>画像を出力しますか？</value>
@@ -206,5 +203,14 @@
   </data>
   <data name="OptionView_Reside_in_system_tray" xml:space="preserve">
     <value>システムトレイに常駐する</value>
+  </data>
+  <data name="Capture_Extract_error" xml:space="preserve">
+    <value>抽出エラー</value>
+  </data>
+  <data name="Capture_Internal_error" xml:space="preserve">
+    <value>内部エラー</value>
+  </data>
+  <data name="Capture_Search_error" xml:space="preserve">
+    <value>検索エラー</value>
   </data>
 </root>

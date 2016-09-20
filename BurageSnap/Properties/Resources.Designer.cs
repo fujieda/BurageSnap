@@ -61,6 +61,33 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Extract error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Capture_Extract_error {
+            get {
+                return ResourceManager.GetString("Capture_Extract_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Internal error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Capture_Internal_error {
+            get {
+                return ResourceManager.GetString("Capture_Internal_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Search error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Capture_Search_error {
+            get {
+                return ResourceManager.GetString("Capture_Search_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
         /// </summary>
         public static System.Drawing.Bitmap cogs {
@@ -343,20 +370,11 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
-        ///   detect error に類似しているローカライズされた文字列を検索します。
+        ///   I/O error に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string Recorder_CaptureFrame_detect_error {
+        public static string Recorder_IO_error {
             get {
-                return ResourceManager.GetString("Recorder_CaptureFrame_detect_error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   I/O Error に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string Recorder_IO_Error {
-            get {
-                return ResourceManager.GetString("Recorder_IO_Error", resourceCulture);
+                return ResourceManager.GetString("Recorder_IO_error", resourceCulture);
             }
         }
     }

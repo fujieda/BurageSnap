@@ -34,7 +34,7 @@ namespace BurageSnap
         private uint _timerId;
         private TimeProc _timeProc;
         private readonly object _lockObj = new object();
-        public Action<object> ReportCaptureResult { private get; set; }
+        public Action<DateTime> ReportCaptureResult { private get; set; }
 
         public Recorder(Config config)
         {
@@ -49,18 +49,11 @@ namespace BurageSnap
         public void Start()
         {
             var frame = CaptureFrame(true);
-            if (frame == null)
-                return;
+            _ringBuffer.Size = _config.RingBuffer;
             if (_config.RingBuffer == 0)
-            {
-                if (!SaveFrame(frame))
-                    return;
-            }
+                SaveFrame(frame);
             else
-            {
-                _ringBuffer.Size = _config.RingBuffer;
                 AddFrame(frame);
-            }
             var dummy = 0u;
             _timeProc = TimerCallback; // avoid to be collected by GC
             _timerId = timeSetEvent(_config.Interval == 0 ? 1u : (uint)_config.Interval, 0, _timeProc, ref dummy,
@@ -96,19 +89,18 @@ namespace BurageSnap
         {
             if (!Monitor.TryEnter(_lockObj))
                 return;
-            var frame = CaptureFrame();
-            if (frame == null)
+            try
+            {
+                var frame = CaptureFrame();
+                if (_config.RingBuffer == 0)
+                    SaveFrame(frame);
+                else
+                    AddFrame(frame);
+            }
+            catch
             {
                 timeKillEvent(timerId);
-            }
-            else if (_config.RingBuffer == 0)
-            {
-                if (!SaveFrame(frame))
-                    timeKillEvent(timerId);
-            }
-            else
-            {
-                AddFrame(frame);
+                throw;
             }
             Monitor.Exit(_lockObj);
         }
@@ -118,20 +110,13 @@ namespace BurageSnap
             var bmp = initial
                 ? _screenCapture.CaptureGameScreen(_config.TitleHistory)
                 : _screenCapture.CaptureGameScreen();
-            if (bmp == null)
-            {
-                ReportCaptureResult(Resources.Recorder_CaptureFrame_detect_error);
-                return null;
-            }
             var now = DateTime.Now;
             ReportCaptureResult(now);
             return new Frame {Time = now, Bitmap = bmp};
         }
 
-        private bool SaveFrame(Frame frame)
+        private void SaveFrame(Frame frame)
         {
-            if (frame == null)
-                return true;
             try
             {
                 using (var fs = OpenFile(frame.Time, _config.Format == OutputFormat.Jpg ? ".jpg" : ".png"))
@@ -139,14 +124,12 @@ namespace BurageSnap
             }
             catch (IOException)
             {
-                ReportCaptureResult(Resources.Recorder_IO_Error);
-                return false;
+                throw new CaptureError(Resources.Recorder_IO_error);
             }
             finally
             {
                 frame.Dispose();
             }
-            return true;
         }
 
         private void AddFrame(Frame frame)
@@ -163,8 +146,7 @@ namespace BurageSnap
             else
             {
                 foreach (var frame in _ringBuffer)
-                    if (!SaveFrame(frame))
-                        break;
+                    SaveFrame(frame);
             }
             _ringBuffer.Clear();
         }
@@ -188,7 +170,7 @@ namespace BurageSnap
             }
             catch (IOException)
             {
-                ReportCaptureResult(Resources.Recorder_IO_Error);
+                throw new CaptureError(Resources.Recorder_IO_error);
             }
             finally
             {

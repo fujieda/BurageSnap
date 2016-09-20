@@ -18,22 +18,30 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using BurageSnap.Properties;
 
 namespace BurageSnap
 {
+    public class CaptureError : Exception
+    {
+        public CaptureError(string message) : base(message)
+        {
+        }
+    }
+
     public class Capture
     {
         private const int WidthMin = 600, HeightMin = 400;
         private IntPtr _hWnd;
-        private Rect _rect;
+        private Rect _windowRect;
         private Rectangle _rectangle;
         private string _title;
 
         public Bitmap CaptureGameScreen()
         {
             if (_hWnd == IntPtr.Zero || _rectangle.IsEmpty)
-                return null;
-            using (var bmp = CaptureWindow(_hWnd, _rect))
+                throw new CaptureError(Resources.Capture_Internal_error);
+            using (var bmp = CaptureWindow(_hWnd, _windowRect))
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
         }
 
@@ -42,7 +50,7 @@ namespace BurageSnap
             int index;
             _hWnd = FindWindow(titles, out index);
             if (_hWnd == IntPtr.Zero)
-                return null;
+                throw new CaptureError(Resources.Capture_Search_error);
             var rect = new Rect();
             GetWindowRect(_hWnd, ref rect);
             using (var bmp = CaptureWindow(_hWnd, rect))
@@ -50,7 +58,7 @@ namespace BurageSnap
                 var rectangle = DetectGameScreen(bmp);
                 if (!rectangle.IsEmpty)
                 {
-                    _rect = rect;
+                    _windowRect = rect;
                     _rectangle = rectangle;
                     _title = titles[index];
                 }
@@ -58,8 +66,8 @@ namespace BurageSnap
                 {
                     using (var file = File.Create("debug.png"))
                         bmp.Save(file, ImageFormat.Png);
-                    if (_rectangle.IsEmpty || !_rect.Equals(rect) || _title != titles[index])
-                        return null;
+                    if (_rectangle.IsEmpty || !_windowRect.Equals(rect) || _title != titles[index])
+                        throw new CaptureError(Resources.Capture_Extract_error);
                 }
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
             }

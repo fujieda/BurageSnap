@@ -32,13 +32,28 @@ namespace BurageSnap
 
         public void OneShot()
         {
-            _recorder.OneShot();
+            try
+            {
+                _recorder.OneShot();
+            }
+            catch (CaptureError e)
+            {
+                CaptureResult = e.Message;
+            }
         }
 
         public void StartCapture()
         {
             Capturing = true;
-            _recorder.Start();
+            try
+            {
+                _recorder.Start();
+            }
+            catch (CaptureError e)
+            {
+                CaptureResult = e.Message;
+                Capturing = false;
+            }
         }
 
         public void StopCapture()
@@ -48,8 +63,18 @@ namespace BurageSnap
 
         public void SaveBuffer()
         {
-            _recorder.SaveBuffer();
-            Capturing = false;
+            try
+            {
+                _recorder.SaveBuffer();
+            }
+            catch (CaptureError e)
+            {
+                CaptureResult = e.Message;
+            }
+            finally
+            {
+                Capturing = false;
+            }
         }
 
         public void DiscardBuffer()
@@ -74,21 +99,9 @@ namespace BurageSnap
             set { SetProperty(ref _capturing, value); }
         }
 
-        private void ReportCaptureResult(object obj)
+        private void ReportCaptureResult(DateTime time)
         {
-            if (obj is DateTime)
-            {
-                var time = (DateTime)obj;
-                CaptureResult = time.ToString("HH:mm:ss.fff");
-                if (time == DateTime.MinValue)
-                    Capturing = false;
-            }
-            // ReSharper disable once CanBeReplacedWithTryCastAndCheckForNull
-            else if (obj is string)
-            {
-                CaptureResult = (string)obj;
-                Capturing = false;
-            }
+            CaptureResult = time.ToString("HH:mm:ss.fff");
         }
 
         public void OpenPictureFolder()

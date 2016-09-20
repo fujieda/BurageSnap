@@ -138,11 +138,8 @@
   <data name="MainWindow_Capture" xml:space="preserve">
     <value>Capture</value>
   </data>
-  <data name="Recorder_IO_Error" xml:space="preserve">
-    <value>I/O Error</value>
-  </data>
-  <data name="Recorder_CaptureFrame_detect_error" xml:space="preserve">
-    <value>detect error</value>
+  <data name="Recorder_IO_error" xml:space="preserve">
+    <value>I/O error</value>
   </data>
   <data name="ConfirmView_Message" xml:space="preserve">
     <value>Output the images?</value>
@@ -218,5 +215,14 @@
   </data>
   <data name="OptionView_Reside_in_system_tray" xml:space="preserve">
     <value>Reside in system tray</value>
+  </data>
+  <data name="Capture_Search_error" xml:space="preserve">
+    <value>Search error</value>
+  </data>
+  <data name="Capture_Extract_error" xml:space="preserve">
+    <value>Extract error</value>
+  </data>
+  <data name="Capture_Internal_error" xml:space="preserve">
+    <value>Internal error</value>
   </data>
 </root>
