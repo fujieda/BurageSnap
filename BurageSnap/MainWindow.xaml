@@ -27,6 +27,9 @@
                 <i:EventTrigger EventName="ExitSelected">
                     <i:InvokeCommandAction Command="{Binding NotifyIconExitCommand}"/>
                 </i:EventTrigger>
+                <prism:InteractionRequestTrigger SourceObject="{Binding ShowBaloonTipRequest, Mode=OneWay}">
+                    <local:ShowBaloonTipAction/>
+                </prism:InteractionRequestTrigger>
             </i:Interaction.Triggers>
         </local:NotifyIconWrapper>
         <Button x:Name="buttonCapture" Content="{Binding CaptureButtonText}" HorizontalAlignment="Left" Margin="8,8,0,0" VerticalAlignment="Top" Width="77" Height="51" FontSize="12" Command="{Binding CaptureCommand}"/>

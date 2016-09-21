@@ -32,6 +32,7 @@ namespace BurageSnap
         public Point Location { get; set; } = new Point(double.MinValue, double.MinValue);
         public bool TopMost { get; set; }
         public bool ResideInSystemTray { get; set; }
+        public bool Notify { get; set; } = true;
         public WindowState WindowState { get; set; }
         public int Interval { get; set; } = 200;
         public int RingBuffer { get; set; } = 25;

@@ -36,6 +36,9 @@ namespace BurageSnap
         public ICommand NotifyIconOpenCommand { get; private set; }
         public ICommand NotifyIconExitCommand { get; private set; }
 
+        public InteractionRequest<INotification> ShowBaloonTipRequest { get; } =
+            new InteractionRequest<INotification>();
+
         public bool BurstMode
         {
             get { return Main.Config.Continuous; }
@@ -181,19 +184,30 @@ namespace BurageSnap
 
         private void Capture()
         {
-            if (!BurstMode)
+            try
             {
-                Main.OneShot();
-                return;
+                if (!BurstMode)
+                {
+                    Main.OneShot();
+                    Notify(Resources.MainWindow_Captured);
+                    return;
+                }
+                if (!Main.Capturing)
+                {
+                    Main.StartCapture();
+                    Notify(Resources.MainWindow_Capture_started);
+                }
+                else
+                {
+                    Main.StopCapture();
+                    Notify(Resources.MainWindow_Capture_ended);
+                    ConfirmSaveBuffer();
+                }
             }
-            if (!Main.Capturing)
+            catch (CaptureError e)
             {
-                Main.StartCapture();
-            }
-            else
-            {
-                Main.StopCapture();
-                ConfirmSaveBuffer();
+                if (Main.Config.Notify)
+                    ShowBaloonTipRequest.Raise(new Notification {Title = Resources.MainWindow_Error, Content = e.Message});
             }
         }
 
@@ -207,6 +221,25 @@ namespace BurageSnap
                 else
                     Main.DiscardBuffer();
             });
+        }
+
+        private void Notify(string message)
+        {
+            if (!Main.Config.Notify)
+                return;
+            var title = Main.WindowTitle;
+            if (title == "")
+            {
+                ShowBaloonTipRequest.Raise(new Notification
+                {
+                    Title = Resources.MainWindow_Error,
+                    Content = Main.CaptureResult
+                });
+                return;
+            }
+            if (title.Length > 22)
+                title = title.Substring(0, 22) + "...";
+            ShowBaloonTipRequest.Raise(new Notification {Title = message, Content = title});
         }
     }
 }

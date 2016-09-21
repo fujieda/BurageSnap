@@ -34,7 +34,7 @@ namespace BurageSnap
         private uint _timerId;
         private TimeProc _timeProc;
         private readonly object _lockObj = new object();
-        public Action<DateTime> ReportCaptureResult { private get; set; }
+        public Action<string, DateTime> ReportCaptureResult { private get; set; }
 
         public Recorder(Config config)
         {
@@ -111,7 +111,7 @@ namespace BurageSnap
                 ? _screenCapture.CaptureGameScreen(_config.TitleHistory)
                 : _screenCapture.CaptureGameScreen();
             var now = DateTime.Now;
-            ReportCaptureResult(now);
+            ReportCaptureResult(_screenCapture.Title, now);
             return new Frame {Time = now, Bitmap = bmp};
         }
 
@@ -124,7 +124,7 @@ namespace BurageSnap
             }
             catch (IOException)
             {
-                throw new CaptureError(Resources.Recorder_IO_error);
+                throw new CaptureError(Resources.Recorder_IO_error, Resources.Recorder_Cant_output_image_file);
             }
             finally
             {
@@ -170,7 +170,7 @@ namespace BurageSnap
             }
             catch (IOException)
             {
-                throw new CaptureError(Resources.Recorder_IO_error);
+                throw new CaptureError(Resources.Recorder_IO_error, Resources.Recorder_Cant_output_image_file);
             }
             finally
             {

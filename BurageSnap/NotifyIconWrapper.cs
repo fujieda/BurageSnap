@@ -18,6 +18,8 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Interactivity;
+using Prism.Interactivity.InteractionRequest;
 using Application = System.Windows.Application;
 
 namespace BurageSnap
@@ -98,9 +100,25 @@ namespace BurageSnap
             RaiseEvent(args);
         }
 
+        public void ShowBaloonTip(string tipTitle, string tipText)
+        {
+            _notifyIcon.ShowBalloonTip(1000, tipTitle, tipText, ToolTipIcon.Info);
+        }
+
         public void Dispose()
         {
             _notifyIcon.Dispose();
+        }
+    }
+
+    public class ShowBaloonTipAction : TriggerAction<NotifyIconWrapper>
+    {
+        protected override void Invoke(object parameter)
+        {
+            var notification = (parameter as InteractionRequestedEventArgs)?.Context as Notification;
+            if (notification == null)
+                return;
+            AssociatedObject.ShowBaloonTip(notification.Title, (string)notification.Content);
         }
     }
 }

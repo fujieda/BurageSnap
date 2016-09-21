@@ -213,4 +213,28 @@
   <data name="Capture_Search_error" xml:space="preserve">
     <value>検索エラー</value>
   </data>
+  <data name="Capture_Cant_extract_game_screen" xml:space="preserve">
+    <value>ゲーム画面を抽出できません。</value>
+  </data>
+  <data name="Capture_Cant_find_window" xml:space="preserve">
+    <value>ウィンドウが見つかりません。</value>
+  </data>
+  <data name="Recorder_Cant_output_image_file" xml:space="preserve">
+    <value>画像ファイルを出力できません。</value>
+  </data>
+  <data name="MainWindow_Captured" xml:space="preserve">
+    <value>撮影しました</value>
+  </data>
+  <data name="MainWindow_Capture_ended" xml:space="preserve">
+    <value>撮影を終了しました</value>
+  </data>
+  <data name="MainWindow_Capture_started" xml:space="preserve">
+    <value>撮影を開始しました</value>
+  </data>
+  <data name="MainWindow_Error" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="OptionView_Notify" xml:space="preserve">
+    <value>通知する</value>
+  </data>
 </root>

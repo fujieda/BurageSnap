@@ -61,6 +61,24 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Can&apos;t extract a game screen. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Capture_Cant_extract_game_screen {
+            get {
+                return ResourceManager.GetString("Capture_Cant_extract_game_screen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Can&apos;t find a window. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Capture_Cant_find_window {
+            get {
+                return ResourceManager.GetString("Capture_Cant_find_window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Extract error に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Capture_Extract_error {
@@ -163,11 +181,47 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Capture ended に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Capture_ended {
+            get {
+                return ResourceManager.GetString("MainWindow_Capture_ended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Capture started に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Capture_started {
+            get {
+                return ResourceManager.GetString("MainWindow_Capture_started", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Captured に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Captured {
+            get {
+                return ResourceManager.GetString("MainWindow_Captured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Burst に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string MainWindow_Continuous {
             get {
                 return ResourceManager.GetString("MainWindow_Continuous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Error に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MainWindow_Error {
+            get {
+                return ResourceManager.GetString("MainWindow_Error", resourceCulture);
             }
         }
         
@@ -296,13 +350,22 @@ namespace BurageSnap.Properties {
                 return ResourceManager.GetString("OptionView_Interval", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Option に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string OptionView_Option {
             get {
                 return ResourceManager.GetString("OptionView_Option", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Notify に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Notify {
+            get {
+                return ResourceManager.GetString("OptionView_Notify", resourceCulture);
             }
         }
         
@@ -366,6 +429,15 @@ namespace BurageSnap.Properties {
         public static string OptionView_Window {
             get {
                 return ResourceManager.GetString("OptionView_Window", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Can&apos;t output a image file に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Recorder_Cant_output_image_file {
+            get {
+                return ResourceManager.GetString("Recorder_Cant_output_image_file", resourceCulture);
             }
         }
         

@@ -38,7 +38,8 @@ namespace BurageSnap
             }
             catch (CaptureError e)
             {
-                CaptureResult = e.Message;
+                CaptureResult = e.Summary;
+                throw;
             }
         }
 
@@ -51,8 +52,9 @@ namespace BurageSnap
             }
             catch (CaptureError e)
             {
-                CaptureResult = e.Message;
+                CaptureResult = e.Summary;
                 Capturing = false;
+                throw;
             }
         }
 
@@ -69,7 +71,8 @@ namespace BurageSnap
             }
             catch (CaptureError e)
             {
-                CaptureResult = e.Message;
+                CaptureResult = e.Summary;
+                throw;
             }
             finally
             {
@@ -81,6 +84,14 @@ namespace BurageSnap
         {
             _recorder.DiscardBuffer();
             Capturing = false;
+        }
+
+        private string _windowTitle = "";
+
+        public string WindowTitle
+        {
+            get { return _windowTitle; }
+            set { SetProperty(ref _windowTitle, value); }
         }
 
         private string _captureResult = "00:00:00.000";
@@ -99,8 +110,9 @@ namespace BurageSnap
             set { SetProperty(ref _capturing, value); }
         }
 
-        private void ReportCaptureResult(DateTime time)
+        private void ReportCaptureResult(string title, DateTime time)
         {
+            WindowTitle = title;
             CaptureResult = time.ToString("HH:mm:ss.fff");
         }
 

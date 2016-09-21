@@ -29,9 +29,9 @@
     <UserControl.DataContext>
         <local:OptionViewModel/>
     </UserControl.DataContext>
-    <Grid Width="510" Height="295">
-        <Button x:Name="buttonOk" Content="Ok" HorizontalAlignment="Left" Margin="345,255,0,0" VerticalAlignment="Top" Width="75" Command="{Binding OkCommand}" IsDefault="True"/>
-        <Button x:Name="buttonCancel" Content="{x:Static proprties:Resources.OptionView_Cancel}" HorizontalAlignment="Left" Margin="425,255,0,0" VerticalAlignment="Top" Width="75" Command="{Binding CancelCommand}" IsCancel="True"/>
+    <Grid Width="510" Height="320">
+        <Button x:Name="buttonOk" Content="Ok" HorizontalAlignment="Left" Margin="345,280,0,0" VerticalAlignment="Top" Width="75" Command="{Binding OkCommand}" IsDefault="True"/>
+        <Button x:Name="buttonCancel" Content="{x:Static proprties:Resources.OptionView_Cancel}" HorizontalAlignment="Left" Margin="425,280,0,0" VerticalAlignment="Top" Width="75" Command="{Binding CancelCommand}" IsCancel="True"/>
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <StackPanel Margin="20 15 10 10" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Right">
                 <Grid HorizontalAlignment="Left" Margin="0 0 0 15" VerticalAlignment="Top">
@@ -67,6 +67,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -74,7 +75,8 @@
                     </Grid.ColumnDefinitions>
                     <Label x:Name="labelWindow" Content="{x:Static proprties:Resources.OptionView_Window}" Margin="0 0 5 0"/>
                     <CheckBox x:Name="checkBoxTopMost" Content="{x:Static proprties:Resources.OptionView_Top_most}" Grid.Row="0" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.TopMost}"/>
-                    <CheckBox x:Name="checkBoxHideOnMinimize" Content="{x:Static proprties:Resources.OptionView_Reside_in_system_tray}" Grid.Row="1" Grid.Column="1" IsChecked="{Binding Options.ResideInSystemTray}"/>
+                    <CheckBox x:Name="checkBoxHideOnMinimize" Content="{x:Static proprties:Resources.OptionView_Reside_in_system_tray}" Grid.Row="1" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.ResideInSystemTray}"/>
+                    <CheckBox x:Name="checkBoxNotify" Content="{x:Static proprties:Resources.OptionView_Notify}" Grid.Row="2" Grid.Column="1" IsChecked="{Binding Options.Notify}"/>
                 </Grid>
                 <Grid HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0 0 0 0">
                     <Grid.RowDefinitions>
@@ -105,7 +107,7 @@
                 </DockPanel>
                 <CheckBox x:Name="checkBoxDailyFolder" Content="{x:Static proprties:Resources.OptionView_Create_daily_folders}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 0 5" IsChecked="{Binding Options.DailyFolder}"/>
                 <Label x:Name="labelTargetWindows" Content="{x:Static proprties:Resources.OptionView_Target_windows}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0 0 0 3"/>
-                <ListBox x:Name="listBox" ItemsSource="{Binding Options.WindowTitles}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="110" BorderThickness="1" Margin="0 0 0 2">
+                <ListBox x:Name="listBox" ItemsSource="{Binding Options.WindowTitles}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="122" BorderThickness="1" Margin="0 0 0 2">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <prism:InvokeCommandAction Command="{Binding SelectedCommand}" TriggerParameterPath="AddedItems"/>

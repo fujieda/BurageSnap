@@ -225,4 +225,28 @@
   <data name="Capture_Internal_error" xml:space="preserve">
     <value>Internal error</value>
   </data>
+  <data name="Capture_Cant_extract_game_screen" xml:space="preserve">
+    <value>Can't extract a game screen.</value>
+  </data>
+  <data name="Capture_Cant_find_window" xml:space="preserve">
+    <value>Can't find a window.</value>
+  </data>
+  <data name="Recorder_Cant_output_image_file" xml:space="preserve">
+    <value>Can't output a image file</value>
+  </data>
+  <data name="MainWindow_Captured" xml:space="preserve">
+    <value>Captured</value>
+  </data>
+  <data name="MainWindow_Capture_ended" xml:space="preserve">
+    <value>Capture ended</value>
+  </data>
+  <data name="MainWindow_Capture_started" xml:space="preserve">
+    <value>Capture started</value>
+  </data>
+  <data name="MainWindow_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="OptionView_Notify" xml:space="preserve">
+    <value>Notify</value>
+  </data>
 </root>
