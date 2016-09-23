@@ -51,16 +51,16 @@
                         <RadioButton x:Name="radioButtonJpg" Content="JPG" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0 0 5 0" IsChecked="{Binding Path=Options.Format, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=Jpg}"/>
                         <RadioButton x:Name="radioButtonPng" Content="PNG" HorizontalAlignment="Left" VerticalAlignment="Top"  IsChecked="{Binding Path=Options.Format, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=Png}"/>
                     </StackPanel>
-                    <CheckBox x:Name="checkBoxAnimationGif" Content="{x:Static proprties:Resources.OptionView_Animation_GIF}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Margin="0 5 0 0" IsChecked="{Binding Options.AnimationGif}"/>
+                    <CheckBox x:Name="checkBoxAnimationGif" Content="{x:Static proprties:Resources.OptionView_Animation_GIF}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Margin="0 5 0 0" IsChecked="{Binding AnimationGif}"/>
                 </Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 0 0 5">
                     <Label x:Name="labelInterval" Content="{x:Static proprties:Resources.OptionView_Interval}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0" />
-                    <TextBox x:Name="textBoxInterval" HorizontalAlignment="Left" Text="{Binding Options.Interval}" VerticalAlignment="Center" Width="41" TextAlignment="Right" Margin="0 0 5 0"/>
+                    <TextBox x:Name="textBoxInterval" HorizontalAlignment="Left" Text="{Binding Interval, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="41" TextAlignment="Right" Margin="0 0 5 0"/>
                     <Label x:Name="labelMs" Content="ms" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal" Margin="0 0 0 15">
                     <Label x:Name="labelRingBuffer" Content="{x:Static proprties:Resources.OptionView_Ring_buffer}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                    <TextBox x:Name="textBoxRingBuffer" HorizontalAlignment="Left" Text="{Binding Options.RingBuffer}" VerticalAlignment="Center" Width="41" TextAlignment="Right"  Margin="0 0 5 0"/>
+                    <TextBox x:Name="textBoxRingBuffer" HorizontalAlignment="Left" Text="{Binding RingBuffer, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="41" TextAlignment="Right"  Margin="0 0 5 0"/>
                     <Label x:Name="labelFrames" Content="{x:Static proprties:Resources.OptionView_Frames}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </StackPanel>
                 <Grid Margin="0 0 0 15">

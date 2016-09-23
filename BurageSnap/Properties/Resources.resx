@@ -249,4 +249,13 @@
   <data name="OptionView_Notify" xml:space="preserve">
     <value>Notify</value>
   </data>
+  <data name="OptionView_Validate_interval" xml:space="preserve">
+    <value>Interval must be in the range of 10 ms to 1000 sec.</value>
+  </data>
+  <data name="OptionView_Validate_ring_buffer" xml:space="preserve">
+    <value>The size of the ring buffer must be in the range of 0 to 100.</value>
+  </data>
+  <data name="OptionView_Validate_ring_buffer_for_animation_GIF" xml:space="preserve">
+    <value>The size of the ring buffer must be greater than 1 to generate animation GIF.</value>
+  </data>
 </root>

@@ -350,22 +350,22 @@ namespace BurageSnap.Properties {
                 return ResourceManager.GetString("OptionView_Interval", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Option に類似しているローカライズされた文字列を検索します。
-        /// </summary>
-        public static string OptionView_Option {
-            get {
-                return ResourceManager.GetString("OptionView_Option", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Notify に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string OptionView_Notify {
             get {
                 return ResourceManager.GetString("OptionView_Notify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Option に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Option {
+            get {
+                return ResourceManager.GetString("OptionView_Option", resourceCulture);
             }
         }
         
@@ -420,6 +420,33 @@ namespace BurageSnap.Properties {
         public static string OptionView_Top_most {
             get {
                 return ResourceManager.GetString("OptionView_Top_most", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Interval must be in the range of 10 ms to 1000 sec. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Validate_interval {
+            get {
+                return ResourceManager.GetString("OptionView_Validate_interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The size of the ring buffer must be in the range of 0 to 100. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Validate_ring_buffer {
+            get {
+                return ResourceManager.GetString("OptionView_Validate_ring_buffer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   The size of the ring buffer must be greater than 1 to generate animation GIF. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Validate_ring_buffer_for_animation_GIF {
+            get {
+                return ResourceManager.GetString("OptionView_Validate_ring_buffer_for_animation_GIF", resourceCulture);
             }
         }
         
