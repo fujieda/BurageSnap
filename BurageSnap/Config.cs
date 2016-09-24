@@ -38,10 +38,10 @@ namespace BurageSnap
         public int RingBuffer { get; set; } = 25;
 
         public string[] TitleHistory { get; set; } = {
-            "艦隊これくしょん -艦これ- - オンラインゲーム - DMM.com",
-            "千年戦争アイギス - オンラインゲーム - DMM.com",
-            "FLOWER KNIGHT GIRL - オンラインゲーム - DMM.com",
-            "刀剣乱舞-ONLINE- - オンラインゲーム - DMM.com"
+            "艦隊これくしょん -艦これ- - オンラインゲーム - DMM GAMES",
+            "千年戦争アイギス - オンラインゲーム - DMM GAMES",
+            "FLOWER KNIGHT GIRL - オンラインゲーム - DMM GAMES",
+            "刀剣乱舞-ONLINE- - オンラインゲーム - DMM GAMES"
         };
 
         public string Folder { get; set; }
@@ -65,6 +65,7 @@ namespace BurageSnap
                 {
                     var config = (Config)new XmlSerializer(typeof(Config)).Deserialize(file);
                     config.Folder = PrependBaseDir(config.Folder);
+                    FixTitles(config);
                     return config;
                 }
             }
@@ -72,6 +73,17 @@ namespace BurageSnap
             {
             }
             return new Config();
+        }
+
+        private static void FixTitles(Config config)
+        {
+            for (var i = 0; i < config.TitleHistory.Length; i++)
+            {
+                var title = config.TitleHistory[i];
+                if (!title.EndsWith("DMM.com"))
+                    continue;
+                config.TitleHistory[i] = title.Substring(0, title.Length - 7) + "DMM GAMES";
+            }
         }
 
         public void Save()
