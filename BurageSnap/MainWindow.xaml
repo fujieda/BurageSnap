@@ -51,7 +51,7 @@
             <prism:InvokeCommandAction Command="{Binding ClosingCommand}"/>
         </i:EventTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding ConfirmationRequest, Mode=OneWay}">
-            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True" Owner="{Binding ElementName=mainWindow}">
+            <local:MetroPopupWindowAction IsModal="True" WindowStartupLocation="CenterOwner" Owner="{Binding ElementName=mainWindow}">
                 <local:MetroPopupWindowAction.WindowContent>
                     <local:ConfirmView/>
                 </local:MetroPopupWindowAction.WindowContent>
@@ -63,7 +63,7 @@
             </local:MetroPopupWindowAction>
         </prism:InteractionRequestTrigger>
         <prism:InteractionRequestTrigger SourceObject="{Binding OptionViewRequest, Mode=OneWay}">
-            <local:MetroPopupWindowAction IsModal="True" CenterOverAssociatedObject="True" Owner="{Binding ElementName=mainWindow}">
+            <local:MetroPopupWindowAction IsModal="True" WindowStartupLocation="CenterOwner" Owner="{Binding ElementName=mainWindow}">
                 <local:MetroPopupWindowAction.WindowContent>
                     <local:OptionView/>
                 </local:MetroPopupWindowAction.WindowContent>
