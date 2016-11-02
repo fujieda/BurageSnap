@@ -142,7 +142,7 @@
     <value>はい</value>
   </data>
   <data name="MainWindow_Continuous" xml:space="preserve">
-    <value>連射</value>
+    <value>連写</value>
   </data>
   <data name="MainWindow_Last_snap" xml:space="preserve">
     <value>撮影時刻</value>
@@ -154,7 +154,7 @@
     <value>追加</value>
   </data>
   <data name="OptionView_Animation_GIF" xml:space="preserve">
-    <value>アニメーションGIF (連射時)</value>
+    <value>アニメーションGIF (連写時)</value>
   </data>
   <data name="OptionView_Create_daily_folders" xml:space="preserve">
     <value>日ごとにフォルダーを作る</value>
@@ -172,7 +172,7 @@
     <value>ホットキー:</value>
   </data>
   <data name="OptionView_Interval" xml:space="preserve">
-    <value>連射間隔:</value>
+    <value>連写間隔:</value>
   </data>
   <data name="OptionView_Pick_window" xml:space="preserve">
     <value>ウィンドウの選択</value>
@@ -211,7 +211,7 @@
     <value>内部エラー</value>
   </data>
   <data name="Capture_Search_error" xml:space="preserve">
-    <value>検索エラー</value>
+    <value>検出エラー</value>
   </data>
   <data name="Capture_Cant_extract_game_screen" xml:space="preserve">
     <value>ゲーム画面を抽出できません。</value>
