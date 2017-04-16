@@ -106,6 +106,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="PreLounch.cs" />
     <Compile Include="WindowPicker.cs" />
     <Page Include="ConfirmView.xaml">
       <SubType>Designer</SubType>

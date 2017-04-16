@@ -10,15 +10,18 @@ namespace BurageSnap
     /// </summary>
     public partial class App
     {
-#if DEBUG
         public App()
         {
+#if DEBUG
             const string lang = "en";
             Thread.CurrentThread.CurrentCulture = new CultureInfo(lang);
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(lang);
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(
                 XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
-        }
 #endif
+            if (PreLounch.ProcessAlreadyExists())
+                Shutdown();
+        }
+
     }
 }
