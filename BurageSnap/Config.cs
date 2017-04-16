@@ -39,8 +39,8 @@ namespace BurageSnap
 
         public string[] TitleHistory { get; set; } = {
             "艦隊これくしょん -艦これ- - オンラインゲーム - DMM GAMES",
-            "千年戦争アイギス - オンラインゲーム - DMM GAMES",
-            "FLOWER KNIGHT GIRL - オンラインゲーム - DMM GAMES",
+            "千年戦争アイギス - DMM GAMES",
+            "FLOWER KNIGHT GIRL - DMM GAMES",
             "刀剣乱舞-ONLINE- - オンラインゲーム - DMM GAMES"
         };
 
