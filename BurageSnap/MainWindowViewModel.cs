@@ -58,18 +58,26 @@ namespace BurageSnap
                     : Resources.MainWindow_Start
                 : Resources.MainWindow_Capture;
 
-        public bool ShowInTaskbar => !(WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray);
+        private bool _showInTaskbar = true;
+
+        public bool ShowInTaskbar
+        {
+            get { return _showInTaskbar; }
+            set { SetProperty(ref _showInTaskbar, value); }
+        }
+
+        private WindowState _windowState = WindowState.Normal;
 
         public WindowState WindowState
         {
-            get { return Main.Config.WindowState; }
+            get { return _windowState; }
             set
             {
-                if (Main.Config.WindowState == value)
+                if (_windowState == value)
                     return;
                 Main.Config.WindowState = value;
-                OnPropertyChanged(() => WindowState);
-                OnPropertyChanged(() => ShowInTaskbar);
+                SetProperty(ref _windowState, value);
+                ShowInTaskbar = !(WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray);
             }
         }
 
@@ -100,6 +108,7 @@ namespace BurageSnap
         private void Loaded()
         {
             RestoreLocation();
+            WindowState = Main.Config.WindowState;
             SetHotKey();
             _globelHotKey.HotKeyPressed += Capture;
         }
