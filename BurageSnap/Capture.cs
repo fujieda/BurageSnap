@@ -171,15 +171,15 @@ namespace BurageSnap
                 }
             }
             bmp.UnlockBits(data);
-            for (var y = 1; y < height - 1; y++)
+            for (var y = 1; y < height; y++)
             {
-                if (!CheckEdge(map, 0, width - 1, y, y, Edge.HorizontalTop))
+                if (!CheckEdge(map, 0, width, y, y, Edge.HorizontalTop))
                     continue;
-                for (var x = 1; x < width - 1; x++)
+                for (var x = 1; x < width; x++)
                 {
                     var rect = Rectangle.Empty;
                     rect.Y = y;
-                    if (!CheckEdge(map, x, x, rect.Y, height - 1, Edge.VerticalLeft))
+                    if (!CheckEdge(map, x, x, rect.Y, height, Edge.VerticalLeft))
                         continue;
                     rect.X = x;
                     rect = FindBottomAndRight(map, rect);
@@ -200,17 +200,17 @@ namespace BurageSnap
         {
             var height = map.GetLength(0);
             var width = map.GetLength(1);
-            for (var y = rect.Y; y < height - 1; y++)
+            for (var y = rect.Y; y < height; y++)
             {
-                if (!CheckEdge(map, rect.X, width - 1, y, y, Edge.HorizontalBottom))
+                if (!CheckEdge(map, rect.X, width, y, y, Edge.HorizontalBottom))
                     continue;
-                rect.Height = y - rect.Y + 1;
+                rect.Height = y - rect.Y;
                 rect.Width = 0;
-                for (var x = rect.X; x < width - 1; x++)
+                for (var x = rect.X; x < width; x++)
                 {
                     if (!CheckEdgeStrict(map, x, x, rect.Y, rect.Bottom, Edge.VerticalRight))
                         continue;
-                    rect.Width = x - rect.X + 1;
+                    rect.Width = x - rect.X;
                     break;
                 }
                 if (rect.Width == 0)
@@ -225,7 +225,7 @@ namespace BurageSnap
             {
                 if (CheckEdgeStrict(map, rect.X, rect.Right, y, y, Edge.HorizontalBottom))
                 {
-                    rect.Height = y - rect.Y + 1;
+                    rect.Height = y - rect.Y;
                     break;
                 }
             }
@@ -238,7 +238,7 @@ namespace BurageSnap
             switch (edge)
             {
                 case Edge.HorizontalTop:
-                    for (var x = left; x <= right; x++)
+                    for (var x = left; x < right; x++)
                     {
                         if (!(map[top - 1, x] == 1 && map[top, x] == 0))
                             continue;
@@ -248,7 +248,7 @@ namespace BurageSnap
                     }
                     return false;
                 case Edge.VerticalLeft:
-                    for (var y = top; y <= bottom; y++)
+                    for (var y = top; y < bottom; y++)
                     {
                         if (!(map[y, left - 1] == 1 && map[y, left] == 0))
                             continue;
@@ -258,9 +258,9 @@ namespace BurageSnap
                     }
                     return false;
                 case Edge.HorizontalBottom:
-                    for (var x = left; x <= right; x++)
+                    for (var x = left; x < right; x++)
                     {
-                        if (!(map[bottom, x] == 0 && map[bottom + 1, x] == 1))
+                        if (!(map[bottom - 1, x] == 0 && map[bottom, x] == 1))
                             continue;
                         if (++n < WidthMin / 3)
                             continue;
@@ -268,9 +268,9 @@ namespace BurageSnap
                     }
                     return false;
                 case Edge.VerticalRight:
-                    for (var y = top; y <= bottom; y++)
+                    for (var y = top; y < bottom; y++)
                     {
-                        if (!(map[y, right] == 0 && map[y, right + 1] == 1))
+                        if (!(map[y, right - 1] == 0 && map[y, right] == 1))
                             continue;
                         if (++n < HeightMin / 3)
                             continue;
@@ -323,28 +323,28 @@ namespace BurageSnap
                 case Edge.HorizontalBottom:
                     for (var x = left; x <= left + WidthMin / 10; x++)
                     {
-                        if (map[bottom + 1, x] == 0)
+                        if (map[bottom, x] == 0)
                             goto bright;
                     }
                     return true;
                     bright:
                     for (var x = right; x >= right - WidthMin / 10; x--)
                     {
-                        if (map[bottom + 1, x] == 0)
+                        if (map[bottom, x] == 0)
                             return false;
                     }
                     return true;
                 case Edge.VerticalRight:
                     for (var y = top; y <= top + HeightMin / 10; y++)
                     {
-                        if (map[y, right + 1] == 0)
+                        if (map[y, right] == 0)
                             goto rbottom;
                     }
                     return true;
                     rbottom:
                     for (var y = bottom; y >= bottom - HeightMin / 10; y--)
                     {
-                        if (map[y, right + 1] == 0)
+                        if (map[y, right] == 0)
                             return false;
                     }
                     return true;
@@ -376,14 +376,14 @@ namespace BurageSnap
                 case Edge.HorizontalBottom:
                     for (var x = left; x <= right; x++)
                     {
-                        if (map[bottom + 1, x] == 1)
+                        if (map[bottom, x] == 1)
                             n++;
                     }
                     return n >= hlen;
                 case Edge.VerticalRight:
                     for (var y = top; y <= bottom; y++)
                     {
-                        if (map[y, right + 1] == 1)
+                        if (map[y, right] == 1)
                             n++;
                     }
                     return n >= vlen;
@@ -410,7 +410,7 @@ namespace BurageSnap
                 {
                     if (map[rect.Top - 1, x] == 1)
                         top++;
-                    if (map[rect.Bottom + 1, x] == 1)
+                    if (map[rect.Bottom, x] == 1)
                         bottom++;
                 }
                 rect.Height += 10 - r;
@@ -426,7 +426,7 @@ namespace BurageSnap
                 {
                     if (map[y, rect.Left - 1] == 1)
                         left++;
-                    if (map[y, rect.Right + 1] == 1)
+                    if (map[y, rect.Right] == 1)
                         right++;
                 }
                 rect.Width += 10 - r;
