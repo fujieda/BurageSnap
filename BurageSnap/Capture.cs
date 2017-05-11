@@ -399,40 +399,20 @@ namespace BurageSnap
             VerticalRight
         }
 
+        // For drop pictures in KanColle with a white region on the top side
         public void RoundUpRectangle(byte[,] map, ref Rectangle rect)
         {
+            if (rect.Width % 10 != 0)
+                return;
+            var top = 0;
+            for (var x = rect.X; x < rect.Right; x++)
+            {
+                if (map[rect.Top - 1, x] == 1)
+                    top++;
+            }
             var r = rect.Height % 10;
-            if (r != 0)
-            {
-                var top = 0;
-                var bottom = 0;
-                for (var x = rect.X; x < rect.Right; x++)
-                {
-                    if (map[rect.Top - 1, x] == 1)
-                        top++;
-                    if (map[rect.Bottom, x] == 1)
-                        bottom++;
-                }
+            if (top > rect.Width / 2 && r != 0)
                 rect.Height += 10 - r;
-                if (top <= bottom) // expand unbiguous edge
-                    rect.Y -= 10 - r;
-            }
-            r = rect.Width % 10;
-            if (r != 0)
-            {
-                var left = 0;
-                var right = 0;
-                for (var y = rect.Y; y < rect.Bottom; y++)
-                {
-                    if (map[y, rect.Left - 1] == 1)
-                        left++;
-                    if (map[y, rect.Right] == 1)
-                        right++;
-                }
-                rect.Width += 10 - r;
-                if (right <= left) // expand unbiguous edge
-                    rect.X -= 10 - r;
-            }
         }
     }
 }
