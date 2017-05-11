@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BurageSnap", "BurageSnap\BurageSnap.csproj", "{16E7C5B7-745E-43B8-8C06-A79D76E52E08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaptureTest", "CaptureTest\CaptureTest.csproj", "{1CB4540E-2010-476C-BA9D-B7528BB0EABC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{16E7C5B7-745E-43B8-8C06-A79D76E52E08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16E7C5B7-745E-43B8-8C06-A79D76E52E08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16E7C5B7-745E-43B8-8C06-A79D76E52E08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CB4540E-2010-476C-BA9D-B7528BB0EABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CB4540E-2010-476C-BA9D-B7528BB0EABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CB4540E-2010-476C-BA9D-B7528BB0EABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CB4540E-2010-476C-BA9D-B7528BB0EABC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

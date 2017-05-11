@@ -151,7 +151,7 @@ namespace BurageSnap
             }
         }
 
-        private Rectangle DetectGameScreen(Bitmap bmp)
+        public Rectangle DetectGameScreen(Bitmap bmp)
         {
             var height = bmp.Height;
             var width = bmp.Width;
