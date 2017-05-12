@@ -189,6 +189,7 @@ namespace BurageSnap
                         break;
                     if (!CheckEdgeStrict(map, x, x, rect.Y, rect.Bottom, Edge.VerticalLeft))
                         continue;
+                    rect = FindTopAndLeft(map, rect);
                     RoundUpRectangle(map, ref rect);
                     return rect;
                 }
@@ -232,8 +233,33 @@ namespace BurageSnap
             return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
         }
 
+        private Rectangle FindTopAndLeft(byte[,] map, Rectangle rect)
+        {
+            for (var y = rect.Bottom - 1; y >= rect.Y; y--)
+            {
+                if (CheckEdgeStrict(map, rect.Left, rect.Right, y, y, Edge.HorizontalTop))
+                {
+                    rect.Height += rect.Y - y;
+                    rect.Y = y;
+                    break;
+                }
+            }
+            for (var x = rect.Right - 1; x >= rect.X; x--)
+            {
+                if (CheckEdgeStrict(map, x, x, rect.Top, rect.Bottom, Edge.VerticalLeft))
+                {
+                    rect.Width += rect.X - x;
+                    rect.X = x;
+                    break;
+                }
+            }
+            return rect;
+        }
+
         private bool CheckEdge(byte[,] map, int left, int right, int top, int bottom, Edge edge)
         {
+            const int edgeWidth = WidthMin / 2;
+            const int edgeHeight = HeightMin / 2;
             var n = 0;
             switch (edge)
             {
@@ -242,7 +268,7 @@ namespace BurageSnap
                     {
                         if (!(map[top - 1, x] == 1 && map[top, x] == 0))
                             continue;
-                        if (++n < WidthMin / 3)
+                        if (++n < edgeWidth)
                             continue;
                         return true;
                     }
@@ -252,7 +278,7 @@ namespace BurageSnap
                     {
                         if (!(map[y, left - 1] == 1 && map[y, left] == 0))
                             continue;
-                        if (++n < HeightMin / 3)
+                        if (++n < edgeHeight)
                             continue;
                         return true;
                     }
@@ -262,7 +288,7 @@ namespace BurageSnap
                     {
                         if (!(map[bottom - 1, x] == 0 && map[bottom, x] == 1))
                             continue;
-                        if (++n < WidthMin / 3)
+                        if (++n < edgeWidth)
                             continue;
                         return true;
                     }
@@ -272,7 +298,7 @@ namespace BurageSnap
                     {
                         if (!(map[y, right - 1] == 0 && map[y, right] == 1))
                             continue;
-                        if (++n < HeightMin / 3)
+                        if (++n < edgeHeight)
                             continue;
                         return true;
                     }
@@ -284,70 +310,76 @@ namespace BurageSnap
         private bool CheckEdgeStrict(byte[,] map, int left, int right, int top, int bottom, Edge edge)
         {
             return CheckEdge(map, left, right, top, bottom, edge) &&
-                   CheckEitherEndClean(map, left, right, top, bottom, edge) &&
+                   CheckBothEndClean(map, left, right, top, bottom, edge) &&
                    CheckEnoughLength(map, left, right, top, bottom, edge);
         }
 
-        private bool CheckEitherEndClean(byte[,] map, int left, int right, int top, int bottom, Edge edge)
+        private bool CheckBothEndClean(byte[,] map, int left, int right, int top, int bottom, Edge edge)
         {
-            switch (edge)
+            const int decorationThickness = 20;
+
+            for (var margin = 0; margin < decorationThickness; margin++)
             {
-                case Edge.HorizontalTop:
-                    for (var x = left; x <= left + WidthMin / 10; x++)
-                    {
-                        if (map[top - 1, x] == 0)
-                            goto tright;
-                    }
-                    return true;
-                    tright:
-                    for (var x = right; x >= right - WidthMin / 10; x--)
-                    {
-                        if (map[top - 1, x] == 0)
+                switch (edge)
+                {
+                    case Edge.HorizontalTop:
+                        if (top - margin - 1 < 0)
                             return false;
-                    }
-                    return true;
-                case Edge.VerticalLeft:
-                    for (var y = top; y <= top + HeightMin / 10; y++)
-                    {
-                        if (map[y, left - 1] == 0)
-                            goto lbottom;
-                    }
-                    return true;
-                    lbottom:
-                    for (var y = bottom; y >= bottom - HeightMin / 10; y--)
-                    {
-                        if (map[y, left - 1] == 0)
+                        for (var x = left ; x <= left + WidthMin / 10; x++)
+                        {
+                            if (map[top - margin - 1, x] == 0)
+                                goto last;
+                        }
+                        for (var x = right; x >= right - WidthMin / 10; x--)
+                        {
+                            if (map[top - margin - 1, x] == 0)
+                                goto last;
+                        }
+                        return true;
+                    case Edge.VerticalLeft:
+                        if (left - margin - 1 < 0)
                             return false;
-                    }
-                    return true;
-                case Edge.HorizontalBottom:
-                    for (var x = left; x <= left + WidthMin / 10; x++)
-                    {
-                        if (map[bottom, x] == 0)
-                            goto bright;
-                    }
-                    return true;
-                    bright:
-                    for (var x = right; x >= right - WidthMin / 10; x--)
-                    {
-                        if (map[bottom, x] == 0)
+                        for (var y = top; y <= top + HeightMin / 10; y++)
+                        {
+                            if (map[y, left - margin - 1] == 0)
+                                goto last;
+                        }
+                        for (var y = bottom; y >= bottom - HeightMin / 10; y--)
+                        {
+                            if (map[y, left - margin - 1] == 0)
+                                goto last;
+                        }
+                        return true;
+                    case Edge.HorizontalBottom:
+                        if (bottom + margin >= map.GetLength(0))
                             return false;
-                    }
-                    return true;
-                case Edge.VerticalRight:
-                    for (var y = top; y <= top + HeightMin / 10; y++)
-                    {
-                        if (map[y, right] == 0)
-                            goto rbottom;
-                    }
-                    return true;
-                    rbottom:
-                    for (var y = bottom; y >= bottom - HeightMin / 10; y--)
-                    {
-                        if (map[y, right] == 0)
+                        for (var x = left; x <= left + WidthMin / 10; x++)
+                        {
+                            if (map[bottom + margin, x] == 0)
+                                goto last;
+                        }
+                        for (var x = right; x >= right - WidthMin / 10; x--)
+                        {
+                            if (map[bottom + margin, x] == 0)
+                                goto last;
+                        }
+                        return true;
+                    case Edge.VerticalRight:
+                        if (right + margin >= map.GetLength(1))
                             return false;
-                    }
-                    return true;
+                        for (var y = top; y <= top + HeightMin / 10; y++)
+                        {
+                            if (map[y, right + margin] == 0)
+                                goto last;
+                        }
+                        for (var y = bottom; y >= bottom - HeightMin / 10; y--)
+                        {
+                            if (map[y, right + margin] == 0)
+                                goto last;
+                        }
+                        return true;
+                }
+                last:;
             }
             return false;
         }
@@ -355,8 +387,8 @@ namespace BurageSnap
         private bool CheckEnoughLength(byte[,] map, int left, int right, int top, int bottom, Edge edge)
         {
             var n = 0;
-            var hlen = (right - left + 1) * 0.7;
-            var vlen = (bottom - top + 1) * 0.7;
+            var hlen = (right - left + 1) * 0.6;
+            var vlen = (bottom - top + 1) * 0.6;
             switch (edge)
             {
                 case Edge.HorizontalTop:
