@@ -155,7 +155,7 @@ namespace BurageSnap
         {
             var height = bmp.Height;
             var width = bmp.Width;
-            var map = new byte[height, width];
+            var map = new byte[width, height];
             var data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
                 PixelFormat.Format24bppRgb);
             unsafe
@@ -166,7 +166,7 @@ namespace BurageSnap
                     for (var x = 0; x < data.Width; x++)
                     {
                         var p = ptr + y * data.Stride + x * 3;
-                        map[y, x] = (byte)(p[0] == 255 && p[1] == 255 && p[2] == 255 ? 1 : 0);
+                        map[x, y] = (byte)(p[0] == 255 && p[1] == 255 && p[2] == 255 ? 1 : 0);
                     }
                 }
             }
@@ -199,8 +199,8 @@ namespace BurageSnap
 
         private Rectangle FindBottomAndRight(byte[,] map, Rectangle rect)
         {
-            var height = map.GetLength(0);
-            var width = map.GetLength(1);
+            var width = map.GetLength(0);
+            var height = map.GetLength(1);
             for (var y = rect.Y; y < height; y++)
             {
                 if (!CheckEdgeHorizontalBottom(map, rect.X, width, y, y))
@@ -266,7 +266,7 @@ namespace BurageSnap
             var n = 0;
             for (var x = left; x < right; x++)
             {
-                if (!(map[top - 1, x] == 1 && map[top, x] == 0))
+                if (!(map[x, top - 1] == 1 && map[x, top] == 0))
                     continue;
                 if (++n < EdgeWidth)
                     continue;
@@ -280,7 +280,7 @@ namespace BurageSnap
             var n = 0;
             for (var y = top; y < bottom; y++)
             {
-                if (!(map[y, left - 1] == 1 && map[y, left] == 0))
+                if (!(map[left - 1, y] == 1 && map[left, y] == 0))
                     continue;
                 if (++n < EdgeHeight)
                     continue;
@@ -294,7 +294,7 @@ namespace BurageSnap
             var n = 0;
             for (var x = left; x < right; x++)
             {
-                if (!(map[bottom - 1, x] == 0 && map[bottom, x] == 1))
+                if (!(map[x, bottom - 1] == 0 && map[x, bottom] == 1))
                     continue;
                 if (++n < EdgeWidth)
                     continue;
@@ -308,7 +308,7 @@ namespace BurageSnap
             var n = 0;
             for (var y = top; y < bottom; y++)
             {
-                if (!(map[y, right - 1] == 0 && map[y, right] == 1))
+                if (!(map[right - 1, y] == 0 && map[right, y] == 1))
                     continue;
                 if (++n < EdgeHeight)
                     continue;
@@ -355,12 +355,12 @@ namespace BurageSnap
                     return false;
                 for (var x = left; x <= left + WidthMin / 10; x++)
                 {
-                    if (map[top - margin - 1, x] == 0)
+                    if (map[x, top - margin - 1] == 0)
                         goto last;
                 }
                 for (var x = right; x >= right - WidthMin / 10; x--)
                 {
-                    if (map[top - margin - 1, x] == 0)
+                    if (map[x, top - margin - 1] == 0)
                         goto last;
                 }
                 return true;
@@ -377,12 +377,12 @@ namespace BurageSnap
                     return false;
                 for (var y = top; y <= top + HeightMin / 10; y++)
                 {
-                    if (map[y, left - margin - 1] == 0)
+                    if (map[left - margin - 1, y] == 0)
                         goto last;
                 }
                 for (var y = bottom; y >= bottom - HeightMin / 10; y--)
                 {
-                    if (map[y, left - margin - 1] == 0)
+                    if (map[left - margin - 1, y] == 0)
                         goto last;
                 }
                 return true;
@@ -395,16 +395,16 @@ namespace BurageSnap
         {
             for (var margin = 0; margin < DecorationThickness; margin++)
             {
-                if (bottom + margin >= map.GetLength(0))
+                if (bottom + margin >= map.GetLength(1))
                     return false;
                 for (var x = left; x <= left + WidthMin / 10; x++)
                 {
-                    if (map[bottom + margin, x] == 0)
+                    if (map[x, bottom + margin] == 0)
                         goto last;
                 }
                 for (var x = right; x >= right - WidthMin / 10; x--)
                 {
-                    if (map[bottom + margin, x] == 0)
+                    if (map[x, bottom + margin] == 0)
                         goto last;
                 }
                 return true;
@@ -417,16 +417,16 @@ namespace BurageSnap
         {
             for (var margin = 0; margin < DecorationThickness; margin++)
             {
-                if (right + margin >= map.GetLength(1))
+                if (right + margin >= map.GetLength(0))
                     return false;
                 for (var y = top; y <= top + HeightMin / 10; y++)
                 {
-                    if (map[y, right + margin] == 0)
+                    if (map[right + margin, y] == 0)
                         goto last;
                 }
                 for (var y = bottom; y >= bottom - HeightMin / 10; y--)
                 {
-                    if (map[y, right + margin] == 0)
+                    if (map[right + margin, y] == 0)
                         goto last;
                 }
                 return true;
@@ -442,7 +442,7 @@ namespace BurageSnap
             var n = 0;
             for (var x = left; x <= right; x++)
             {
-                if (map[top - 1, x] == 1)
+                if (map[x, top - 1] == 1)
                     n++;
             }
             return n >= (right - left + 1) * EnoughLengthRatio;
@@ -453,7 +453,7 @@ namespace BurageSnap
             var n = 0;
             for (var y = top; y <= bottom; y++)
             {
-                if (map[y, left - 1] == 1)
+                if (map[left - 1, y] == 1)
                     n++;
             }
             return n >= (bottom - top + 1) * EnoughLengthRatio;
@@ -464,7 +464,7 @@ namespace BurageSnap
             var n = 0;
             for (var x = left; x <= right; x++)
             {
-                if (map[bottom, x] == 1)
+                if (map[x, bottom] == 1)
                     n++;
             }
             return n >= (right - left + 1) * EnoughLengthRatio;
@@ -475,7 +475,7 @@ namespace BurageSnap
             var n = 0;
             for (var y = top; y <= bottom; y++)
             {
-                if (map[y, right] == 1)
+                if (map[right, y] == 1)
                     n++;
             }
             return n >= (bottom - top + 1) * EnoughLengthRatio;
@@ -490,7 +490,7 @@ namespace BurageSnap
             var top = 0;
             for (var x = rect.X; x < rect.Right; x++)
             {
-                if (map[rect.Top - 1, x] == 1)
+                if (map[x, rect.Top - 1] == 1)
                     top++;
             }
             var r = rect.Height % 10;
