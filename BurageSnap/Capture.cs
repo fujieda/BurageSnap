@@ -320,45 +320,46 @@ namespace BurageSnap
         private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
         {
             return CheckEdgeHorizontalTop(map, left, right, top, bottom) &&
-                   CheckBothEndCleanHorizontalTop(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom) &&
                    CheckEnoughLengthHorizontalTop(map, left, right, top, bottom);
         }
 
         private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
         {
             return CheckEdgeVerticalLeft(map, left, right, top, bottom) &&
-                   CheckBothEndCleanVerticalLeft(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeVerticalLeft(map, left, right, top, bottom) &&
                    CheckEnoughLengthVerticalLeft(map, left, right, top, bottom);
         }
 
         private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
         {
             return CheckEdgeHorizontalBottom(map, left, right, top, bottom) &&
-                   CheckBothEndCleanHorizontalBottom(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeHorizontalBottom(map, left, right, top, bottom) &&
                    CheckEnoughLengthHorizontalBottom(map, left, right, top, bottom);
         }
 
         private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom)
         {
             return CheckEdgeVerticalRight(map, left, right, top, bottom) &&
-                   CheckBothEndCleanVerticalRight(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeVerticalRight(map, left, right, top, bottom) &&
                    CheckEnoughLengthVerticalRight(map, left, right, top, bottom);
         }
 
-        const int DecorationThickness = 20;
+        private const int DecorationThickness = 20;
+        private const int CornerSize = 10;
 
-        private bool CheckBothEndCleanHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
         {
             for (var margin = 0; margin < DecorationThickness; margin++)
             {
                 if (top - margin - 1 < 0)
                     return false;
-                for (var x = left; x <= left + WidthMin / 10; x++)
+                for (var x = left; x < left + CornerSize; x++)
                 {
                     if (map[x, top - margin - 1] == 0)
                         goto last;
                 }
-                for (var x = right; x >= right - WidthMin / 10; x--)
+                for (var x = right - 1; x >= right - CornerSize; x--)
                 {
                     if (map[x, top - margin - 1] == 0)
                         goto last;
@@ -369,18 +370,18 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckBothEndCleanVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
         {
             for (var margin = 0; margin < DecorationThickness; margin++)
             {
                 if (left - margin - 1 < 0)
                     return false;
-                for (var y = top; y <= top + HeightMin / 10; y++)
+                for (var y = top; y < top + CornerSize; y++)
                 {
                     if (map[left - margin - 1, y] == 0)
                         goto last;
                 }
-                for (var y = bottom; y >= bottom - HeightMin / 10; y--)
+                for (var y = bottom - 1; y >= bottom - CornerSize; y--)
                 {
                     if (map[left - margin - 1, y] == 0)
                         goto last;
@@ -391,18 +392,18 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckBothEndCleanHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
         {
             for (var margin = 0; margin < DecorationThickness; margin++)
             {
                 if (bottom + margin >= map.GetLength(1))
                     return false;
-                for (var x = left; x <= left + WidthMin / 10; x++)
+                for (var x = left; x < left + CornerSize; x++)
                 {
                     if (map[x, bottom + margin] == 0)
                         goto last;
                 }
-                for (var x = right; x >= right - WidthMin / 10; x--)
+                for (var x = right - 1; x >= right - CornerSize; x--)
                 {
                     if (map[x, bottom + margin] == 0)
                         goto last;
@@ -413,18 +414,18 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckBothEndCleanVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom)
         {
             for (var margin = 0; margin < DecorationThickness; margin++)
             {
                 if (right + margin >= map.GetLength(0))
                     return false;
-                for (var y = top; y <= top + HeightMin / 10; y++)
+                for (var y = top; y < top + CornerSize; y++)
                 {
                     if (map[right + margin, y] == 0)
                         goto last;
                 }
-                for (var y = bottom; y >= bottom - HeightMin / 10; y--)
+                for (var y = bottom - 1; y >= bottom - CornerSize; y--)
                 {
                     if (map[right + margin, y] == 0)
                         goto last;
@@ -435,50 +436,126 @@ namespace BurageSnap
             return false;
         }
 
-        private const float EnoughLengthRatio = 0.6f;
+        private const float EnoughLengthRatio = 0.9f;
 
         private bool CheckEnoughLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
         {
             var n = 0;
-            for (var x = left; x <= right; x++)
+            for (var x = left; x < right; x++)
             {
                 if (map[x, top - 1] == 1)
                     n++;
             }
-            return n >= (right - left + 1) * EnoughLengthRatio;
+            var decor = GetDecorationLengthHorizontalTop(map, left, right, top, bottom);
+            return n + decor >= (right - left) * EnoughLengthRatio;
+        }
+
+        private int GetDecorationLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+        {
+            var decor = 0;
+            for (var x = left; x < right; x++)
+            {
+                if (map[x, top - 1] == 1)
+                    break;
+                decor++;
+            }
+            for (var x = right - 1; x >= left; x--)
+            {
+                if (map[x, top - 1] == 1)
+                    break;
+                decor++;
+            }
+            return decor;
         }
 
         private bool CheckEnoughLengthVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
         {
             var n = 0;
-            for (var y = top; y <= bottom; y++)
+            for (var y = top; y < bottom; y++)
             {
                 if (map[left - 1, y] == 1)
                     n++;
             }
-            return n >= (bottom - top + 1) * EnoughLengthRatio;
+            var decor = GetDecorationLengthVerticalLeft(map, left, right, top, bottom);
+            return n + decor >= (bottom - top) * EnoughLengthRatio;
+        }
+
+        private int GetDecorationLengthVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+        {
+            var decor = 0;
+            for (var y = top; y < bottom; y++)
+            {
+                if (map[left - 1, y] == 1)
+                    break;
+                decor++;
+            }
+            for (var y = bottom - 1; y >= top; y--)
+            {
+                if (map[left - 1, y] == 1)
+                    break;
+                decor++;
+            }
+            return decor;
         }
 
         private bool CheckEnoughLengthHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
         {
             var n = 0;
-            for (var x = left; x <= right; x++)
+            for (var x = left; x < right; x++)
             {
                 if (map[x, bottom] == 1)
                     n++;
             }
-            return n >= (right - left + 1) * EnoughLengthRatio;
+            var decor = GetDecorationLengthHorizontalBottom(map, left, right, top, bottom);
+            return n + decor >= (right - left) * EnoughLengthRatio;
+        }
+
+        private int GetDecorationLengthHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+        {
+            var decor = 0;
+            for (var x = left; x < right; x++)
+            {
+                if (map[x, bottom] == 1)
+                    break;
+                decor++;
+            }
+            for (var x = right - 1; x >= left; x--)
+            {
+                if (map[x, bottom] == 1)
+                    break;
+                decor++;
+            }
+            return decor;
         }
 
         private bool CheckEnoughLengthVerticalRight(byte[,] map, int left, int right, int top, int bottom)
         {
             var n = 0;
-            for (var y = top; y <= bottom; y++)
+            for (var y = top; y < bottom; y++)
             {
                 if (map[right, y] == 1)
                     n++;
             }
-            return n >= (bottom - top + 1) * EnoughLengthRatio;
+            var decor = GetDecorationLengthVerticalRight(map, left, right, top, bottom);
+            return n + decor >= (bottom - top) * EnoughLengthRatio;
+        }
+
+        private int GetDecorationLengthVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+        {
+            var decor = 0;
+            for (var y = top; y < bottom; y++)
+            {
+                if (map[right, y] == 1)
+                    break;
+                decor++;
+            }
+            for (var y = bottom - 1; y >= top; y--)
+            {
+                if (map[right, y] == 1)
+                    break;
+                decor++;
+            }
+            return decor;
         }
         // ReSharper restore UnusedParameter.Local
 
