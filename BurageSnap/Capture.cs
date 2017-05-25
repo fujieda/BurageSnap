@@ -171,6 +171,14 @@ namespace BurageSnap
                 }
             }
             bmp.UnlockBits(data);
+            var rect = FindRectangle(map, false);
+            return rect != Rectangle.Empty ? rect : FindRectangle(map, true);
+        }
+
+        private Rectangle FindRectangle(byte[,] map, bool vagueTop)
+        {
+            var width = map.GetLength(0);
+            var height = map.GetLength(1);
             for (var y = 1; y < height; y++)
             {
                 if (!CheckEdgeHorizontalTop(map, 0, width, y, y))
@@ -185,11 +193,11 @@ namespace BurageSnap
                     rect = FindBottomAndRight(map, rect);
                     if (rect == Rectangle.Empty)
                         continue;
-                    if (!CheckEdgeStrictHorizontalTop(map, rect.X, rect.Right, y, y))
+                    if (!CheckEdgeStrictHorizontalTop(map, rect.X, rect.Right, y, y, vagueTop))
                         break;
                     if (!CheckEdgeStrictVerticalLeft(map, x, x, rect.Y, rect.Bottom))
                         continue;
-                    rect = FindTopAndLeft(map, rect);
+                    rect = FindTopAndLeft(map, rect, vagueTop);
                     RoundUpRectangle(map, ref rect);
                     return rect;
                 }
@@ -233,11 +241,11 @@ namespace BurageSnap
             return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
         }
 
-        private Rectangle FindTopAndLeft(byte[,] map, Rectangle rect)
+        private Rectangle FindTopAndLeft(byte[,] map, Rectangle rect, bool vagueTop)
         {
             for (var y = rect.Bottom - 1; y >= rect.Y; y--)
             {
-                if (CheckEdgeStrictHorizontalTop(map, rect.Left, rect.Right, y, y))
+                if (CheckEdgeStrictHorizontalTop(map, rect.Left, rect.Right, y, y, vagueTop))
                 {
                     rect.Height += rect.Y - y;
                     rect.Y = y;
@@ -317,11 +325,11 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop)
         {
             return CheckEdgeHorizontalTop(map, left, right, top, bottom) &&
                    CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom) &&
-                   CheckEnoughLengthHorizontalTop(map, left, right, top, bottom);
+                   CheckEnoughLengthHorizontalTop(map, left, right, top, bottom, vagueTop);
         }
 
         private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
@@ -365,7 +373,8 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:;
+                last:
+                ;
             }
             return false;
         }
@@ -387,7 +396,8 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:;
+                last:
+                ;
             }
             return false;
         }
@@ -409,7 +419,8 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:;
+                last:
+                ;
             }
             return false;
         }
@@ -431,14 +442,16 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:;
+                last:
+                ;
             }
             return false;
         }
 
         private const float EnoughLengthRatio = 0.9f;
 
-        private bool CheckEnoughLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEnoughLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom,
+            bool vagueTop)
         {
             var n = 0;
             for (var x = left; x < right; x++)
@@ -447,7 +460,7 @@ namespace BurageSnap
                     n++;
             }
             var decor = GetDecorationLengthHorizontalTop(map, left, right, top, bottom);
-            return n + decor >= (right - left) * EnoughLengthRatio;
+            return n + decor >= (right - left) * (vagueTop ? 0.6f : EnoughLengthRatio);
         }
 
         private int GetDecorationLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
