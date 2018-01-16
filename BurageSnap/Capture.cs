@@ -585,7 +585,10 @@ namespace BurageSnap
             }
             var r = rect.Height % 10;
             if (top > rect.Width / 2 && r != 0)
+            {
+                rect.Y -= 10 - r;
                 rect.Height += 10 - r;
+            }
         }
     }
 }
