@@ -51,8 +51,7 @@ namespace BurageSnap
 
         public Bitmap CaptureGameScreen(string[] titles)
         {
-            int index;
-            _hWnd = FindWindow(titles, out index);
+            _hWnd = FindWindow(titles, out var index);
             if (_hWnd == IntPtr.Zero)
                 throw new CaptureError(Resources.Capture_Search_error,
                     Resources.Capture_Cant_find_window);
@@ -166,7 +165,15 @@ namespace BurageSnap
                     for (var x = 0; x < data.Width; x++)
                     {
                         var p = ptr + y * data.Stride + x * 3;
-                        map[x, y] = (byte)(p[0] == 255 && p[1] == 255 && p[2] == 255 ? 1 : 0);
+                        map[x, y] = (byte)(p[0] >= 254 && p[1] >= 254 && p[2] >= 254 ? 1 : 0);
+                    }
+                }
+                for (var y = 0; y < data.Height; y++)
+                {
+                    for (var x = 0; x < data.Width; x++)
+                    {
+                        var p = ptr + y * data.Stride + x * 3;
+                        map[x, y] = (byte)(p[0] >= 254 && p[1] >= 254 && p[2] >= 254 ? 1 : 0);
                     }
                 }
             }
