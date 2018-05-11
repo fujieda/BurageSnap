@@ -62,22 +62,32 @@ namespace BurageSnap
 
         public bool ShowInTaskbar
         {
-            get { return _showInTaskbar; }
-            set { SetProperty(ref _showInTaskbar, value); }
+            get => _showInTaskbar;
+            set => SetProperty(ref _showInTaskbar, value);
+        }
+
+        private WindowStyle _windowStyle;
+
+        public WindowStyle WindowStyle
+        {
+            get => _windowStyle;
+            set => SetProperty(ref _windowStyle, value);
         }
 
         private WindowState _windowState = WindowState.Normal;
 
         public WindowState WindowState
         {
-            get { return _windowState; }
+            get => _windowState;
             set
             {
                 if (_windowState == value)
                     return;
                 Main.Config.WindowState = value;
                 SetProperty(ref _windowState, value);
-                ShowInTaskbar = !(WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray);
+                var hide = WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray;
+                ShowInTaskbar = !hide;
+                WindowStyle = hide ? WindowStyle.ToolWindow : WindowStyle.SingleBorderWindow;
             }
         }
 

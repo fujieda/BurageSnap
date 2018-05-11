@@ -11,7 +11,7 @@
         mc:Ignorable="d"
         Style="{StaticResource WindowStyle}"
         Title="BurageSnap" Height="114" Width="169" ResizeMode="CanMinimize" Icon="app.ico"
-        ShowInTaskbar="{Binding ShowInTaskbar}" WindowState="{Binding WindowState}">
+        ShowInTaskbar="{Binding ShowInTaskbar}" WindowState="{Binding WindowState}" WindowStyle="{Binding WindowStyle, Mode=TwoWay}">
     <controls:MetroWindow.DataContext>
         <local:MainWindowViewModel/>
     </controls:MetroWindow.DataContext>
