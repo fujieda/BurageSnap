@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Xml.Serialization;
 
@@ -25,11 +27,17 @@ namespace BurageSnap
         Png
     }
 
+    public class LocationPerMachine
+    {
+        public string MachineName { get; set; }
+        public Point Location { get; set; }
+    }
+
     public class Config
     {
-
         private static readonly string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
         public Point Location { get; set; } = new Point(double.MinValue, double.MinValue);
+        public List<LocationPerMachine> LocationList { get; set; } = new List<LocationPerMachine>();
         public bool TopMost { get; set; }
         public bool ResideInSystemTray { get; set; }
         public bool Notify { get; set; } = true;
@@ -37,7 +45,8 @@ namespace BurageSnap
         public int Interval { get; set; } = 200;
         public int RingBuffer { get; set; } = 25;
 
-        public string[] TitleHistory { get; set; } = {
+        public string[] TitleHistory { get; set; } =
+        {
             "艦隊これくしょん -艦これ- - オンラインゲーム - DMM GAMES",
             "千年戦争アイギス - DMM GAMES",
             "FLOWER KNIGHT GIRL - DMM GAMES",
@@ -66,6 +75,14 @@ namespace BurageSnap
                     var config = (Config)new XmlSerializer(typeof(Config)).Deserialize(file);
                     config.Folder = PrependBaseDir(config.Folder);
                     FixTitles(config);
+                    foreach (var l in config.LocationList)
+                    {
+                        if (l.MachineName == Environment.MachineName)
+                        {
+                            config.Location = l.Location;
+                            break;
+                        }
+                    }
                     return config;
                 }
             }
@@ -88,6 +105,8 @@ namespace BurageSnap
 
         public void Save()
         {
+            LocationList = LocationList.Where(l => l.MachineName != Environment.MachineName).Concat(new[]
+                {new LocationPerMachine {MachineName = Environment.MachineName, Location = Location}}).ToList();
             Folder = StripBaseDir(Folder);
             using (var file = File.CreateText("config.xml"))
                 new XmlSerializer(typeof(Config)).Serialize(file, this);
