@@ -36,6 +36,7 @@ namespace BurageSnap
             set
             {
                 Options = (OptionContent)value.Content;
+                JpegQuality = Options.JpegQuality.ToString();
                 Interval = Options.Interval.ToString();
                 RingBuffer = Options.RingBuffer.ToString();
                 AnimationGif = Options.AnimationGif;
@@ -98,6 +99,26 @@ namespace BurageSnap
                     ClearError();
                 }
                 _options.RingBuffer = result;
+            }
+        }
+
+        private string _jpegQuality;
+
+        public string JpegQuality
+        {
+            get => _jpegQuality;
+            set
+            {
+                SetProperty(ref _jpegQuality, value);
+                if (!int.TryParse(value, out var result) || result < 0 || result > 100)
+                {
+                    SetError(Resources.OptionView_Validate_jpeg_quality);
+                }
+                else
+                {
+                    ClearError();
+                }
+                _options.JpegQuality = result;
             }
         }
 

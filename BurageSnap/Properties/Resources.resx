@@ -118,7 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <!-- ReSharper disable NotOverriddenInSpecificCulture -->
   <data name="folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\folder_open.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -128,7 +127,6 @@
   <data name="cogs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\cogs.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <!-- ReSharper restore NotOverriddenInSpecificCulture -->
   <data name="MainWindow_Stop" xml:space="preserve">
     <value>Stop</value>
   </data>
@@ -257,5 +255,11 @@
   </data>
   <data name="OptionView_Validate_ring_buffer_for_animation_GIF" xml:space="preserve">
     <value>The size of the ring buffer must be greater than 1 to generate animation GIF.</value>
+  </data>
+  <data name="OptionView_Quality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="OptionView_Validate_jpeg_quality" xml:space="preserve">
+    <value>Quality must be in the range of 0 to 100.</value>
   </data>
 </root>

@@ -19,7 +19,7 @@ namespace BurageSnap.Properties {
     // または Visual Studio のようなツールを使用して自動生成されました。
     // メンバーを追加または削除するには、.ResX ファイルを編集して、/str オプションと共に
     // ResGen を実行し直すか、または VS プロジェクトをビルドし直します。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -47,7 +47,7 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
-        ///   厳密に型指定されたこのリソース クラスを使用して、すべての検索リソースに対し、
+        ///   すべてについて、現在のスレッドの CurrentUICulture プロパティをオーバーライドします
         ///   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -379,6 +379,15 @@ namespace BurageSnap.Properties {
         }
         
         /// <summary>
+        ///   Quality に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Quality {
+            get {
+                return ResourceManager.GetString("OptionView_Quality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Remove に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string OptionView_Remove {
@@ -429,6 +438,15 @@ namespace BurageSnap.Properties {
         public static string OptionView_Validate_interval {
             get {
                 return ResourceManager.GetString("OptionView_Validate_interval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Quality must be in the range of 0 to 100. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string OptionView_Validate_jpeg_quality {
+            get {
+                return ResourceManager.GetString("OptionView_Validate_jpeg_quality", resourceCulture);
             }
         }
         

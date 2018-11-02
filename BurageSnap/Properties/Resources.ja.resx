@@ -246,4 +246,10 @@
   <data name="OptionView_Validate_ring_buffer_for_animation_GIF" xml:space="preserve">
     <value>アニメーションGIFを出力するにはリングバッファのサイズを2以上にしてください。</value>
   </data>
+  <data name="OptionView_Quality" xml:space="preserve">
+    <value>品質</value>
+  </data>
+  <data name="OptionView_Validate_jpeg_quality" xml:space="preserve">
+    <value>品質は0から100の間で指定してください</value>
+  </data>
 </root>

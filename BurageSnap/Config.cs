@@ -56,6 +56,7 @@ namespace BurageSnap
         public string Folder { get; set; }
         public bool DailyFolder { get; set; } = true;
         public OutputFormat Format { get; set; } = OutputFormat.Jpg;
+        public int JpegQuality { get; set; } = 70;
         public bool Continuous { get; set; }
         public bool AnimationGif { get; set; }
         public int HotKeyModifier { get; set; }

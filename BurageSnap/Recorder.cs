@@ -19,6 +19,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using BurageSnap.Properties;
@@ -82,6 +83,7 @@ namespace BurageSnap
 
         // ReSharper disable InconsistentNaming
         private const int TIME_PERIODIC = 0x0001;
+
         private const int TIME_KILL_SYNCHRONOUS = 0x0100;
         // ReSharper restore InconsistentNaming
 
@@ -119,8 +121,12 @@ namespace BurageSnap
         {
             try
             {
+                var parameters = new EncoderParameters(1);
+                parameters.Param[0] = new EncoderParameter(Encoder.Quality, _config.JpegQuality);
                 using (var fs = OpenFile(frame.Time, _config.Format == OutputFormat.Jpg ? ".jpg" : ".png"))
-                    frame.Bitmap.Save(fs, _config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png);
+                    frame.Bitmap.Save(fs,
+                        GetEncoder(_config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png),
+                        parameters);
             }
             catch (IOException)
             {
@@ -130,6 +136,11 @@ namespace BurageSnap
             {
                 frame.Dispose();
             }
+        }
+
+        private ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            return ImageCodecInfo.GetImageEncoders().FirstOrDefault(codec => codec.FormatID == format.Guid);
         }
 
         private void AddFrame(Frame frame)
