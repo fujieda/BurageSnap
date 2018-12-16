@@ -193,18 +193,21 @@ namespace BurageSnap
                 for (var x = 1; x < width; x++)
                 {
                     var rect = Rectangle.Empty;
+                    var margin = Rectangle.Empty;
                     rect.Y = y;
                     if (!CheckEdgeVerticalLeft(map, x, x, rect.Y, height))
                         continue;
                     rect.X = x;
-                    rect = FindBottomAndRight(map, rect);
+                    FindBottomAndRight(map, ref rect, ref margin);
                     if (rect == Rectangle.Empty)
                         continue;
-                    if (!CheckEdgeStrictHorizontalTop(map, rect.X, rect.Right, y, y, vagueTop))
+                    var unused = Rectangle.Empty;
+                    if (!CheckEdgeStrictHorizontalTop(map, rect.X, rect.Right, y, y, vagueTop, ref unused))
                         break;
-                    if (!CheckEdgeStrictVerticalLeft(map, x, x, rect.Y, rect.Bottom))
+                    if (!CheckEdgeStrictVerticalLeft(map, x, x, rect.Y, rect.Bottom, ref unused))
                         continue;
-                    rect = FindTopAndLeft(map, rect, vagueTop);
+                    FindTopAndLeft(map, ref rect, vagueTop, ref margin);
+                    InflateRectangle(ref rect, margin);
                     RoundUpRectangle(map, ref rect);
                     return rect;
                 }
@@ -212,7 +215,15 @@ namespace BurageSnap
             return Rectangle.Empty;
         }
 
-        private Rectangle FindBottomAndRight(byte[,] map, Rectangle rect)
+        private void InflateRectangle(ref Rectangle rect, Rectangle margin)
+        {
+            rect.X -= margin.X;
+            rect.Y -= margin.Y;
+            rect.Width += margin.X + margin.Width;
+            rect.Height += margin.Y + margin.Height;
+        }
+
+        private void FindBottomAndRight(byte[,] map, ref Rectangle rect, ref Rectangle margin)
         {
             var width = map.GetLength(0);
             var height = map.GetLength(1);
@@ -224,35 +235,40 @@ namespace BurageSnap
                 rect.Width = 0;
                 for (var x = rect.X; x < width; x++)
                 {
-                    if (!CheckEdgeStrictVerticalRight(map, x, x, rect.Y, rect.Bottom))
+                    if (!CheckEdgeStrictVerticalRight(map, x, x, rect.Y, rect.Bottom, ref margin))
                         continue;
                     rect.Width = x - rect.X;
                     break;
                 }
                 if (rect.Width == 0)
                     continue;
-                if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, rect.Bottom, rect.Bottom))
+                var unused = Rectangle.Empty;
+                if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, rect.Bottom, rect.Bottom, ref unused))
                     break;
             }
             if (rect.Width == 0)
-                return Rectangle.Empty;
+            {
+                rect = Rectangle.Empty;
+                return;
+            }
             // check a smaller rectangle
             for (var y = rect.Y; y <= rect.Bottom; y++)
             {
-                if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, y, y))
+                if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, y, y, ref margin))
                 {
                     rect.Height = y - rect.Y;
                     break;
                 }
             }
-            return rect.Width >= WidthMin && rect.Height >= HeightMin ? rect : Rectangle.Empty;
+            if (!(rect.Width >= WidthMin && rect.Height >= HeightMin))
+                rect = Rectangle.Empty;
         }
 
-        private Rectangle FindTopAndLeft(byte[,] map, Rectangle rect, bool vagueTop)
+        private void FindTopAndLeft(byte[,] map, ref Rectangle rect, bool vagueTop, ref Rectangle margin)
         {
             for (var y = rect.Bottom - 1; y >= rect.Y; y--)
             {
-                if (CheckEdgeStrictHorizontalTop(map, rect.Left, rect.Right, y, y, vagueTop))
+                if (CheckEdgeStrictHorizontalTop(map, rect.Left, rect.Right, y, y, vagueTop, ref margin))
                 {
                     rect.Height += rect.Y - y;
                     rect.Y = y;
@@ -261,14 +277,13 @@ namespace BurageSnap
             }
             for (var x = rect.Right - 1; x >= rect.X; x--)
             {
-                if (CheckEdgeStrictVerticalLeft(map, x, x, rect.Top, rect.Bottom))
+                if (CheckEdgeStrictVerticalLeft(map, x, x, rect.Top, rect.Bottom, ref margin))
                 {
                     rect.Width += rect.X - x;
                     rect.X = x;
                     break;
                 }
             }
-            return rect;
         }
 
         const int EdgeWidth = WidthMin / 2;
@@ -332,51 +347,51 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop)
+        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop, ref Rectangle margin)
         {
             return CheckEdgeHorizontalTop(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthHorizontalTop(map, left, right, top, bottom, vagueTop);
         }
 
-        private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
             return CheckEdgeVerticalLeft(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeVerticalLeft(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeVerticalLeft(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthVerticalLeft(map, left, right, top, bottom);
         }
 
-        private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
             return CheckEdgeHorizontalBottom(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeHorizontalBottom(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeHorizontalBottom(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthHorizontalBottom(map, left, right, top, bottom);
         }
 
-        private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
             return CheckEdgeVerticalRight(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeVerticalRight(map, left, right, top, bottom) &&
+                   CheckEndOfEdgeVerticalRight(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthVerticalRight(map, left, right, top, bottom);
         }
 
         private const int DecorationThickness = 20;
         private const int CornerSize = 10;
 
-        private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
-            for (var margin = 0; margin < DecorationThickness; margin++)
+            for (margin.Y = 0; margin.Top < DecorationThickness; margin.Y++)
             {
-                if (top - margin - 1 < 0)
+                if (top - margin.Y - 1 < 0)
                     return false;
                 for (var x = left; x < left + CornerSize; x++)
                 {
-                    if (map[x, top - margin - 1] == 0)
+                    if (map[x, top - margin.Y - 1] == 0)
                         goto last;
                 }
                 for (var x = right - 1; x >= right - CornerSize; x--)
                 {
-                    if (map[x, top - margin - 1] == 0)
+                    if (map[x, top - margin.Y - 1] == 0)
                         goto last;
                 }
                 return true;
@@ -386,20 +401,20 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
-            for (var margin = 0; margin < DecorationThickness; margin++)
+            for (margin.X = 0; margin.X < DecorationThickness; margin.X++)
             {
-                if (left - margin - 1 < 0)
+                if (left - margin.X - 1 < 0)
                     return false;
                 for (var y = top; y < top + CornerSize; y++)
                 {
-                    if (map[left - margin - 1, y] == 0)
+                    if (map[left - margin.X - 1, y] == 0)
                         goto last;
                 }
                 for (var y = bottom - 1; y >= bottom - CornerSize; y--)
                 {
-                    if (map[left - margin - 1, y] == 0)
+                    if (map[left - margin.X - 1, y] == 0)
                         goto last;
                 }
                 return true;
@@ -409,20 +424,20 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
-            for (var margin = 0; margin < DecorationThickness; margin++)
+            for (margin.Height = 0; margin.Height < DecorationThickness; margin.Height++)
             {
-                if (bottom + margin >= map.GetLength(1))
+                if (bottom + margin.Height >= map.GetLength(1))
                     return false;
                 for (var x = left; x < left + CornerSize; x++)
                 {
-                    if (map[x, bottom + margin] == 0)
+                    if (map[x, bottom + margin.Height] == 0)
                         goto last;
                 }
                 for (var x = right - 1; x >= right - CornerSize; x--)
                 {
-                    if (map[x, bottom + margin] == 0)
+                    if (map[x, bottom + margin.Height] == 0)
                         goto last;
                 }
                 return true;
@@ -432,20 +447,20 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+        private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
         {
-            for (var margin = 0; margin < DecorationThickness; margin++)
+            for (margin.Width = 0; margin.Width < DecorationThickness; margin.Width++)
             {
-                if (right + margin >= map.GetLength(0))
+                if (right + margin.Width >= map.GetLength(0))
                     return false;
                 for (var y = top; y < top + CornerSize; y++)
                 {
-                    if (map[right + margin, y] == 0)
+                    if (map[right + margin.Width, y] == 0)
                         goto last;
                 }
                 for (var y = bottom - 1; y >= bottom - CornerSize; y--)
                 {
-                    if (map[right + margin, y] == 0)
+                    if (map[right + margin.Width, y] == 0)
                         goto last;
                 }
                 return true;
