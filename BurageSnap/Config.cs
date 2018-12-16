@@ -90,6 +90,9 @@ namespace BurageSnap
             catch (IOException)
             {
             }
+            catch (InvalidOperationException)
+            {
+            }
             return new Config();
         }
 
