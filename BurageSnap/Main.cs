@@ -90,24 +90,24 @@ namespace BurageSnap
 
         public string WindowTitle
         {
-            get { return _windowTitle; }
-            set { SetProperty(ref _windowTitle, value); }
+            get => _windowTitle;
+            private set => SetProperty(ref _windowTitle, value);
         }
 
         private string _captureResult = "00:00:00.000";
 
         public string CaptureResult
         {
-            get { return _captureResult; }
-            set { SetProperty(ref _captureResult, value); }
+            get => _captureResult;
+            set => SetProperty(ref _captureResult, value);
         }
 
         private bool _capturing;
 
         public bool Capturing
         {
-            get { return _capturing; }
-            set { SetProperty(ref _capturing, value); }
+            get => _capturing;
+            private set => SetProperty(ref _capturing, value);
         }
 
         private void ReportCaptureResult(string title, DateTime time)

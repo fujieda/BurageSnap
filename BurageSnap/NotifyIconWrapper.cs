@@ -24,7 +24,7 @@ using Application = System.Windows.Application;
 
 namespace BurageSnap
 {
-    public class NotifyIconWrapper : FrameworkElement
+    public class NotifyIconWrapper : FrameworkElement, IDisposable
     {
         private readonly NotifyIcon _notifyIcon;
 
@@ -39,26 +39,29 @@ namespace BurageSnap
 
         public string Text
         {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            // ReSharper disable once UnusedMember.Global
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
-        public static readonly RoutedEvent OpenSelectedEvent = EventManager.RegisterRoutedEvent("OpenSelected",
+        private static readonly RoutedEvent OpenSelectedEvent = EventManager.RegisterRoutedEvent("OpenSelected",
             RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(NotifyIconWrapper));
 
+        // ReSharper disable once EventNeverSubscribedTo.Global
         public event RoutedEventHandler OpenSelected
         {
-            add { AddHandler(OpenSelectedEvent, value);}
-            remove { RemoveHandler(OpenSelectedEvent, value);}
+            add => AddHandler(OpenSelectedEvent, value);
+            remove => RemoveHandler(OpenSelectedEvent, value);
         }
 
-        public static readonly RoutedEvent ExitSelectedEvent = EventManager.RegisterRoutedEvent("ExitSelected",
+        private static readonly RoutedEvent ExitSelectedEvent = EventManager.RegisterRoutedEvent("ExitSelected",
             RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(NotifyIconWrapper));
 
+        // ReSharper disable once EventNeverSubscribedTo.Global
         public event RoutedEventHandler ExitSelected
         {
-            add { AddHandler(ExitSelectedEvent, value); }
-            remove { RemoveHandler(ExitSelectedEvent, value); }
+            add => AddHandler(ExitSelectedEvent, value);
+            remove => RemoveHandler(ExitSelectedEvent, value);
         }
 
         public NotifyIconWrapper()
@@ -100,7 +103,7 @@ namespace BurageSnap
             RaiseEvent(args);
         }
 
-        public void ShowBaloonTip(string tipTitle, string tipText)
+        public void ShowBalloonTip(string tipTitle, string tipText)
         {
             _notifyIcon.ShowBalloonTip(1000, tipTitle, tipText, ToolTipIcon.Info);
         }
@@ -111,14 +114,14 @@ namespace BurageSnap
         }
     }
 
-    public class ShowBaloonTipAction : TriggerAction<NotifyIconWrapper>
+    public class ShowBalloonTipAction : TriggerAction<NotifyIconWrapper>
     {
         protected override void Invoke(object parameter)
         {
             var notification = (parameter as InteractionRequestedEventArgs)?.Context as Notification;
             if (notification == null)
                 return;
-            AssociatedObject.ShowBaloonTip(notification.Title, (string)notification.Content);
+            AssociatedObject.ShowBalloonTip(notification.Title, (string)notification.Content);
         }
     }
 }

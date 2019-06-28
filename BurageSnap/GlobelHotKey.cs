@@ -9,7 +9,7 @@ using System.Windows.Interop;
 
 namespace BurageSnap
 {
-    public class GlobelHotKey
+    public class GlobalHotKey
     {
         private static readonly OrderedDictionary KeyDictionary = new OrderedDictionary
         {
@@ -107,13 +107,13 @@ namespace BurageSnap
             if (_modifiers == modifiers && _key == key)
                 return;
             if (_source != null)
-                Unregister();
+                UnRegister();
             if (key == "")
                 return;
-            int vkey;
+            int vKey;
             try
             {
-                vkey = KeyInterop.VirtualKeyFromKey((Key)KeyDictionary[key]);
+                vKey = KeyInterop.VirtualKeyFromKey((Key)KeyDictionary[key]);
             }
             catch (KeyNotFoundException)
             {
@@ -124,15 +124,15 @@ namespace BurageSnap
             if (_source == null)
                 return;
             _source.AddHook(HwndHook);
-            RegisterHotKey(hWnd, HotKeyId, modifiers, vkey);
+            RegisterHotKey(hWnd, HotKeyId, modifiers, vKey);
             _modifiers = modifiers;
             _key = key;
         }
 
         private IntPtr HwndHook(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            const int wmHotkey = 0x0312;
-            if (msg == wmHotkey && wParam.ToInt32() == HotKeyId)
+            const int wmHotKey = 0x0312;
+            if (msg == wmHotKey && wParam.ToInt32() == HotKeyId)
             {
                 HotKeyPressed?.Invoke();
                 handled = true;
@@ -140,7 +140,7 @@ namespace BurageSnap
             return IntPtr.Zero;
         }
 
-        public void Unregister()
+        public void UnRegister()
         {
             if (_source == null)
                 return;

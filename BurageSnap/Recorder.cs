@@ -72,6 +72,7 @@ namespace BurageSnap
             _ringBuffer.Clear();
         }
 
+        // ReSharper disable StringLiteralTypo
         [DllImport("winmm.dll")]
         private static extern uint timeSetEvent(uint delay, uint resolution, TimeProc timeProc,
             ref uint user, uint eventType);
@@ -121,8 +122,10 @@ namespace BurageSnap
         {
             try
             {
-                var parameters = new EncoderParameters(1);
-                parameters.Param[0] = new EncoderParameter(Encoder.Quality, _config.JpegQuality);
+                var parameters = new EncoderParameters(1)
+                {
+                    Param = {[0] = new EncoderParameter(Encoder.Quality, _config.JpegQuality)}
+                };
                 using (var fs = OpenFile(frame.Time, _config.Format == OutputFormat.Jpg ? ".jpg" : ".png"))
                     frame.Bitmap.Save(fs,
                         GetEncoder(_config.Format == OutputFormat.Jpg ? ImageFormat.Jpeg : ImageFormat.Png),
@@ -152,7 +155,7 @@ namespace BurageSnap
         {
             if (_config.AnimationGif)
             {
-                SaveRingBufferAsAnimattionGif();
+                SaveRingBufferAsAnimationGif();
             }
             else
             {
@@ -162,7 +165,7 @@ namespace BurageSnap
             _ringBuffer.Clear();
         }
 
-        private void SaveRingBufferAsAnimattionGif()
+        private void SaveRingBufferAsAnimationGif()
         {
             var encoder = new AnimationGifEncoder();
             try
@@ -190,6 +193,8 @@ namespace BurageSnap
             }
         }
 
+        // For debugging
+        // ReSharper disable once UnusedMember.Global
         public void GenerateAnimationGifFromFiles()
         {
             _ringBuffer.Size = _config.RingBuffer;
@@ -201,7 +206,7 @@ namespace BurageSnap
                 var date = DateTime.ParseExact(name, "yyyy-MM-dd HH-mm-ss.fff", CultureInfo.InvariantCulture);
                 _ringBuffer.Add(new Frame {Time = date, Bitmap = new Bitmap(path)});
             }
-            SaveRingBufferAsAnimattionGif();
+            SaveRingBufferAsAnimationGif();
         }
 
         private Stream OpenFile(DateTime time, string ext)

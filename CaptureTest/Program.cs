@@ -6,9 +6,9 @@ using BurageSnap;
 
 namespace CaptureTest
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length == 0)
                 return;
@@ -21,9 +21,10 @@ namespace CaptureTest
                     Console.WriteLine(@"extract error");
                     return;
                 }
-                using (var file = File.Create(Path.Combine(Path.GetDirectoryName(args[0]) ?? "", Path.GetFileNameWithoutExtension(args[0]) + "_result" + Path.GetExtension(args[0]))))
-                using (var cripped = bmp.Clone(rectangle, bmp.PixelFormat))
-                    cripped.Save(file, ImageFormat.Png);
+                using (var file = File.Create(Path.Combine(Path.GetDirectoryName(args[0]) ?? "",
+                    Path.GetFileNameWithoutExtension(args[0]) + "_result" + Path.GetExtension(args[0]))))
+                using (var clipped = bmp.Clone(rectangle, bmp.PixelFormat))
+                    clipped.Save(file, ImageFormat.Png);
             }
         }
     }

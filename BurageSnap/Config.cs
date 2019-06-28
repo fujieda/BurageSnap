@@ -19,6 +19,11 @@ using System.Linq;
 using System.Windows;
 using System.Xml.Serialization;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable MemberCanBePrivate.Global
+
 namespace BurageSnap
 {
     public enum OutputFormat

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BurageSnap"
-             xmlns:proprties="clr-namespace:BurageSnap.Properties"
+             xmlns:properties="clr-namespace:BurageSnap.Properties"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://www.codeplex.com/prism"
              mc:Ignorable="d"
@@ -31,7 +31,8 @@
     </UserControl.DataContext>
     <Grid Width="510" Height="320">
         <Button x:Name="buttonOk" Content="Ok" HorizontalAlignment="Left" Margin="345,280,0,0" VerticalAlignment="Top" Width="75" Command="{Binding OkCommand}" IsDefault="True"/>
-        <Button x:Name="buttonCancel" Content="{x:Static proprties:Resources.OptionView_Cancel}" HorizontalAlignment="Left" Margin="425,280,0,0" VerticalAlignment="Top" Width="75" Command="{Binding CancelCommand}" IsCancel="True"/>
+        <!-- ReSharper disable UnusedMember.Global -->
+        <Button x:Name="buttonCancel" Content="{x:Static properties:Resources.OptionView_Cancel}" HorizontalAlignment="Left" Margin="425,280,0,0" VerticalAlignment="Top" Width="75" Command="{Binding CancelCommand}" IsCancel="True"/>
         <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Top">
             <StackPanel Margin="20 15 10 10" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Right">
                 <Grid HorizontalAlignment="Left" Margin="0 0 0 15" VerticalAlignment="Top">
@@ -43,27 +44,27 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Label x:Name="labelFormat" Content="{x:Static proprties:Resources.OptionView_Format}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Margin="0 0 5 0"/>
+                    <Label x:Name="labelFormat" Content="{x:Static properties:Resources.OptionView_Format}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Margin="0 0 5 0"/>
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
                         <StackPanel.Resources>
                             <local:EnumBooleanConverter x:Key="EnumBooleanConverter"/>
                         </StackPanel.Resources>
                         <RadioButton x:Name="radioButtonJpg" Content="JPG" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0" IsChecked="{Binding Path=Options.Format, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=Jpg}"/>
-                        <TextBlock Name="textBlockQuality" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 3 0" Text="{x:Static proprties:Resources.OptionView_Quality}"></TextBlock>
+                        <TextBlock Name="textBlockQuality" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 3 0" Text="{x:Static properties:Resources.OptionView_Quality}"></TextBlock>
                         <TextBox Name="textBoxQuality" Width="35" HorizontalAlignment="Center" Margin="0 0 10 0" TextAlignment="Right" Text="{Binding JpegQuality, UpdateSourceTrigger=PropertyChanged}"/>
                         <RadioButton x:Name="radioButtonPng" Content="PNG" HorizontalAlignment="Right" VerticalAlignment="Center"  IsChecked="{Binding Path=Options.Format, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=Png}"/>
                     </StackPanel>
-                    <CheckBox x:Name="checkBoxAnimationGif" Content="{x:Static proprties:Resources.OptionView_Animation_GIF}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Margin="0 5 0 0" IsChecked="{Binding AnimationGif}"/>
+                    <CheckBox x:Name="checkBoxAnimationGif" Content="{x:Static properties:Resources.OptionView_Animation_GIF}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Margin="0 5 0 0" IsChecked="{Binding AnimationGif}"/>
                 </Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 0 0 5">
-                    <Label x:Name="labelInterval" Content="{x:Static proprties:Resources.OptionView_Interval}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0" />
+                    <Label x:Name="labelInterval" Content="{x:Static properties:Resources.OptionView_Interval}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0" />
                     <TextBox x:Name="textBoxInterval" HorizontalAlignment="Left" Text="{Binding Interval, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="41" TextAlignment="Right" Margin="0 0 5 0"/>
                     <Label x:Name="labelMs" Content="ms" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal" Margin="0 0 0 15">
-                    <Label x:Name="labelRingBuffer" Content="{x:Static proprties:Resources.OptionView_Ring_buffer}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                    <Label x:Name="labelRingBuffer" Content="{x:Static properties:Resources.OptionView_Ring_buffer}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0"/>
                     <TextBox x:Name="textBoxRingBuffer" HorizontalAlignment="Left" Text="{Binding RingBuffer, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="41" TextAlignment="Right"  Margin="0 0 5 0"/>
-                    <Label x:Name="labelFrames" Content="{x:Static proprties:Resources.OptionView_Frames}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Label x:Name="labelFrames" Content="{x:Static properties:Resources.OptionView_Frames}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 </StackPanel>
                 <Grid Margin="0 0 0 15">
                     <Grid.RowDefinitions>
@@ -75,10 +76,10 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Label x:Name="labelWindow" Content="{x:Static proprties:Resources.OptionView_Window}" Margin="0 0 5 0"/>
-                    <CheckBox x:Name="checkBoxTopMost" Content="{x:Static proprties:Resources.OptionView_Top_most}" Grid.Row="0" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.TopMost}"/>
-                    <CheckBox x:Name="checkBoxHideOnMinimize" Content="{x:Static proprties:Resources.OptionView_Reside_in_system_tray}" Grid.Row="1" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.ResideInSystemTray}"/>
-                    <CheckBox x:Name="checkBoxNotify" Content="{x:Static proprties:Resources.OptionView_Notify}" Grid.Row="2" Grid.Column="1" IsChecked="{Binding Options.Notify}"/>
+                    <Label x:Name="labelWindow" Content="{x:Static properties:Resources.OptionView_Window}" Margin="0 0 5 0"/>
+                    <CheckBox x:Name="checkBoxTopMost" Content="{x:Static properties:Resources.OptionView_Top_most}" Grid.Row="0" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.TopMost}"/>
+                    <CheckBox x:Name="checkBoxHideOnMinimize" Content="{x:Static properties:Resources.OptionView_Reside_in_system_tray}" Grid.Row="1" Grid.Column="1" Margin="0 0 0 5" IsChecked="{Binding Options.ResideInSystemTray}"/>
+                    <CheckBox x:Name="checkBoxNotify" Content="{x:Static properties:Resources.OptionView_Notify}" Grid.Row="2" Grid.Column="1" IsChecked="{Binding Options.Notify}"/>
                 </Grid>
                 <Grid HorizontalAlignment="Left"  VerticalAlignment="Top" Margin="0 0 0 0">
                     <Grid.RowDefinitions>
@@ -91,7 +92,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Label x:Name="labelHotkey" Content="{x:Static proprties:Resources.OptionView_Hot_key}" HorizontalAlignment="Left" Grid.RowSpan="2" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                    <Label x:Name="labelHotKey" Content="{x:Static properties:Resources.OptionView_Hot_key}" HorizontalAlignment="Left" Grid.RowSpan="2" Margin="0,0,5,0" VerticalAlignment="Center"/>
                     <CheckBox x:Name="checkBoxAlt" Content="Alt" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1" Margin="0 0 5 1" IsChecked="{Binding Modifier.Alt}" IsEnabled="{Binding IsKeySelected}"/>
                     <CheckBox x:Name="checkBoxCtrl" Content="Ctrl" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Margin="0 0 5 1" IsChecked="{Binding Modifier.Control}" IsEnabled="{Binding IsKeySelected}"/>
                     <CheckBox x:Name="checkBoxShift" Content="Shift" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" Margin="0 0 5 0" IsChecked="{Binding Modifier.Shift}" IsEnabled="{Binding IsKeySelected}"/>
@@ -101,14 +102,14 @@
             </StackPanel>
             <StackPanel Margin="10 10 0 0" HorizontalAlignment="Stretch" VerticalAlignment="Top">
                 <DockPanel Margin="0 0 0 5">
-                    <Label x:Name="labelFolder" Content="{x:Static proprties:Resources.OptionView_Folder}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0" DockPanel.Dock="Left"/>
+                    <Label x:Name="labelFolder" Content="{x:Static properties:Resources.OptionView_Folder}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0 0 5 0" DockPanel.Dock="Left"/>
                     <Button x:Name="buttonFolderBrowser" HorizontalAlignment="Left" Padding="1" VerticalAlignment="Top" Width="24" Height="20" DockPanel.Dock="Right" Click="buttonFolderBrowser_Click">
                         <Image Source="folder_open_16.ico"/>
                     </Button>
                     <TextBox x:Name="textBoxFolder" HorizontalAlignment="Stretch" Height="23" VerticalAlignment="Top" Margin="0 0 5 0" Text="{Binding Options.Folder, Mode=TwoWay}"/>
                 </DockPanel>
-                <CheckBox x:Name="checkBoxDailyFolder" Content="{x:Static proprties:Resources.OptionView_Create_daily_folders}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 0 5" IsChecked="{Binding Options.DailyFolder}"/>
-                <Label x:Name="labelTargetWindows" Content="{x:Static proprties:Resources.OptionView_Target_windows}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0 0 0 3"/>
+                <CheckBox x:Name="checkBoxDailyFolder" Content="{x:Static properties:Resources.OptionView_Create_daily_folders}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 0 0 5" IsChecked="{Binding Options.DailyFolder}"/>
+                <Label x:Name="labelTargetWindows" Content="{x:Static properties:Resources.OptionView_Target_windows}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0 0 0 3"/>
                 <ListBox x:Name="listBox" ItemsSource="{Binding Options.WindowTitles}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="122" BorderThickness="1" Margin="0 0 0 2">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
@@ -123,9 +124,9 @@
                 </ListBox>
                 <TextBox x:Name="textBoxWindowTitle" HorizontalAlignment="Stretch" Height="23" VerticalAlignment="Top" Text="{Binding Title, Mode=TwoWay}"/>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button x:Name="buttonChooseWindow" Content="{x:Static proprties:Resources.OptionView_Pick_window}" Margin="0 5 20 0" Command="{Binding ChooseWindowCommand}"/>
-                    <Button x:Name="buttonAdd" Content="{x:Static proprties:Resources.OptionView_Add}" Margin="0 5 5 0" Command="{Binding AddTitleCommand}"/>
-                    <Button x:Name="buttonRemove" Content="{x:Static proprties:Resources.OptionView_Remove}" Margin="0 5 0 0" Command="{Binding RemoveTitleCommand}"/>
+                    <Button x:Name="buttonChooseWindow" Content="{x:Static properties:Resources.OptionView_Pick_window}" Margin="0 5 20 0" Command="{Binding ChooseWindowCommand}"/>
+                    <Button x:Name="buttonAdd" Content="{x:Static properties:Resources.OptionView_Add}" Margin="0 5 5 0" Command="{Binding AddTitleCommand}"/>
+                    <Button x:Name="buttonRemove" Content="{x:Static properties:Resources.OptionView_Remove}" Margin="0 5 0 0" Command="{Binding RemoveTitleCommand}"/>
                 </StackPanel>
             </StackPanel>
         </DockPanel>

@@ -45,7 +45,7 @@ namespace BurageSnap
         {
             if (_hWnd == IntPtr.Zero || _rectangle.IsEmpty)
                 throw new CaptureError(Resources.Capture_Internal_error, Resources.Capture_Internal_error);
-            using (var bmp = CaptureWindow(_hWnd, _windowRect))
+            using (var bmp = CaptureWindow(_windowRect))
                 return bmp.Clone(_rectangle, bmp.PixelFormat);
         }
 
@@ -57,7 +57,7 @@ namespace BurageSnap
                     Resources.Capture_Cant_find_window);
             var rect = new Rect();
             GetWindowRect(_hWnd, ref rect);
-            using (var bmp = CaptureWindow(_hWnd, rect))
+            using (var bmp = CaptureWindow(rect))
             {
                 var rectangle = DetectGameScreen(bmp);
                 if (!rectangle.IsEmpty)
@@ -123,7 +123,7 @@ namespace BurageSnap
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
 
-        public static Bitmap CaptureWindow(IntPtr hWnd, Rect rect)
+        private static Bitmap CaptureWindow(Rect rect)
         {
             var width = rect.Right - rect.Left;
             var height = rect.Bottom - rect.Top;
@@ -139,10 +139,10 @@ namespace BurageSnap
         [StructLayout(LayoutKind.Sequential)]
         public struct Rect : IEquatable<Rect>
         {
-            public int Left;
-            public int Top;
-            public int Right;
-            public int Bottom;
+            public readonly int Left;
+            public readonly int Top;
+            public readonly int Right;
+            public readonly int Bottom;
 
             public bool Equals(Rect other)
             {
@@ -286,8 +286,8 @@ namespace BurageSnap
             }
         }
 
-        const int EdgeWidth = WidthMin / 2;
-        const int EdgeHeight = HeightMin / 2;
+        private const int EdgeWidth = WidthMin / 2;
+        private const int EdgeHeight = HeightMin / 2;
 
         // ReSharper disable UnusedParameter.Local
         private bool CheckEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
@@ -347,28 +347,32 @@ namespace BurageSnap
             return false;
         }
 
-        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop, ref Rectangle margin)
+        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop,
+            ref Rectangle margin)
         {
             return CheckEdgeHorizontalTop(map, left, right, top, bottom) &&
                    CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthHorizontalTop(map, left, right, top, bottom, vagueTop);
         }
 
-        private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             return CheckEdgeVerticalLeft(map, left, right, top, bottom) &&
                    CheckEndOfEdgeVerticalLeft(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthVerticalLeft(map, left, right, top, bottom);
         }
 
-        private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             return CheckEdgeHorizontalBottom(map, left, right, top, bottom) &&
                    CheckEndOfEdgeHorizontalBottom(map, left, right, top, bottom, ref margin) &&
                    CheckEnoughLengthHorizontalBottom(map, left, right, top, bottom);
         }
 
-        private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             return CheckEdgeVerticalRight(map, left, right, top, bottom) &&
                    CheckEndOfEdgeVerticalRight(map, left, right, top, bottom, ref margin) &&
@@ -378,7 +382,8 @@ namespace BurageSnap
         private const int DecorationThickness = 20;
         private const int CornerSize = 10;
 
-        private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             for (margin.Y = 0; margin.Top < DecorationThickness; margin.Y++)
             {
@@ -395,13 +400,13 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:
-                ;
+                last: ;
             }
             return false;
         }
 
-        private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             for (margin.X = 0; margin.X < DecorationThickness; margin.X++)
             {
@@ -418,13 +423,13 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:
-                ;
+                last: ;
             }
             return false;
         }
 
-        private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             for (margin.Height = 0; margin.Height < DecorationThickness; margin.Height++)
             {
@@ -441,13 +446,13 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:
-                ;
+                last: ;
             }
             return false;
         }
 
-        private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom, ref Rectangle margin)
+        private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom,
+            ref Rectangle margin)
         {
             for (margin.Width = 0; margin.Width < DecorationThickness; margin.Width++)
             {
@@ -464,8 +469,7 @@ namespace BurageSnap
                         goto last;
                 }
                 return true;
-                last:
-                ;
+                last: ;
             }
             return false;
         }
@@ -592,10 +596,9 @@ namespace BurageSnap
             }
             return decor;
         }
-        // ReSharper restore UnusedParameter.Local
 
         // For drop pictures in KanColle with a white region on the top side
-        public void RoundUpRectangle(byte[,] map, ref Rectangle rect)
+        private void RoundUpRectangle(byte[,] map, ref Rectangle rect)
         {
             if (rect.Width % 10 != 0)
                 return;

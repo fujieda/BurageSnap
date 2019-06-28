@@ -47,7 +47,7 @@ namespace BurageSnap
             public MemoryStream Gif;
         }
 
-        public bool IsLoop { get; set; } = true;
+        private bool IsLoop { get; } = true;
 
         public void Start(Stream stream, double scale = 1.0)
         {
@@ -257,7 +257,7 @@ namespace BurageSnap
             _firstFrame = false;
         }
 
-        public void WriteAppExt()
+        private void WriteAppExt()
         {
             _stream.Write(new byte[] { 0x21, 0xff, 0x0b });
             _stream.Write(Encoding.ASCII.GetBytes("NETSCAPE2.0"));
@@ -267,7 +267,7 @@ namespace BurageSnap
             _stream.Write((byte)0x00);
         }
 
-        public void WriteGce(int delay)
+        private void WriteGce(int delay)
         {
             _stream.Write(new byte[] { 0x21, 0xf9, 0x04 });
             _stream.Write((byte)0x01); // have transparent index

@@ -27,11 +27,12 @@
                 <i:EventTrigger EventName="ExitSelected">
                     <i:InvokeCommandAction Command="{Binding NotifyIconExitCommand}"/>
                 </i:EventTrigger>
-                <prism:InteractionRequestTrigger SourceObject="{Binding ShowBaloonTipRequest, Mode=OneWay}">
-                    <local:ShowBaloonTipAction/>
+                <prism:InteractionRequestTrigger SourceObject="{Binding ShowBalloonTipRequest, Mode=OneWay}">
+                    <local:ShowBalloonTipAction/>
                 </prism:InteractionRequestTrigger>
             </i:Interaction.Triggers>
         </local:NotifyIconWrapper>
+        <!-- ReSharper disable UnusedMember.Global -->
         <Button x:Name="buttonCapture" Content="{Binding CaptureButtonText}" HorizontalAlignment="Left" Margin="8,8,0,0" VerticalAlignment="Top" Width="77" Height="51" FontSize="12" Command="{Binding CaptureCommand}"/>
         <Button x:Name="buttonBrowse" HorizontalAlignment="Left" Margin="93,9,0,0" VerticalAlignment="Top" Width="31" Height="31" Command="{Binding BrowseCommand}">
             <Image Source="folder_open.ico"/>
@@ -39,7 +40,7 @@
         <Button x:Name="buttonOption" HorizontalAlignment="Left" Margin="130,9,0,0" VerticalAlignment="Top" Width="31" Height="31" IsEnabled="{Binding AllowChangeSettings}" Command="{Binding OptionCommand}">
             <Image Source="cogs.ico"/>
         </Button>
-        <Label x:Name="labeLastSnap" Content="{x:Static properties:Resources.MainWindow_Last_snap}" HorizontalAlignment="Left" Margin="87,46,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labelLastSnap" Content="{x:Static properties:Resources.MainWindow_Last_snap}" HorizontalAlignment="Left" Margin="87,46,0,0" VerticalAlignment="Top"/>
         <TextBlock x:Name="labelCaptureResult" Text="{Binding Main.CaptureResult}" HorizontalAlignment="Left" Margin="93,66,0,0" VerticalAlignment="Top" FontFamily="Segoe UI, Meiryo UI"/>
         <CheckBox x:Name="checkBox" Content="{x:Static properties:Resources.MainWindow_Continuous}" HorizontalAlignment="Left" Margin="8,64,0,0" VerticalAlignment="Top" IsChecked="{Binding BurstMode}" IsEnabled="{Binding AllowChangeSettings}"/>
     </Grid>

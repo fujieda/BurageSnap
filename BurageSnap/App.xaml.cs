@@ -19,7 +19,7 @@ namespace BurageSnap
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(
                 XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 #endif
-            if (PreLounch.ProcessAlreadyExists())
+            if (PreLaunch.ProcessAlreadyExists())
                 Shutdown();
         }
 

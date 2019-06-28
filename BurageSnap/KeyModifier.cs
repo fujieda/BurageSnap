@@ -16,12 +16,11 @@ namespace BurageSnap
 {
     public class KeyModifier
     {
-
         public int Value { get; set; }
 
         public bool Alt
         {
-            get { return (Value & 1) != 0; }
+            get => (Value & 1) != 0;
             set
             {
                 if (value)
@@ -33,7 +32,7 @@ namespace BurageSnap
 
         public bool Control
         {
-            get { return (Value & 2) != 0; }
+            get => (Value & 2) != 0;
             set
             {
                 if (value)
@@ -45,7 +44,7 @@ namespace BurageSnap
 
         public bool Shift
         {
-            get { return (Value & 4) != 0; }
+            get => (Value & 4) != 0;
             set
             {
                 if (value)
@@ -57,7 +56,7 @@ namespace BurageSnap
 
         public bool Win
         {
-            get { return (Value & 8) != 0; }
+            get => (Value & 8) != 0;
             set
             {
                 if (value)

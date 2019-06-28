@@ -16,6 +16,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Height="75" Width="137" Margin="0,0,0,0" VerticalAlignment="Bottom">
+        <!-- ReSharper disable UnusedMember.Global -->
         <Button x:Name="buttonYes" Content="{x:Static properties:Resources.ConfirmView_Yes}" HorizontalAlignment="Left" Margin="8,29,0,0" VerticalAlignment="Top" Width="57" Height="38" Command="{Binding YesCommand}"/>
         <Button x:Name="buttonNo" Content="{x:Static properties:Resources.ConfirmView_No}" HorizontalAlignment="Left" Margin="72,29,0,0" VerticalAlignment="Top" Width="57" Height="38"  Command="{Binding NoCommand}"/>
         <Label x:Name="labelMessage" Content="{x:Static properties:Resources.ConfirmView_Message}" HorizontalAlignment="Center" Margin="5,0" VerticalAlignment="Top"/>

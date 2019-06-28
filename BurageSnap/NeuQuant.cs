@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ReSharper disable CommentTypo
 /* NeuQuant Neural-Net Quantization Algorithm
  * ------------------------------------------
  *
@@ -36,7 +37,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+// ReSharper disable IdentifierTypo
 
 namespace BurageSnap
 {
@@ -87,21 +88,6 @@ namespace BurageSnap
             SetUpArrays();
         }
 
-        public NeuQuant(Bitmap bmp) : this(bmp, 1)
-        {
-        }
-
-        public NeuQuant(Bitmap bmp, int sample) : this(GetPixels(bmp), bmp.Width, bmp.Height, sample)
-        {
-        }
-
-        public static Bitmap Quantize(Bitmap bmp, int sample)
-        {
-            var nq = new NeuQuant(bmp, sample);
-            nq.Init();
-            return nq.CreateBitmap();
-        }
-
         public Bitmap CreateBitmap()
         {
             var bmp8 = new Bitmap(_width, _height, PixelFormat.Format8bppIndexed);
@@ -127,9 +113,7 @@ namespace BurageSnap
             return bmp8;
         }
 
-        public int ColorCount => NetSize;
-
-        public Color GetColor(int i)
+        private Color GetColor(int i)
         {
             if (i < 0 || i >= NetSize)
                 return Color.Empty;
@@ -159,18 +143,6 @@ namespace BurageSnap
 
             for (var i = 0; i < NetSize; i++)
                 _colormap[i] = new int[4];
-        }
-
-        private static int[] GetPixels(Bitmap bmp)
-        {
-            var width = bmp.Width;
-            var height = bmp.Height;
-            var pixels = new int[width * height];
-            var data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppArgb);
-            Marshal.Copy(data.Scan0, pixels, 0, width * height);
-            bmp.UnlockBits(data);
-            return pixels;
         }
 
         public void Init()
@@ -387,9 +359,7 @@ namespace BurageSnap
                 _netIndex[j] = MaxNetPos; // really 256
         }
 
-        public int Lookup(int pixel) => InxSearch(pixel);
-
-        public int Lookup(Color c) => InxSearch(c.R << 16 | c.G << 8 | c.B);
+        private int Lookup(int pixel) => InxSearch(pixel);
 
         private int InxSearch(int pixel)
         {

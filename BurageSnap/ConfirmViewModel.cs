@@ -25,8 +25,8 @@ namespace BurageSnap
         public INotification Notification { get; set; }
         public Action FinishInteraction { get; set; }
 
-        public ICommand YesCommand { get; private set; }
-        public ICommand NoCommand { get; private set; }
+        public ICommand YesCommand { get; }
+        public ICommand NoCommand { get; }
 
         public ConfirmViewModel()
         {
@@ -34,13 +34,13 @@ namespace BurageSnap
             NoCommand = new DelegateCommand(NoInteraction);
         }
 
-        public void YesInteraction()
+        private void YesInteraction()
         {
             ((IConfirmation)Notification).Confirmed = true;
             FinishInteraction();
         }
 
-        public void NoInteraction()
+        private void NoInteraction()
         {
             ((IConfirmation)Notification).Confirmed = false;
             FinishInteraction();

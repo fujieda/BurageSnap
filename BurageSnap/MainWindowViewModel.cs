@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Reflection;
 using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using BurageSnap.Properties;
@@ -26,22 +26,22 @@ namespace BurageSnap
     internal class MainWindowViewModel : BindableBase
     {
         public Main Main { get; }
-        public ICommand LoadedCommand { get; private set; }
-        public ICommand ClosingCommand { get; private set; }
-        public ICommand BrowseCommand { get; private set; }
-        public ICommand OptionCommand { get; private set; }
-        public ICommand CaptureCommand { get; private set; }
+        public ICommand LoadedCommand { get; }
+        public ICommand ClosingCommand { get; }
+        public ICommand BrowseCommand { get; }
+        public ICommand OptionCommand { get; }
+        public ICommand CaptureCommand { get; }
         public InteractionRequest<IConfirmation> ConfirmationRequest { get; } = new InteractionRequest<IConfirmation>();
         public InteractionRequest<IConfirmation> OptionViewRequest { get; } = new InteractionRequest<IConfirmation>();
-        public ICommand NotifyIconOpenCommand { get; private set; }
-        public ICommand NotifyIconExitCommand { get; private set; }
+        public ICommand NotifyIconOpenCommand { get; }
+        public ICommand NotifyIconExitCommand { get; }
 
-        public InteractionRequest<INotification> ShowBaloonTipRequest { get; } =
+        public InteractionRequest<INotification> ShowBalloonTipRequest { get; } =
             new InteractionRequest<INotification>();
 
         public bool BurstMode
         {
-            get { return Main.Config.Continuous; }
+            get => Main.Config.Continuous;
             set
             {
                 Main.Config.Continuous = value;
@@ -120,12 +120,14 @@ namespace BurageSnap
             RestoreLocation();
             WindowState = Main.Config.WindowState;
             SetHotKey();
-            _globelHotKey.HotKeyPressed += Capture;
+            _globalHotKey.HotKeyPressed += Capture;
         }
 
         private void RestoreLocation()
         {
             var window = Application.Current.MainWindow;
+            if (window == null)
+                return;
             window.Topmost = Main.Config.TopMost;
             var location = Main.Config.Location;
             // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -153,17 +155,20 @@ namespace BurageSnap
                 if (!c.Confirmed)
                     return;
                 ((OptionContent)c.Content).ToConfig(Main.Config);
-                Application.Current.MainWindow.Topmost = Main.Config.TopMost;
+                var main = Application.Current.MainWindow;
+                if (main == null)
+                    return;
+                main.Topmost = Main.Config.TopMost;
                 SetHotKey();
             });
         }
 
-        private readonly GlobelHotKey _globelHotKey = new GlobelHotKey();
+        private readonly GlobalHotKey _globalHotKey = new GlobalHotKey();
 
         private void SetHotKey()
         {
             var config = Main.Config;
-            _globelHotKey.Register(Application.Current.MainWindow, config.HotKeyModifier, config.HotKey);
+            _globalHotKey.Register(Application.Current.MainWindow, config.HotKeyModifier, config.HotKey);
         }
 
         private void Closing(CancelEventArgs e)
@@ -179,23 +184,25 @@ namespace BurageSnap
             }
         }
 
-        public void Terminate()
+        private void Terminate()
         {
             SaveConfig();
-            _globelHotKey.Unregister();
+            _globalHotKey.UnRegister();
         }
 
         private void SaveConfig()
         {
             var config = Main.Config;
             var main = Application.Current.MainWindow;
+            if (main == null)
+                return;
             config.Location = main.WindowState == WindowState.Normal
                 ? new Point(main.Left, main.Top)
                 : new Point(main.RestoreBounds.Left, main.RestoreBounds.Top);
             config.Save();
         }
 
-        public static bool IsVisibleOnScreen(Rect rect)
+        private static bool IsVisibleOnScreen(Rect rect)
         {
             return new Rect(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop,
                 SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight).IntersectsWith(rect);
@@ -226,7 +233,8 @@ namespace BurageSnap
             catch (CaptureError e)
             {
                 if (Main.Config.Notify)
-                    ShowBaloonTipRequest.Raise(new Notification {Title = Resources.MainWindow_Error, Content = e.Message});
+                    ShowBalloonTipRequest.Raise(new Notification
+                        {Title = Resources.MainWindow_Error, Content = e.Message});
             }
         }
 
@@ -249,7 +257,7 @@ namespace BurageSnap
             var title = Main.WindowTitle;
             if (title == "")
             {
-                ShowBaloonTipRequest.Raise(new Notification
+                ShowBalloonTipRequest.Raise(new Notification
                 {
                     Title = Resources.MainWindow_Error,
                     Content = Main.CaptureResult
@@ -258,7 +266,7 @@ namespace BurageSnap
             }
             if (title.Length > 22)
                 title = title.Substring(0, 22) + "...";
-            ShowBaloonTipRequest.Raise(new Notification {Title = message, Content = title});
+            ShowBalloonTipRequest.Raise(new Notification {Title = message, Content = title});
         }
     }
 }

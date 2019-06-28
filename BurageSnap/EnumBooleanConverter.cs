@@ -26,7 +26,7 @@ namespace BurageSnap
             var parameterString = parameter as string;
             if (parameterString == null)
                 return DependencyProperty.UnsetValue;
-            if (Enum.IsDefined(value.GetType(), value) == false)
+            if (value == null || !Enum.IsDefined(value.GetType(), value))
                 return DependencyProperty.UnsetValue;
             var parameterValue = Enum.Parse(value.GetType(), parameterString);
             return parameterValue.Equals(value);

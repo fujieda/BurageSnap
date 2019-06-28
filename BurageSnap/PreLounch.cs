@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace BurageSnap
 {
-    public class PreLounch
+    public static class PreLaunch
     {
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
@@ -25,7 +25,9 @@ namespace BurageSnap
             {
                 var cur = Process.GetCurrentProcess();
                 var process = Process.GetProcessesByName(cur.ProcessName)
-                    .FirstOrDefault(p => cur.Id != p.Id && p.MainModule.FileName == cur.MainModule.FileName);
+                    .FirstOrDefault(p =>
+                        cur.Id != p.Id && p.MainModule != null && cur.MainModule != null &&
+                        p.MainModule.FileName == cur.MainModule.FileName);
                 if (process != null)
                 {
                     ActivateProcessWindow(process);

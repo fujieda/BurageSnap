@@ -32,7 +32,7 @@ namespace BurageSnap
 
         public INotification Notification
         {
-            get { return _notification; }
+            get => _notification;
             set
             {
                 Options = (OptionContent)value.Content;
@@ -52,20 +52,19 @@ namespace BurageSnap
 
         public OptionContent Options
         {
-            get { return _options; }
-            set { SetProperty(ref _options, value); }
+            get => _options;
+            set => SetProperty(ref _options, value);
         }
 
         private string _interval;
 
         public string Interval
         {
-            get { return _interval; }
+            get => _interval;
             set
             {
                 SetProperty(ref _interval, value);
-                int result;
-                if (!int.TryParse(_interval, out result) || result < 10 || result > 1000 * 1000)
+                if (!int.TryParse(_interval, out var result) || result < 10 || result > 1000 * 1000)
                 {
                     SetError(Resources.OptionView_Validate_interval);
                 }
@@ -81,12 +80,11 @@ namespace BurageSnap
 
         public string RingBuffer
         {
-            get { return _ringBuffer; }
+            get => _ringBuffer;
             set
             {
                 SetProperty(ref _ringBuffer, value);
-                int result;
-                if (!int.TryParse(value, out result) || result < 0 || result > 100)
+                if (!int.TryParse(value, out var result) || result < 0 || result > 100)
                 {
                     SetError(Resources.OptionView_Validate_ring_buffer);
                 }
@@ -126,7 +124,7 @@ namespace BurageSnap
 
         public bool AnimationGif
         {
-            get { return _animationGif; }
+            get => _animationGif;
             set
             {
                 SetProperty(ref _animationGif, value);
@@ -148,25 +146,25 @@ namespace BurageSnap
 
         public string Title
         {
-            get { return _title; }
-            set { SetProperty(ref _title, value); }
+            get => _title;
+            set => SetProperty(ref _title, value);
         }
 
-        public IEnumerable<string> KeyList => GlobelHotKey.KeyList;
+        public IEnumerable<string> KeyList => GlobalHotKey.KeyList;
 
         private KeyModifier _modifier;
 
         public KeyModifier Modifier
         {
-            get { return _modifier; }
-            set { SetProperty(ref _modifier, value); }
+            get => _modifier;
+            set => SetProperty(ref _modifier, value);
         }
 
         private string _hotKey;
 
         public string HotKey
         {
-            get { return _hotKey; }
+            get => _hotKey;
             set
             {
                 SetProperty(ref _hotKey, value);
@@ -184,12 +182,12 @@ namespace BurageSnap
         private readonly ErrorsContainer<string> _errors;
 
         public ICommand OkCommand { get; }
-        public ICommand CancelCommand { get; private set; }
-        public ICommand SelectedCommand { get; private set; }
-        public ICommand AddTitleCommand { get; private set; }
-        public ICommand RemoveTitleCommand { get; private set; }
-        public ICommand ChooseWindowCommand { get; private set; }
-        public ICommand UnloadedCommand { get; private set; }
+        public ICommand CancelCommand { get; }
+        public ICommand SelectedCommand { get; }
+        public ICommand AddTitleCommand { get; }
+        public ICommand RemoveTitleCommand { get; }
+        public ICommand ChooseWindowCommand { get; }
+        public ICommand UnloadedCommand { get; }
 
         public OptionViewModel()
         {
@@ -206,7 +204,7 @@ namespace BurageSnap
             WindowPicker.Picked += title => { Title = title; };
         }
 
-        public void OkInteraction()
+        private void OkInteraction()
         {
             Options.HotKeyModifier = Modifier.Value;
             Options.HotKey = HotKey;
@@ -214,13 +212,13 @@ namespace BurageSnap
             FinishInteraction();
         }
 
-        public void CancelInteraction()
+        private void CancelInteraction()
         {
             ((IConfirmation)Notification).Confirmed = false;
             FinishInteraction();
         }
 
-        public void Selected(object[] args)
+        private void Selected(object[] args)
         {
             var title = args.FirstOrDefault() as string;
             if (title == null)
@@ -228,24 +226,24 @@ namespace BurageSnap
             Title = title;
         }
 
-        public void AddTitle()
+        private void AddTitle()
         {
             if (Options.WindowTitles.Contains(Title))
                 return;
             Options.WindowTitles.Add(Title);
         }
 
-        public void RemoveTitle()
+        private void RemoveTitle()
         {
             Options.WindowTitles.Remove(Title);
         }
 
-        public void ChooseWindow()
+        private void ChooseWindow()
         {
             WindowPicker.Start();
         }
 
-        public void Unloaded()
+        private void Unloaded()
         {
             WindowPicker.Stop();
         }
@@ -267,7 +265,7 @@ namespace BurageSnap
 
         private void SetError(string message, [CallerMemberName] string propertyName = null)
         {
-            _errors.SetErrors(propertyName, new [] {message});
+            _errors.SetErrors(propertyName, new[] {message});
         }
 
         private void ClearError([CallerMemberName] string propertyName = null)
