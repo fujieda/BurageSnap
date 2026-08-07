@@ -127,12 +127,10 @@ public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDa
             SetProperty(ref _animationGif, value);
             if (value && _options.RingBuffer <= 1)
             {
-                // ReSharper disable once ExplicitCallerInfoArgument
                 SetError(Resources.OptionView_Validate_ring_buffer_for_animation_GIF, nameof(RingBuffer));
             }
             else
             {
-                // ReSharper disable once ExplicitCallerInfoArgument
                 ClearError(nameof(RingBuffer));
             }
             _options.AnimationGif = value;

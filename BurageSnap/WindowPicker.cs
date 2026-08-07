@@ -86,7 +86,6 @@ public static class WindowPicker
         }
     }
 
-    // ReSharper disable All
     private static class NativeMethods
     {
         public const int WH_MOUSE_LL = 14;

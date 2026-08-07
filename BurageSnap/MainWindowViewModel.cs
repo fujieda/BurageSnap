@@ -130,7 +130,6 @@ internal class MainWindowViewModel : BindableBase
             return;
         window.Topmost = Main.Config.TopMost;
         var location = Main.Config.Location;
-        // ReSharper disable once CompareOfFloatsByEqualityOperator
         if (location.X == double.MinValue)
             return;
         var width = window.Width;

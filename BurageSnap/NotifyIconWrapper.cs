@@ -36,7 +36,6 @@ public class NotifyIconWrapper : FrameworkElement, IDisposable
 
     public string Text
     {
-        // ReSharper disable once UnusedMember.Global
         get => (string)GetValue(TextProperty);
         set => SetValue(TextProperty, value);
     }
@@ -44,7 +43,6 @@ public class NotifyIconWrapper : FrameworkElement, IDisposable
     private static readonly RoutedEvent OpenSelectedEvent = EventManager.RegisterRoutedEvent("OpenSelected",
         RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(NotifyIconWrapper));
 
-    // ReSharper disable once EventNeverSubscribedTo.Global
     public event RoutedEventHandler OpenSelected
     {
         add => AddHandler(OpenSelectedEvent, value);
@@ -54,7 +52,6 @@ public class NotifyIconWrapper : FrameworkElement, IDisposable
     private static readonly RoutedEvent ExitSelectedEvent = EventManager.RegisterRoutedEvent("ExitSelected",
         RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(NotifyIconWrapper));
 
-    // ReSharper disable once EventNeverSubscribedTo.Global
     public event RoutedEventHandler ExitSelected
     {
         add => AddHandler(ExitSelectedEvent, value);
@@ -67,7 +64,6 @@ public class NotifyIconWrapper : FrameworkElement, IDisposable
             return;
         _notifyIcon = new NotifyIcon
         {
-            // ReSharper disable once AssignNullToNotNullAttribute
             Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location),
             Visible = true,
             ContextMenuStrip = CreateContextMenu()

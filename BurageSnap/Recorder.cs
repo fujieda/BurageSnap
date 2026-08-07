@@ -67,7 +67,6 @@ public class Recorder
         _ringBuffer.Clear();
     }
 
-    // ReSharper disable StringLiteralTypo
     [DllImport("winmm.dll")]
     private static extern uint timeSetEvent(uint delay, uint resolution, TimeProc timeProc,
         ref uint user, uint eventType);
@@ -77,11 +76,9 @@ public class Recorder
     [DllImport("winmm.dll")]
     private static extern uint timeKillEvent(uint timerId);
 
-    // ReSharper disable InconsistentNaming
     private const int TIME_PERIODIC = 0x0001;
 
     private const int TIME_KILL_SYNCHRONOUS = 0x0100;
-    // ReSharper restore InconsistentNaming
 
     private void TimerCallback(uint timerId, uint msg, ref uint user, ref uint rsv1, uint rsv2)
     {
@@ -189,7 +186,6 @@ public class Recorder
     }
 
     // For debugging
-    // ReSharper disable once UnusedMember.Global
     public void GenerateAnimationGifFromFiles()
     {
         _ringBuffer.Size = _config.RingBuffer;

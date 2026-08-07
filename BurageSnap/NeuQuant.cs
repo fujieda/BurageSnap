@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// ReSharper disable CommentTypo
 /* NeuQuant Neural-Net Quantization Algorithm
  * ------------------------------------------
  *
@@ -35,7 +34,6 @@
  */
 
 using System.Drawing.Imaging;
-// ReSharper disable IdentifierTypo
 
 namespace BurageSnap;
 
@@ -291,10 +289,8 @@ public class NeuQuant
         for (var i = 0; i < Specials; i++)
         {
             var n = _network[i];
-            // ReSharper disable CompareOfFloatsByEqualityOperator
             if (n[0] == b && n[1] == g && n[2] == r)
                 return i;
-            // ReSharper restore CompareOfFloatsByEqualityOperator
         }
         return -1;
     }

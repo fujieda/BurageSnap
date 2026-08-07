@@ -287,7 +287,6 @@ public class Capture
     private const int EdgeWidth = WidthMin / 2;
     private const int EdgeHeight = HeightMin / 2;
 
-    // ReSharper disable UnusedParameter.Local
     private bool CheckEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
 
     {
