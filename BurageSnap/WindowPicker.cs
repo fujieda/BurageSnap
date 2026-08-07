@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2016 Kazuhiro Fujieda <fujieda@users.osdn.me>
+﻿// Copyright (C) 2026 Kazuhiro Fujieda <fujieda@roundwide.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
