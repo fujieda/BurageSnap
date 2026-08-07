@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
+using ControlzEx.Theming;
 
 namespace BurageSnap;
 
@@ -21,6 +22,14 @@ public partial class App
 #endif
         if (PreLaunch.ProcessAlreadyExists())
             Shutdown();
+    }
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        // Apply MahApps.Metro theme (Light base + Steel accent)
+        ThemeManager.Current.ChangeTheme(this, "Light.Steel");
     }
 
 }

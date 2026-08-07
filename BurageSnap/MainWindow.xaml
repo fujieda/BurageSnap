@@ -18,6 +18,11 @@
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}"/>
     </Window.Resources>
+    <controls:MetroWindow.WindowButtonCommands>
+        <controls:WindowButtonCommands Style="{StaticResource MahApps.Styles.WindowButtonCommands}"
+                                        LightMinButtonStyle="{StaticResource WindowButtonStyle}"
+                                        LightCloseButtonStyle="{StaticResource WindowButtonStyle}"/>
+    </controls:MetroWindow.WindowButtonCommands>
     <Grid>
         <local:NotifyIconWrapper Text="BurageSnap">
             <i:Interaction.Triggers>

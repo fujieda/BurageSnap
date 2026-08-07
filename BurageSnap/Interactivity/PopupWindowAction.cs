@@ -93,6 +93,12 @@ public abstract class PopupWindowAction : TriggerAction<FrameworkElement>
         }
 
         var content = WindowContent;
+
+        if (content != null && content.Parent is Window oldWindow)
+        {
+            oldWindow.Content = null;
+        }
+
         window.Content = content;
 
         if (content?.DataContext is IInteractionRequestAware aware)

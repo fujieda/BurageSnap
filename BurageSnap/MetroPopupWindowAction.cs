@@ -35,12 +35,20 @@ internal class MetroPopupWindowAction : PopupWindowAction
 
     protected override Window CreateWindow()
     {
-        return new MetroWindow
+        var window = new MetroWindow
         {
             Style = (Style)Application.Current.FindResource("WindowStyle"),
             ResizeMode = ResizeMode.NoResize,
             SizeToContent = SizeToContent.WidthAndHeight,
             Owner = GetOwner(this)
         };
+        window.WindowButtonCommands = new WindowButtonCommands
+        {
+            Style = (Style)Application.Current.FindResource("MahApps.Styles.WindowButtonCommands"),
+            LightMinButtonStyle = (Style)Application.Current.FindResource("WindowButtonStyle"),
+            LightCloseButtonStyle = (Style)Application.Current.FindResource("WindowButtonStyle")
+        };
+
+        return window;
     }
 }

@@ -3,18 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- MahApps.Metro 2.x required resources -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Themes/MetroWindow.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Steel.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <!-- Theme (Light + Steel) is applied at runtime via ThemeManager in App.xaml.cs -->
                 <ResourceDictionary>
-                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
-                    <Style x:Key="WindowButtonStyle" TargetType="Button" BasedOn="{StaticResource MetroBaseWindowButtonStyle}">
+                    <!-- Custom styles for BurageSnap -->
+                    <Style x:Key="WindowButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.MetroWindow.Light}">
                         <Setter Property="Width" Value="26"/>
                     </Style>
                     <DataTemplate x:Key="WindowIconTemplate">
@@ -25,18 +25,16 @@
                     <Style x:Key="WindowStyle" TargetType="controls:MetroWindow">
                         <Setter Property="WindowTransitionsEnabled" Value="False"/>
                         <Setter Property="BorderThickness" Value="1"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}"/>
-                        <Setter Property="TitlebarHeight" Value="24"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                        <Setter Property="TitleBarHeight" Value="24"/>
                         <Setter Property="FontFamily" Value="Meiryo UI, Segoe UI"/>
-                        <Setter Property="WindowMinButtonStyle" Value="{StaticResource WindowButtonStyle}"/>
-                        <Setter Property="WindowCloseButtonStyle" Value="{StaticResource WindowButtonStyle}"/>
                         <Setter Property="IconTemplate" Value="{StaticResource WindowIconTemplate}"/>
-                        <Setter Property="TitleCaps" Value="False"/>
+                        <Setter Property="TitleCharacterCasing" Value="Normal"/>
+                        <Setter Property="ShowMaxRestoreButton" Value="False"/>
                     </Style>
-                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
-                    <Style x:Key="ButtonStyle" TargetType="Button" BasedOn="{StaticResource MetroButton}">
-                        <Setter Property="controls:ButtonHelper.PreserveTextCase" Value="True"/>
+                    <Style x:Key="ButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
                         <Setter Property="FontWeight" Value="Normal"/>
+                        <Setter Property="controls:ControlsHelper.ContentCharacterCasing" Value="Normal"/>
                     </Style>
                     <system:Double x:Key="WindowTitleFontSize">14</system:Double>
                     <Brush x:Key="ButtonMouseOverBorderBrush">DarkGray</Brush>
