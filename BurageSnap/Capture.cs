@@ -121,6 +121,10 @@ public class Capture
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
 
+    // GetWindowRect と CopyFromScreen はいずれもプロセスの DPI Awareness に依存する。
+    // app.manifest で PerMonitorV2 を宣言しているため、これらは常に物理ピクセル座標を
+    // 返す/受け取る前提となり、キャプチャ対象ウィンドウとメインウィンドウが異なる DPI の
+    // モニタに表示されていても座標系がずれることはない。
     private static Bitmap CaptureWindow(Rect rect)
     {
         var width = rect.Right - rect.Left;
@@ -131,6 +135,7 @@ public class Capture
         return bmp;
     }
 
+    // 物理ピクセル座標を返す（PerMonitorV2 の場合）。
     [DllImport("user32.dll")]
     private static extern int GetWindowRect(IntPtr hWnd, ref Rect lpRec);
 
