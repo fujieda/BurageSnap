@@ -12,38 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
 using Prism.Mvvm;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+public class ConfirmViewModel : BindableBase, IInteractionRequestAware
 {
-    public class ConfirmViewModel : BindableBase, IInteractionRequestAware
+    public INotification Notification { get; set; }
+    public Action FinishInteraction { get; set; }
+
+    public ICommand YesCommand { get; }
+    public ICommand NoCommand { get; }
+
+    public ConfirmViewModel()
     {
-        public INotification Notification { get; set; }
-        public Action FinishInteraction { get; set; }
+        YesCommand = new DelegateCommand(YesInteraction);
+        NoCommand = new DelegateCommand(NoInteraction);
+    }
 
-        public ICommand YesCommand { get; }
-        public ICommand NoCommand { get; }
+    private void YesInteraction()
+    {
+        ((IConfirmation)Notification).Confirmed = true;
+        FinishInteraction();
+    }
 
-        public ConfirmViewModel()
-        {
-            YesCommand = new DelegateCommand(YesInteraction);
-            NoCommand = new DelegateCommand(NoInteraction);
-        }
-
-        private void YesInteraction()
-        {
-            ((IConfirmation)Notification).Confirmed = true;
-            FinishInteraction();
-        }
-
-        private void NoInteraction()
-        {
-            ((IConfirmation)Notification).Confirmed = false;
-            FinishInteraction();
-        }
+    private void NoInteraction()
+    {
+        ((IConfirmation)Notification).Confirmed = false;
+        FinishInteraction();
     }
 }

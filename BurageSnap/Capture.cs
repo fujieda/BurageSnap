@@ -12,608 +12,605 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using BurageSnap.Properties;
 
-namespace BurageSnap
-{
-    public class CaptureError : Exception
-    {
-        public string Summary { get; }
+namespace BurageSnap;
 
-        public CaptureError(string summary, string message) : base(message)
+public class CaptureError : Exception
+{
+    public string Summary { get; }
+
+    public CaptureError(string summary, string message) : base(message)
+    {
+        Summary = summary;
+    }
+}
+
+public class Capture
+{
+    private const int WidthMin = 600, HeightMin = 400;
+    private IntPtr _hWnd;
+    private Rect _windowRect;
+    private Rectangle _rectangle;
+
+    public string Title { get; private set; }
+
+    public Bitmap CaptureGameScreen()
+    {
+        if (_hWnd == IntPtr.Zero || _rectangle.IsEmpty)
+            throw new CaptureError(Resources.Capture_Internal_error, Resources.Capture_Internal_error);
+        using (var bmp = CaptureWindow(_windowRect))
+            return bmp.Clone(_rectangle, bmp.PixelFormat);
+    }
+
+    public Bitmap CaptureGameScreen(string[] titles)
+    {
+        _hWnd = FindWindow(titles, out var index);
+        if (_hWnd == IntPtr.Zero)
+            throw new CaptureError(Resources.Capture_Search_error,
+                Resources.Capture_Cant_find_window);
+        var rect = new Rect();
+        GetWindowRect(_hWnd, ref rect);
+        using (var bmp = CaptureWindow(rect))
         {
-            Summary = summary;
+            var rectangle = DetectGameScreen(bmp);
+            if (!rectangle.IsEmpty)
+            {
+                _windowRect = rect;
+                _rectangle = rectangle;
+                Title = titles[index];
+            }
+            else
+            {
+                using (var file = File.Create("debug.png"))
+                    bmp.Save(file, ImageFormat.Png);
+                if (_rectangle.IsEmpty || !_windowRect.Equals(rect) || Title != titles[index])
+                    throw new CaptureError(Resources.Capture_Extract_error,
+                        Resources.Capture_Cant_extract_game_screen);
+            }
+            return bmp.Clone(_rectangle, bmp.PixelFormat);
         }
     }
 
-    public class Capture
+    private IntPtr FindWindow(string[] titles, out int index)
     {
-        private const int WidthMin = 600, HeightMin = 400;
-        private IntPtr _hWnd;
-        private Rect _windowRect;
-        private Rectangle _rectangle;
-
-        public string Title { get; private set; }
-
-        public Bitmap CaptureGameScreen()
+        var found = IntPtr.Zero;
+        var idx = 0;
+        EnumWindows((hWnd, lParam) =>
         {
-            if (_hWnd == IntPtr.Zero || _rectangle.IsEmpty)
-                throw new CaptureError(Resources.Capture_Internal_error, Resources.Capture_Internal_error);
-            using (var bmp = CaptureWindow(_windowRect))
-                return bmp.Clone(_rectangle, bmp.PixelFormat);
-        }
-
-        public Bitmap CaptureGameScreen(string[] titles)
-        {
-            _hWnd = FindWindow(titles, out var index);
-            if (_hWnd == IntPtr.Zero)
-                throw new CaptureError(Resources.Capture_Search_error,
-                    Resources.Capture_Cant_find_window);
             var rect = new Rect();
-            GetWindowRect(_hWnd, ref rect);
-            using (var bmp = CaptureWindow(rect))
-            {
-                var rectangle = DetectGameScreen(bmp);
-                if (!rectangle.IsEmpty)
-                {
-                    _windowRect = rect;
-                    _rectangle = rectangle;
-                    Title = titles[index];
-                }
-                else
-                {
-                    using (var file = File.Create("debug.png"))
-                        bmp.Save(file, ImageFormat.Png);
-                    if (_rectangle.IsEmpty || !_windowRect.Equals(rect) || Title != titles[index])
-                        throw new CaptureError(Resources.Capture_Extract_error,
-                            Resources.Capture_Cant_extract_game_screen);
-                }
-                return bmp.Clone(_rectangle, bmp.PixelFormat);
-            }
-        }
-
-        private IntPtr FindWindow(string[] titles, out int index)
-        {
-            var found = IntPtr.Zero;
-            var idx = 0;
-            EnumWindows((hWnd, lParam) =>
-            {
-                var rect = new Rect();
-                if (GetWindowRect(hWnd, ref rect) == 0 || rect.Right - rect.Left < WidthMin ||
-                    rect.Bottom - rect.Top < HeightMin)
-                    return true;
-                var text = GetWindowText(hWnd);
-                for (var i = 0; i < titles.Length; i++)
-                    if (text.Contains(titles[i]))
-                    {
-                        found = hWnd;
-                        idx = i;
-                        return false;
-                    }
+            if (GetWindowRect(hWnd, ref rect) == 0 || rect.Right - rect.Left < WidthMin ||
+                rect.Bottom - rect.Top < HeightMin)
                 return true;
-            }, IntPtr.Zero);
-            index = idx;
-            return found;
-        }
+            var text = GetWindowText(hWnd);
+            for (var i = 0; i < titles.Length; i++)
+                if (text.Contains(titles[i]))
+                {
+                    found = hWnd;
+                    idx = i;
+                    return false;
+                }
+            return true;
+        }, IntPtr.Zero);
+        index = idx;
+        return found;
+    }
 
-        public static string GetWindowText(IntPtr hWnd)
+    public static string GetWindowText(IntPtr hWnd)
+    {
+        var size = GetWindowTextLength(hWnd);
+        if (size == 0)
+            return "";
+        var sb = new StringBuilder(size + 1);
+        GetWindowText(hWnd, sb, sb.Capacity);
+        return sb.ToString();
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, StringBuilder strText, int maxCount);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowTextLength(IntPtr hWnd);
+
+    private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
+
+    private static Bitmap CaptureWindow(Rect rect)
+    {
+        var width = rect.Right - rect.Left;
+        var height = rect.Bottom - rect.Top;
+        var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+        using (var g = Graphics.FromImage(bmp))
+            g.CopyFromScreen(rect.Left, rect.Top, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
+        return bmp;
+    }
+
+    [DllImport("user32.dll")]
+    private static extern int GetWindowRect(IntPtr hWnd, ref Rect lpRec);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Rect : IEquatable<Rect>
+    {
+        public readonly int Left;
+        public readonly int Top;
+        public readonly int Right;
+        public readonly int Bottom;
+
+        public bool Equals(Rect other)
         {
-            var size = GetWindowTextLength(hWnd);
-            if (size == 0)
-                return "";
-            var sb = new StringBuilder(size + 1);
-            GetWindowText(hWnd, sb, sb.Capacity);
-            return sb.ToString();
+            return Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
         }
+    }
 
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder strText, int maxCount);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern int GetWindowTextLength(IntPtr hWnd);
-
-        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern bool EnumWindows(EnumWindowsProc enumProc, IntPtr lParam);
-
-        private static Bitmap CaptureWindow(Rect rect)
+    public Rectangle DetectGameScreen(Bitmap bmp)
+    {
+        var height = bmp.Height;
+        var width = bmp.Width;
+        var map = new byte[width, height];
+        var data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+            PixelFormat.Format24bppRgb);
+        unsafe
         {
-            var width = rect.Right - rect.Left;
-            var height = rect.Bottom - rect.Top;
-            var bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-            using (var g = Graphics.FromImage(bmp))
-                g.CopyFromScreen(rect.Left, rect.Top, 0, 0, new Size(width, height), CopyPixelOperation.SourceCopy);
-            return bmp;
-        }
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowRect(IntPtr hWnd, ref Rect lpRec);
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct Rect : IEquatable<Rect>
-        {
-            public readonly int Left;
-            public readonly int Top;
-            public readonly int Right;
-            public readonly int Bottom;
-
-            public bool Equals(Rect other)
+            var ptr = (byte*)data.Scan0;
+            for (var y = 0; y < data.Height; y++)
             {
-                return Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
+                for (var x = 0; x < data.Width; x++)
+                {
+                    var p = ptr + y * data.Stride + x * 3;
+                    map[x, y] = (byte)(p[0] >= 254 && p[1] >= 254 && p[2] >= 254 ? 1 : 0);
+                }
+            }
+            for (var y = 0; y < data.Height; y++)
+            {
+                for (var x = 0; x < data.Width; x++)
+                {
+                    var p = ptr + y * data.Stride + x * 3;
+                    map[x, y] = (byte)(p[0] >= 254 && p[1] >= 254 && p[2] >= 254 ? 1 : 0);
+                }
             }
         }
+        bmp.UnlockBits(data);
+        var rect = FindRectangle(map, false);
+        return rect != Rectangle.Empty ? rect : FindRectangle(map, true);
+    }
 
-        public Rectangle DetectGameScreen(Bitmap bmp)
+    private Rectangle FindRectangle(byte[,] map, bool vagueTop)
+    {
+        var width = map.GetLength(0);
+        var height = map.GetLength(1);
+        for (var y = 1; y < height; y++)
         {
-            var height = bmp.Height;
-            var width = bmp.Width;
-            var map = new byte[width, height];
-            var data = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
-                PixelFormat.Format24bppRgb);
-            unsafe
+            if (!CheckEdgeHorizontalTop(map, 0, width, y, y))
+                continue;
+            for (var x = 1; x < width; x++)
             {
-                var ptr = (byte*)data.Scan0;
-                for (var y = 0; y < data.Height; y++)
-                {
-                    for (var x = 0; x < data.Width; x++)
-                    {
-                        var p = ptr + y * data.Stride + x * 3;
-                        map[x, y] = (byte)(p[0] >= 254 && p[1] >= 254 && p[2] >= 254 ? 1 : 0);
-                    }
-                }
-                for (var y = 0; y < data.Height; y++)
-                {
-                    for (var x = 0; x < data.Width; x++)
-                    {
-                        var p = ptr + y * data.Stride + x * 3;
-                        map[x, y] = (byte)(p[0] >= 254 && p[1] >= 254 && p[2] >= 254 ? 1 : 0);
-                    }
-                }
-            }
-            bmp.UnlockBits(data);
-            var rect = FindRectangle(map, false);
-            return rect != Rectangle.Empty ? rect : FindRectangle(map, true);
-        }
-
-        private Rectangle FindRectangle(byte[,] map, bool vagueTop)
-        {
-            var width = map.GetLength(0);
-            var height = map.GetLength(1);
-            for (var y = 1; y < height; y++)
-            {
-                if (!CheckEdgeHorizontalTop(map, 0, width, y, y))
+                var rect = Rectangle.Empty;
+                var margin = Rectangle.Empty;
+                rect.Y = y;
+                if (!CheckEdgeVerticalLeft(map, x, x, rect.Y, height))
                     continue;
-                for (var x = 1; x < width; x++)
-                {
-                    var rect = Rectangle.Empty;
-                    var margin = Rectangle.Empty;
-                    rect.Y = y;
-                    if (!CheckEdgeVerticalLeft(map, x, x, rect.Y, height))
-                        continue;
-                    rect.X = x;
-                    FindBottomAndRight(map, ref rect, ref margin);
-                    if (rect == Rectangle.Empty)
-                        continue;
-                    var unused = Rectangle.Empty;
-                    if (!CheckEdgeStrictHorizontalTop(map, rect.X, rect.Right, y, y, vagueTop, ref unused))
-                        break;
-                    if (!CheckEdgeStrictVerticalLeft(map, x, x, rect.Y, rect.Bottom, ref unused))
-                        continue;
-                    FindTopAndLeft(map, ref rect, vagueTop, ref margin);
-                    InflateRectangle(ref rect, margin);
-                    RoundUpRectangle(map, ref rect);
-                    return rect;
-                }
-            }
-            return Rectangle.Empty;
-        }
-
-        private void InflateRectangle(ref Rectangle rect, Rectangle margin)
-        {
-            rect.X -= margin.X;
-            rect.Y -= margin.Y;
-            rect.Width += margin.X + margin.Width;
-            rect.Height += margin.Y + margin.Height;
-        }
-
-        private void FindBottomAndRight(byte[,] map, ref Rectangle rect, ref Rectangle margin)
-        {
-            var width = map.GetLength(0);
-            var height = map.GetLength(1);
-            for (var y = rect.Y; y < height; y++)
-            {
-                if (!CheckEdgeHorizontalBottom(map, rect.X, width, y, y))
-                    continue;
-                rect.Height = y - rect.Y;
-                rect.Width = 0;
-                for (var x = rect.X; x < width; x++)
-                {
-                    if (!CheckEdgeStrictVerticalRight(map, x, x, rect.Y, rect.Bottom, ref margin))
-                        continue;
-                    rect.Width = x - rect.X;
-                    break;
-                }
-                if (rect.Width == 0)
+                rect.X = x;
+                FindBottomAndRight(map, ref rect, ref margin);
+                if (rect == Rectangle.Empty)
                     continue;
                 var unused = Rectangle.Empty;
-                if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, rect.Bottom, rect.Bottom, ref unused))
+                if (!CheckEdgeStrictHorizontalTop(map, rect.X, rect.Right, y, y, vagueTop, ref unused))
                     break;
+                if (!CheckEdgeStrictVerticalLeft(map, x, x, rect.Y, rect.Bottom, ref unused))
+                    continue;
+                FindTopAndLeft(map, ref rect, vagueTop, ref margin);
+                InflateRectangle(ref rect, margin);
+                RoundUpRectangle(map, ref rect);
+                return rect;
+            }
+        }
+        return Rectangle.Empty;
+    }
+
+    private void InflateRectangle(ref Rectangle rect, Rectangle margin)
+    {
+        rect.X -= margin.X;
+        rect.Y -= margin.Y;
+        rect.Width += margin.X + margin.Width;
+        rect.Height += margin.Y + margin.Height;
+    }
+
+    private void FindBottomAndRight(byte[,] map, ref Rectangle rect, ref Rectangle margin)
+    {
+        var width = map.GetLength(0);
+        var height = map.GetLength(1);
+        for (var y = rect.Y; y < height; y++)
+        {
+            if (!CheckEdgeHorizontalBottom(map, rect.X, width, y, y))
+                continue;
+            rect.Height = y - rect.Y;
+            rect.Width = 0;
+            for (var x = rect.X; x < width; x++)
+            {
+                if (!CheckEdgeStrictVerticalRight(map, x, x, rect.Y, rect.Bottom, ref margin))
+                    continue;
+                rect.Width = x - rect.X;
+                break;
             }
             if (rect.Width == 0)
-            {
-                rect = Rectangle.Empty;
-                return;
-            }
-            // check a smaller rectangle
-            for (var y = rect.Y; y <= rect.Bottom; y++)
-            {
-                if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, y, y, ref margin))
-                {
-                    rect.Height = y - rect.Y;
-                    break;
-                }
-            }
-            if (!(rect.Width >= WidthMin && rect.Height >= HeightMin))
-                rect = Rectangle.Empty;
+                continue;
+            var unused = Rectangle.Empty;
+            if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, rect.Bottom, rect.Bottom, ref unused))
+                break;
         }
-
-        private void FindTopAndLeft(byte[,] map, ref Rectangle rect, bool vagueTop, ref Rectangle margin)
+        if (rect.Width == 0)
         {
-            for (var y = rect.Bottom - 1; y >= rect.Y; y--)
+            rect = Rectangle.Empty;
+            return;
+        }
+        // check a smaller rectangle
+        for (var y = rect.Y; y <= rect.Bottom; y++)
+        {
+            if (CheckEdgeStrictHorizontalBottom(map, rect.X, rect.Right, y, y, ref margin))
             {
-                if (CheckEdgeStrictHorizontalTop(map, rect.Left, rect.Right, y, y, vagueTop, ref margin))
-                {
-                    rect.Height += rect.Y - y;
-                    rect.Y = y;
-                    break;
-                }
-            }
-            for (var x = rect.Right - 1; x >= rect.X; x--)
-            {
-                if (CheckEdgeStrictVerticalLeft(map, x, x, rect.Top, rect.Bottom, ref margin))
-                {
-                    rect.Width += rect.X - x;
-                    rect.X = x;
-                    break;
-                }
+                rect.Height = y - rect.Y;
+                break;
             }
         }
+        if (!(rect.Width >= WidthMin && rect.Height >= HeightMin))
+            rect = Rectangle.Empty;
+    }
 
-        private const int EdgeWidth = WidthMin / 2;
-        private const int EdgeHeight = HeightMin / 2;
-
-        // ReSharper disable UnusedParameter.Local
-        private bool CheckEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
-
+    private void FindTopAndLeft(byte[,] map, ref Rectangle rect, bool vagueTop, ref Rectangle margin)
+    {
+        for (var y = rect.Bottom - 1; y >= rect.Y; y--)
         {
-            var n = 0;
-            for (var x = left; x < right; x++)
+            if (CheckEdgeStrictHorizontalTop(map, rect.Left, rect.Right, y, y, vagueTop, ref margin))
             {
-                if (!(map[x, top - 1] == 1 && map[x, top] == 0))
-                    continue;
-                if (++n < EdgeWidth)
-                    continue;
-                return true;
+                rect.Height += rect.Y - y;
+                rect.Y = y;
+                break;
             }
-            return false;
         }
-
-        private bool CheckEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+        for (var x = rect.Right - 1; x >= rect.X; x--)
         {
-            var n = 0;
-            for (var y = top; y < bottom; y++)
+            if (CheckEdgeStrictVerticalLeft(map, x, x, rect.Top, rect.Bottom, ref margin))
             {
-                if (!(map[left - 1, y] == 1 && map[left, y] == 0))
-                    continue;
-                if (++n < EdgeHeight)
-                    continue;
-                return true;
+                rect.Width += rect.X - x;
+                rect.X = x;
+                break;
             }
-            return false;
         }
+    }
 
-        private bool CheckEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+    private const int EdgeWidth = WidthMin / 2;
+    private const int EdgeHeight = HeightMin / 2;
+
+    // ReSharper disable UnusedParameter.Local
+    private bool CheckEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+
+    {
+        var n = 0;
+        for (var x = left; x < right; x++)
         {
-            var n = 0;
-            for (var x = left; x < right; x++)
-            {
-                if (!(map[x, bottom - 1] == 0 && map[x, bottom] == 1))
-                    continue;
-                if (++n < EdgeWidth)
-                    continue;
-                return true;
-            }
-            return false;
+            if (!(map[x, top - 1] == 1 && map[x, top] == 0))
+                continue;
+            if (++n < EdgeWidth)
+                continue;
+            return true;
         }
+        return false;
+    }
 
-        private bool CheckEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+    private bool CheckEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var n = 0;
+        for (var y = top; y < bottom; y++)
         {
-            var n = 0;
-            for (var y = top; y < bottom; y++)
-            {
-                if (!(map[right - 1, y] == 0 && map[right, y] == 1))
-                    continue;
-                if (++n < EdgeHeight)
-                    continue;
-                return true;
-            }
-            return false;
+            if (!(map[left - 1, y] == 1 && map[left, y] == 0))
+                continue;
+            if (++n < EdgeHeight)
+                continue;
+            return true;
         }
+        return false;
+    }
 
-        private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop,
-            ref Rectangle margin)
+    private bool CheckEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var n = 0;
+        for (var x = left; x < right; x++)
         {
-            return CheckEdgeHorizontalTop(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom, ref margin) &&
-                   CheckEnoughLengthHorizontalTop(map, left, right, top, bottom, vagueTop);
+            if (!(map[x, bottom - 1] == 0 && map[x, bottom] == 1))
+                continue;
+            if (++n < EdgeWidth)
+                continue;
+            return true;
         }
+        return false;
+    }
 
-        private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private bool CheckEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var n = 0;
+        for (var y = top; y < bottom; y++)
         {
-            return CheckEdgeVerticalLeft(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeVerticalLeft(map, left, right, top, bottom, ref margin) &&
-                   CheckEnoughLengthVerticalLeft(map, left, right, top, bottom);
+            if (!(map[right - 1, y] == 0 && map[right, y] == 1))
+                continue;
+            if (++n < EdgeHeight)
+                continue;
+            return true;
         }
+        return false;
+    }
 
-        private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private bool CheckEdgeStrictHorizontalTop(byte[,] map, int left, int right, int top, int bottom, bool vagueTop,
+        ref Rectangle margin)
+    {
+        return CheckEdgeHorizontalTop(map, left, right, top, bottom) &&
+               CheckEndOfEdgeHorizontalTop(map, left, right, top, bottom, ref margin) &&
+               CheckEnoughLengthHorizontalTop(map, left, right, top, bottom, vagueTop);
+    }
+
+    private bool CheckEdgeStrictVerticalLeft(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        return CheckEdgeVerticalLeft(map, left, right, top, bottom) &&
+               CheckEndOfEdgeVerticalLeft(map, left, right, top, bottom, ref margin) &&
+               CheckEnoughLengthVerticalLeft(map, left, right, top, bottom);
+    }
+
+    private bool CheckEdgeStrictHorizontalBottom(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        return CheckEdgeHorizontalBottom(map, left, right, top, bottom) &&
+               CheckEndOfEdgeHorizontalBottom(map, left, right, top, bottom, ref margin) &&
+               CheckEnoughLengthHorizontalBottom(map, left, right, top, bottom);
+    }
+
+    private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        return CheckEdgeVerticalRight(map, left, right, top, bottom) &&
+               CheckEndOfEdgeVerticalRight(map, left, right, top, bottom, ref margin) &&
+               CheckEnoughLengthVerticalRight(map, left, right, top, bottom);
+    }
+
+    private const int DecorationThickness = 20;
+    private const int CornerSize = 10;
+
+    private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        for (margin.Y = 0; margin.Top < DecorationThickness; margin.Y++)
         {
-            return CheckEdgeHorizontalBottom(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeHorizontalBottom(map, left, right, top, bottom, ref margin) &&
-                   CheckEnoughLengthHorizontalBottom(map, left, right, top, bottom);
+            if (top - margin.Y - 1 < 0)
+                return false;
+            for (var x = left; x < left + CornerSize; x++)
+            {
+                if (map[x, top - margin.Y - 1] == 0)
+                    goto last;
+            }
+            for (var x = right - 1; x >= right - CornerSize; x--)
+            {
+                if (map[x, top - margin.Y - 1] == 0)
+                    goto last;
+            }
+            return true;
+            last: ;
         }
+        return false;
+    }
 
-        private bool CheckEdgeStrictVerticalRight(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        for (margin.X = 0; margin.X < DecorationThickness; margin.X++)
         {
-            return CheckEdgeVerticalRight(map, left, right, top, bottom) &&
-                   CheckEndOfEdgeVerticalRight(map, left, right, top, bottom, ref margin) &&
-                   CheckEnoughLengthVerticalRight(map, left, right, top, bottom);
+            if (left - margin.X - 1 < 0)
+                return false;
+            for (var y = top; y < top + CornerSize; y++)
+            {
+                if (map[left - margin.X - 1, y] == 0)
+                    goto last;
+            }
+            for (var y = bottom - 1; y >= bottom - CornerSize; y--)
+            {
+                if (map[left - margin.X - 1, y] == 0)
+                    goto last;
+            }
+            return true;
+            last: ;
         }
+        return false;
+    }
 
-        private const int DecorationThickness = 20;
-        private const int CornerSize = 10;
-
-        private bool CheckEndOfEdgeHorizontalTop(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        for (margin.Height = 0; margin.Height < DecorationThickness; margin.Height++)
         {
-            for (margin.Y = 0; margin.Top < DecorationThickness; margin.Y++)
+            if (bottom + margin.Height >= map.GetLength(1))
+                return false;
+            for (var x = left; x < left + CornerSize; x++)
             {
-                if (top - margin.Y - 1 < 0)
-                    return false;
-                for (var x = left; x < left + CornerSize; x++)
-                {
-                    if (map[x, top - margin.Y - 1] == 0)
-                        goto last;
-                }
-                for (var x = right - 1; x >= right - CornerSize; x--)
-                {
-                    if (map[x, top - margin.Y - 1] == 0)
-                        goto last;
-                }
-                return true;
-                last: ;
+                if (map[x, bottom + margin.Height] == 0)
+                    goto last;
             }
-            return false;
+            for (var x = right - 1; x >= right - CornerSize; x--)
+            {
+                if (map[x, bottom + margin.Height] == 0)
+                    goto last;
+            }
+            return true;
+            last: ;
         }
+        return false;
+    }
 
-        private bool CheckEndOfEdgeVerticalLeft(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom,
+        ref Rectangle margin)
+    {
+        for (margin.Width = 0; margin.Width < DecorationThickness; margin.Width++)
         {
-            for (margin.X = 0; margin.X < DecorationThickness; margin.X++)
+            if (right + margin.Width >= map.GetLength(0))
+                return false;
+            for (var y = top; y < top + CornerSize; y++)
             {
-                if (left - margin.X - 1 < 0)
-                    return false;
-                for (var y = top; y < top + CornerSize; y++)
-                {
-                    if (map[left - margin.X - 1, y] == 0)
-                        goto last;
-                }
-                for (var y = bottom - 1; y >= bottom - CornerSize; y--)
-                {
-                    if (map[left - margin.X - 1, y] == 0)
-                        goto last;
-                }
-                return true;
-                last: ;
+                if (map[right + margin.Width, y] == 0)
+                    goto last;
             }
-            return false;
+            for (var y = bottom - 1; y >= bottom - CornerSize; y--)
+            {
+                if (map[right + margin.Width, y] == 0)
+                    goto last;
+            }
+            return true;
+            last: ;
         }
+        return false;
+    }
 
-        private bool CheckEndOfEdgeHorizontalBottom(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private const float EnoughLengthRatio = 0.9f;
+
+    private bool CheckEnoughLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom,
+        bool vagueTop)
+    {
+        var n = 0;
+        for (var x = left; x < right; x++)
         {
-            for (margin.Height = 0; margin.Height < DecorationThickness; margin.Height++)
-            {
-                if (bottom + margin.Height >= map.GetLength(1))
-                    return false;
-                for (var x = left; x < left + CornerSize; x++)
-                {
-                    if (map[x, bottom + margin.Height] == 0)
-                        goto last;
-                }
-                for (var x = right - 1; x >= right - CornerSize; x--)
-                {
-                    if (map[x, bottom + margin.Height] == 0)
-                        goto last;
-                }
-                return true;
-                last: ;
-            }
-            return false;
+            if (map[x, top - 1] == 1)
+                n++;
         }
+        var decor = GetDecorationLengthHorizontalTop(map, left, right, top, bottom);
+        return n + decor >= (right - left) * (vagueTop ? 0.6f : EnoughLengthRatio);
+    }
 
-        private bool CheckEndOfEdgeVerticalRight(byte[,] map, int left, int right, int top, int bottom,
-            ref Rectangle margin)
+    private int GetDecorationLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var decor = 0;
+        for (var x = left; x < right; x++)
         {
-            for (margin.Width = 0; margin.Width < DecorationThickness; margin.Width++)
-            {
-                if (right + margin.Width >= map.GetLength(0))
-                    return false;
-                for (var y = top; y < top + CornerSize; y++)
-                {
-                    if (map[right + margin.Width, y] == 0)
-                        goto last;
-                }
-                for (var y = bottom - 1; y >= bottom - CornerSize; y--)
-                {
-                    if (map[right + margin.Width, y] == 0)
-                        goto last;
-                }
-                return true;
-                last: ;
-            }
-            return false;
+            if (map[x, top - 1] == 1)
+                break;
+            decor++;
         }
-
-        private const float EnoughLengthRatio = 0.9f;
-
-        private bool CheckEnoughLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom,
-            bool vagueTop)
+        for (var x = right - 1; x >= left; x--)
         {
-            var n = 0;
-            for (var x = left; x < right; x++)
-            {
-                if (map[x, top - 1] == 1)
-                    n++;
-            }
-            var decor = GetDecorationLengthHorizontalTop(map, left, right, top, bottom);
-            return n + decor >= (right - left) * (vagueTop ? 0.6f : EnoughLengthRatio);
+            if (map[x, top - 1] == 1)
+                break;
+            decor++;
         }
+        return decor;
+    }
 
-        private int GetDecorationLengthHorizontalTop(byte[,] map, int left, int right, int top, int bottom)
+    private bool CheckEnoughLengthVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var n = 0;
+        for (var y = top; y < bottom; y++)
         {
-            var decor = 0;
-            for (var x = left; x < right; x++)
-            {
-                if (map[x, top - 1] == 1)
-                    break;
-                decor++;
-            }
-            for (var x = right - 1; x >= left; x--)
-            {
-                if (map[x, top - 1] == 1)
-                    break;
-                decor++;
-            }
-            return decor;
+            if (map[left - 1, y] == 1)
+                n++;
         }
+        var decor = GetDecorationLengthVerticalLeft(map, left, right, top, bottom);
+        return n + decor >= (bottom - top) * EnoughLengthRatio;
+    }
 
-        private bool CheckEnoughLengthVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+    private int GetDecorationLengthVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var decor = 0;
+        for (var y = top; y < bottom; y++)
         {
-            var n = 0;
-            for (var y = top; y < bottom; y++)
-            {
-                if (map[left - 1, y] == 1)
-                    n++;
-            }
-            var decor = GetDecorationLengthVerticalLeft(map, left, right, top, bottom);
-            return n + decor >= (bottom - top) * EnoughLengthRatio;
+            if (map[left - 1, y] == 1)
+                break;
+            decor++;
         }
-
-        private int GetDecorationLengthVerticalLeft(byte[,] map, int left, int right, int top, int bottom)
+        for (var y = bottom - 1; y >= top; y--)
         {
-            var decor = 0;
-            for (var y = top; y < bottom; y++)
-            {
-                if (map[left - 1, y] == 1)
-                    break;
-                decor++;
-            }
-            for (var y = bottom - 1; y >= top; y--)
-            {
-                if (map[left - 1, y] == 1)
-                    break;
-                decor++;
-            }
-            return decor;
+            if (map[left - 1, y] == 1)
+                break;
+            decor++;
         }
+        return decor;
+    }
 
-        private bool CheckEnoughLengthHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+    private bool CheckEnoughLengthHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var n = 0;
+        for (var x = left; x < right; x++)
         {
-            var n = 0;
-            for (var x = left; x < right; x++)
-            {
-                if (map[x, bottom] == 1)
-                    n++;
-            }
-            var decor = GetDecorationLengthHorizontalBottom(map, left, right, top, bottom);
-            return n + decor >= (right - left) * EnoughLengthRatio;
+            if (map[x, bottom] == 1)
+                n++;
         }
+        var decor = GetDecorationLengthHorizontalBottom(map, left, right, top, bottom);
+        return n + decor >= (right - left) * EnoughLengthRatio;
+    }
 
-        private int GetDecorationLengthHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+    private int GetDecorationLengthHorizontalBottom(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var decor = 0;
+        for (var x = left; x < right; x++)
         {
-            var decor = 0;
-            for (var x = left; x < right; x++)
-            {
-                if (map[x, bottom] == 1)
-                    break;
-                decor++;
-            }
-            for (var x = right - 1; x >= left; x--)
-            {
-                if (map[x, bottom] == 1)
-                    break;
-                decor++;
-            }
-            return decor;
+            if (map[x, bottom] == 1)
+                break;
+            decor++;
         }
-
-        private bool CheckEnoughLengthVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+        for (var x = right - 1; x >= left; x--)
         {
-            var n = 0;
-            for (var y = top; y < bottom; y++)
-            {
-                if (map[right, y] == 1)
-                    n++;
-            }
-            var decor = GetDecorationLengthVerticalRight(map, left, right, top, bottom);
-            return n + decor >= (bottom - top) * EnoughLengthRatio;
+            if (map[x, bottom] == 1)
+                break;
+            decor++;
         }
+        return decor;
+    }
 
-        private int GetDecorationLengthVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+    private bool CheckEnoughLengthVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var n = 0;
+        for (var y = top; y < bottom; y++)
         {
-            var decor = 0;
-            for (var y = top; y < bottom; y++)
-            {
-                if (map[right, y] == 1)
-                    break;
-                decor++;
-            }
-            for (var y = bottom - 1; y >= top; y--)
-            {
-                if (map[right, y] == 1)
-                    break;
-                decor++;
-            }
-            return decor;
+            if (map[right, y] == 1)
+                n++;
         }
+        var decor = GetDecorationLengthVerticalRight(map, left, right, top, bottom);
+        return n + decor >= (bottom - top) * EnoughLengthRatio;
+    }
 
-        // For drop pictures in KanColle with a white region on the top side
-        private void RoundUpRectangle(byte[,] map, ref Rectangle rect)
+    private int GetDecorationLengthVerticalRight(byte[,] map, int left, int right, int top, int bottom)
+    {
+        var decor = 0;
+        for (var y = top; y < bottom; y++)
         {
-            if (rect.Width % 10 != 0)
-                return;
-            var top = 0;
-            for (var x = rect.X; x < rect.Right; x++)
-            {
-                if (map[x, rect.Top - 1] == 1)
-                    top++;
-            }
-            var r = rect.Height % 10;
-            if (top > rect.Width / 2 && r != 0)
-            {
-                rect.Y -= 10 - r;
-                rect.Height += 10 - r;
-            }
+            if (map[right, y] == 1)
+                break;
+            decor++;
+        }
+        for (var y = bottom - 1; y >= top; y--)
+        {
+            if (map[right, y] == 1)
+                break;
+            decor++;
+        }
+        return decor;
+    }
+
+    // For drop pictures in KanColle with a white region on the top side
+    private void RoundUpRectangle(byte[,] map, ref Rectangle rect)
+    {
+        if (rect.Width % 10 != 0)
+            return;
+        var top = 0;
+        for (var x = rect.X; x < rect.Right; x++)
+        {
+            if (map[x, rect.Top - 1] == 1)
+                top++;
+        }
+        var r = rect.Height % 10;
+        if (top > rect.Width / 2 && r != 0)
+        {
+            rect.Y -= 10 - r;
+            rect.Height += 10 - r;
         }
     }
 }

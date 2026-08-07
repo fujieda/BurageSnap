@@ -16,31 +16,30 @@ using System.Windows;
 using MahApps.Metro.Controls;
 using Prism.Interactivity;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+internal class MetroPopupWindowAction : PopupWindowAction
 {
-    internal class MetroPopupWindowAction : PopupWindowAction
+    public static Window GetOwner(DependencyObject obj)
     {
-        public static Window GetOwner(DependencyObject obj)
-        {
-            return (Window)obj.GetValue(OwnerProperty);
-        }
+        return (Window)obj.GetValue(OwnerProperty);
+    }
 
-        public static void SetOwner(DependencyObject obj, Window value)
-        {
-            obj.SetValue(OwnerProperty, value);
-        }
+    public static void SetOwner(DependencyObject obj, Window value)
+    {
+        obj.SetValue(OwnerProperty, value);
+    }
 
-        public static readonly DependencyProperty OwnerProperty = DependencyProperty.RegisterAttached("Owner", typeof(Window), typeof(MetroPopupWindowAction), new PropertyMetadata());
+    public static readonly DependencyProperty OwnerProperty = DependencyProperty.RegisterAttached("Owner", typeof(Window), typeof(MetroPopupWindowAction), new PropertyMetadata());
 
-        protected override Window CreateWindow()
+    protected override Window CreateWindow()
+    {
+        return new MetroWindow
         {
-            return new MetroWindow
-            {
-                Style = (Style)Application.Current.FindResource("WindowStyle"),
-                ResizeMode = ResizeMode.NoResize,
-                SizeToContent = SizeToContent.WidthAndHeight,
-                Owner = GetOwner(this)
-            };
-        }
+            Style = (Style)Application.Current.FindResource("WindowStyle"),
+            ResizeMode = ResizeMode.NoResize,
+            SizeToContent = SizeToContent.WidthAndHeight,
+            Owner = GetOwner(this)
+        };
     }
 }

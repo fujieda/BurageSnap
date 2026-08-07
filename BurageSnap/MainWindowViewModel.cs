@@ -21,252 +21,251 @@ using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
 using Prism.Mvvm;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+internal class MainWindowViewModel : BindableBase
 {
-    internal class MainWindowViewModel : BindableBase
+    public Main Main { get; }
+    public ICommand LoadedCommand { get; }
+    public ICommand ClosingCommand { get; }
+    public ICommand BrowseCommand { get; }
+    public ICommand OptionCommand { get; }
+    public ICommand CaptureCommand { get; }
+    public InteractionRequest<IConfirmation> ConfirmationRequest { get; } = new InteractionRequest<IConfirmation>();
+    public InteractionRequest<IConfirmation> OptionViewRequest { get; } = new InteractionRequest<IConfirmation>();
+    public ICommand NotifyIconOpenCommand { get; }
+    public ICommand NotifyIconExitCommand { get; }
+
+    public InteractionRequest<INotification> ShowBalloonTipRequest { get; } =
+        new InteractionRequest<INotification>();
+
+    public bool BurstMode
     {
-        public Main Main { get; }
-        public ICommand LoadedCommand { get; }
-        public ICommand ClosingCommand { get; }
-        public ICommand BrowseCommand { get; }
-        public ICommand OptionCommand { get; }
-        public ICommand CaptureCommand { get; }
-        public InteractionRequest<IConfirmation> ConfirmationRequest { get; } = new InteractionRequest<IConfirmation>();
-        public InteractionRequest<IConfirmation> OptionViewRequest { get; } = new InteractionRequest<IConfirmation>();
-        public ICommand NotifyIconOpenCommand { get; }
-        public ICommand NotifyIconExitCommand { get; }
-
-        public InteractionRequest<INotification> ShowBalloonTipRequest { get; } =
-            new InteractionRequest<INotification>();
-
-        public bool BurstMode
+        get => Main.Config.Continuous;
+        set
         {
-            get => Main.Config.Continuous;
-            set
+            Main.Config.Continuous = value;
+            OnPropertyChanged(() => CaptureButtonText);
+        }
+    }
+
+    public bool AllowChangeSettings => !Main.Capturing;
+
+    public string CaptureButtonText
+        => BurstMode
+            ? Main.Capturing
+                ? Resources.MainWindow_Stop
+                : Resources.MainWindow_Start
+            : Resources.MainWindow_Capture;
+
+    private bool _showInTaskbar = true;
+
+    public bool ShowInTaskbar
+    {
+        get => _showInTaskbar;
+        set => SetProperty(ref _showInTaskbar, value);
+    }
+
+    private WindowStyle _windowStyle;
+
+    public WindowStyle WindowStyle
+    {
+        get => _windowStyle;
+        set => SetProperty(ref _windowStyle, value);
+    }
+
+    private WindowState _windowState = WindowState.Normal;
+
+    public WindowState WindowState
+    {
+        get => _windowState;
+        set
+        {
+            if (_windowState == value)
+                return;
+            Main.Config.WindowState = value;
+            SetProperty(ref _windowState, value);
+            var hide = WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray;
+            ShowInTaskbar = !hide;
+            WindowStyle = hide ? WindowStyle.ToolWindow : WindowStyle.SingleBorderWindow;
+        }
+    }
+
+    public MainWindowViewModel()
+    {
+        Main = new Main();
+        Main.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == "Capturing")
             {
-                Main.Config.Continuous = value;
                 OnPropertyChanged(() => CaptureButtonText);
+                OnPropertyChanged(() => AllowChangeSettings);
             }
-        }
-
-        public bool AllowChangeSettings => !Main.Capturing;
-
-        public string CaptureButtonText
-            => BurstMode
-                ? Main.Capturing
-                    ? Resources.MainWindow_Stop
-                    : Resources.MainWindow_Start
-                : Resources.MainWindow_Capture;
-
-        private bool _showInTaskbar = true;
-
-        public bool ShowInTaskbar
+        };
+        LoadedCommand = new DelegateCommand(Loaded);
+        ClosingCommand = new DelegateCommand<CancelEventArgs>(Closing);
+        BrowseCommand = new DelegateCommand(Main.OpenPictureFolder);
+        OptionCommand = new DelegateCommand(SelectOption);
+        CaptureCommand = new DelegateCommand(Capture);
+        NotifyIconOpenCommand = new DelegateCommand(() => { WindowState = WindowState.Normal; });
+        NotifyIconExitCommand = new DelegateCommand(() =>
         {
-            get => _showInTaskbar;
-            set => SetProperty(ref _showInTaskbar, value);
-        }
+            Terminate();
+            Application.Current.Shutdown();
+        });
+    }
 
-        private WindowStyle _windowStyle;
+    private void Loaded()
+    {
+        RestoreLocation();
+        WindowState = Main.Config.WindowState;
+        SetHotKey();
+        _globalHotKey.HotKeyPressed += Capture;
+    }
 
-        public WindowStyle WindowStyle
+    private void RestoreLocation()
+    {
+        var window = Application.Current.MainWindow;
+        if (window == null)
+            return;
+        window.Topmost = Main.Config.TopMost;
+        var location = Main.Config.Location;
+        // ReSharper disable once CompareOfFloatsByEqualityOperator
+        if (location.X == double.MinValue)
+            return;
+        var width = window.Width;
+        var height = window.Height;
+        var newBounds = new Rect(location.X, location.Y, width, height);
+        if (!IsVisibleOnScreen(newBounds))
+            return;
+        window.Left = location.X;
+        window.Top = location.Y;
+    }
+
+    private void SelectOption()
+    {
+        var assembly = Assembly.GetExecutingAssembly().GetName();
+        OptionViewRequest.Raise(new Confirmation
         {
-            get => _windowStyle;
-            set => SetProperty(ref _windowStyle, value);
-        }
-
-        private WindowState _windowState = WindowState.Normal;
-
-        public WindowState WindowState
+            Title = assembly.Name + " " + assembly.Version.Major + "." + assembly.Version.Minor + " - " +
+                    Resources.OptionView_Option,
+            Content = new OptionContent(Main.Config)
+        }, c =>
         {
-            get => _windowState;
-            set
-            {
-                if (_windowState == value)
-                    return;
-                Main.Config.WindowState = value;
-                SetProperty(ref _windowState, value);
-                var hide = WindowState == WindowState.Minimized && Main.Config.ResideInSystemTray;
-                ShowInTaskbar = !hide;
-                WindowStyle = hide ? WindowStyle.ToolWindow : WindowStyle.SingleBorderWindow;
-            }
-        }
-
-        public MainWindowViewModel()
-        {
-            Main = new Main();
-            Main.PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == "Capturing")
-                {
-                    OnPropertyChanged(() => CaptureButtonText);
-                    OnPropertyChanged(() => AllowChangeSettings);
-                }
-            };
-            LoadedCommand = new DelegateCommand(Loaded);
-            ClosingCommand = new DelegateCommand<CancelEventArgs>(Closing);
-            BrowseCommand = new DelegateCommand(Main.OpenPictureFolder);
-            OptionCommand = new DelegateCommand(SelectOption);
-            CaptureCommand = new DelegateCommand(Capture);
-            NotifyIconOpenCommand = new DelegateCommand(() => { WindowState = WindowState.Normal; });
-            NotifyIconExitCommand = new DelegateCommand(() =>
-            {
-                Terminate();
-                Application.Current.Shutdown();
-            });
-        }
-
-        private void Loaded()
-        {
-            RestoreLocation();
-            WindowState = Main.Config.WindowState;
-            SetHotKey();
-            _globalHotKey.HotKeyPressed += Capture;
-        }
-
-        private void RestoreLocation()
-        {
-            var window = Application.Current.MainWindow;
-            if (window == null)
+            if (!c.Confirmed)
                 return;
-            window.Topmost = Main.Config.TopMost;
-            var location = Main.Config.Location;
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (location.X == double.MinValue)
-                return;
-            var width = window.Width;
-            var height = window.Height;
-            var newBounds = new Rect(location.X, location.Y, width, height);
-            if (!IsVisibleOnScreen(newBounds))
-                return;
-            window.Left = location.X;
-            window.Top = location.Y;
-        }
-
-        private void SelectOption()
-        {
-            var assembly = Assembly.GetExecutingAssembly().GetName();
-            OptionViewRequest.Raise(new Confirmation
-            {
-                Title = assembly.Name + " " + assembly.Version.Major + "." + assembly.Version.Minor + " - " +
-                        Resources.OptionView_Option,
-                Content = new OptionContent(Main.Config)
-            }, c =>
-            {
-                if (!c.Confirmed)
-                    return;
-                ((OptionContent)c.Content).ToConfig(Main.Config);
-                var main = Application.Current.MainWindow;
-                if (main == null)
-                    return;
-                main.Topmost = Main.Config.TopMost;
-                SetHotKey();
-            });
-        }
-
-        private readonly GlobalHotKey _globalHotKey = new GlobalHotKey();
-
-        private void SetHotKey()
-        {
-            var config = Main.Config;
-            _globalHotKey.Register(Application.Current.MainWindow, config.HotKeyModifier, config.HotKey);
-        }
-
-        private void Closing(CancelEventArgs e)
-        {
-            if (Main.Config.ResideInSystemTray)
-            {
-                e.Cancel = true;
-                WindowState = WindowState.Minimized;
-            }
-            else
-            {
-                Terminate();
-            }
-        }
-
-        private void Terminate()
-        {
-            SaveConfig();
-            _globalHotKey.UnRegister();
-        }
-
-        private void SaveConfig()
-        {
-            var config = Main.Config;
+            ((OptionContent)c.Content).ToConfig(Main.Config);
             var main = Application.Current.MainWindow;
             if (main == null)
                 return;
-            config.Location = main.WindowState == WindowState.Normal
-                ? new Point(main.Left, main.Top)
-                : new Point(main.RestoreBounds.Left, main.RestoreBounds.Top);
-            config.Save();
-        }
+            main.Topmost = Main.Config.TopMost;
+            SetHotKey();
+        });
+    }
 
-        private static bool IsVisibleOnScreen(Rect rect)
-        {
-            return new Rect(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop,
-                SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight).IntersectsWith(rect);
-        }
+    private readonly GlobalHotKey _globalHotKey = new GlobalHotKey();
 
-        private void Capture()
+    private void SetHotKey()
+    {
+        var config = Main.Config;
+        _globalHotKey.Register(Application.Current.MainWindow, config.HotKeyModifier, config.HotKey);
+    }
+
+    private void Closing(CancelEventArgs e)
+    {
+        if (Main.Config.ResideInSystemTray)
         {
-            try
+            e.Cancel = true;
+            WindowState = WindowState.Minimized;
+        }
+        else
+        {
+            Terminate();
+        }
+    }
+
+    private void Terminate()
+    {
+        SaveConfig();
+        _globalHotKey.UnRegister();
+    }
+
+    private void SaveConfig()
+    {
+        var config = Main.Config;
+        var main = Application.Current.MainWindow;
+        if (main == null)
+            return;
+        config.Location = main.WindowState == WindowState.Normal
+            ? new Point(main.Left, main.Top)
+            : new Point(main.RestoreBounds.Left, main.RestoreBounds.Top);
+        config.Save();
+    }
+
+    private static bool IsVisibleOnScreen(Rect rect)
+    {
+        return new Rect(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop,
+            SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight).IntersectsWith(rect);
+    }
+
+    private void Capture()
+    {
+        try
+        {
+            if (!BurstMode)
             {
-                if (!BurstMode)
-                {
-                    Main.OneShot();
-                    Notify(Resources.MainWindow_Captured);
-                    return;
-                }
-                if (!Main.Capturing)
-                {
-                    Main.StartCapture();
-                    Notify(Resources.MainWindow_Capture_started);
-                }
-                else
-                {
-                    Main.StopCapture();
-                    Notify(Resources.MainWindow_Capture_ended);
-                    ConfirmSaveBuffer();
-                }
-            }
-            catch (CaptureError e)
-            {
-                if (Main.Config.Notify)
-                    ShowBalloonTipRequest.Raise(new Notification
-                        {Title = Resources.MainWindow_Error, Content = e.Message});
-            }
-        }
-
-        private void ConfirmSaveBuffer()
-        {
-            WindowState = WindowState.Normal;
-            ConfirmationRequest.Raise(new Confirmation {Title = Resources.ConfirmView_Title}, c =>
-            {
-                if (c.Confirmed)
-                    Main.SaveBuffer();
-                else
-                    Main.DiscardBuffer();
-            });
-        }
-
-        private void Notify(string message)
-        {
-            if (!Main.Config.Notify)
+                Main.OneShot();
+                Notify(Resources.MainWindow_Captured);
                 return;
-            var title = Main.WindowTitle;
-            if (title == "")
+            }
+            if (!Main.Capturing)
             {
+                Main.StartCapture();
+                Notify(Resources.MainWindow_Capture_started);
+            }
+            else
+            {
+                Main.StopCapture();
+                Notify(Resources.MainWindow_Capture_ended);
+                ConfirmSaveBuffer();
+            }
+        }
+        catch (CaptureError e)
+        {
+            if (Main.Config.Notify)
                 ShowBalloonTipRequest.Raise(new Notification
-                {
-                    Title = Resources.MainWindow_Error,
-                    Content = Main.CaptureResult
-                });
-                return;
-            }
-            if (title.Length > 22)
-                title = title.Substring(0, 22) + "...";
-            ShowBalloonTipRequest.Raise(new Notification {Title = message, Content = title});
+                    {Title = Resources.MainWindow_Error, Content = e.Message});
         }
+    }
+
+    private void ConfirmSaveBuffer()
+    {
+        WindowState = WindowState.Normal;
+        ConfirmationRequest.Raise(new Confirmation {Title = Resources.ConfirmView_Title}, c =>
+        {
+            if (c.Confirmed)
+                Main.SaveBuffer();
+            else
+                Main.DiscardBuffer();
+        });
+    }
+
+    private void Notify(string message)
+    {
+        if (!Main.Config.Notify)
+            return;
+        var title = Main.WindowTitle;
+        if (title == "")
+        {
+            ShowBalloonTipRequest.Raise(new Notification
+            {
+                Title = Resources.MainWindow_Error,
+                Content = Main.CaptureResult
+            });
+            return;
+        }
+        if (title.Length > 22)
+            title = title.Substring(0, 22) + "...";
+        ShowBalloonTipRequest.Raise(new Notification {Title = message, Content = title});
     }
 }

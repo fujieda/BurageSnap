@@ -12,32 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace BurageSnap
-{
-    public class EnumBooleanConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-            if (value == null || !Enum.IsDefined(value.GetType(), value))
-                return DependencyProperty.UnsetValue;
-            var parameterValue = Enum.Parse(value.GetType(), parameterString);
-            return parameterValue.Equals(value);
-        }
+namespace BurageSnap;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-            return Enum.Parse(targetType, parameterString);
-        }
+public class EnumBooleanConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var parameterString = parameter as string;
+        if (parameterString == null)
+            return DependencyProperty.UnsetValue;
+        if (value == null || !Enum.IsDefined(value.GetType(), value))
+            return DependencyProperty.UnsetValue;
+        var parameterValue = Enum.Parse(value.GetType(), parameterString);
+        return parameterValue.Equals(value);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var parameterString = parameter as string;
+        if (parameterString == null)
+            return DependencyProperty.UnsetValue;
+        return Enum.Parse(targetType, parameterString);
     }
 }

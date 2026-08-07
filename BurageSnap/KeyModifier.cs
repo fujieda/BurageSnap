@@ -12,58 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace BurageSnap
+namespace BurageSnap;
+
+public class KeyModifier
 {
-    public class KeyModifier
+    public int Value { get; set; }
+
+    public bool Alt
     {
-        public int Value { get; set; }
-
-        public bool Alt
+        get => (Value & 1) != 0;
+        set
         {
-            get => (Value & 1) != 0;
-            set
-            {
-                if (value)
-                    Value |= 1;
-                else
-                    Value &= ~1;
-            }
+            if (value)
+                Value |= 1;
+            else
+                Value &= ~1;
         }
+    }
 
-        public bool Control
+    public bool Control
+    {
+        get => (Value & 2) != 0;
+        set
         {
-            get => (Value & 2) != 0;
-            set
-            {
-                if (value)
-                    Value |= 2;
-                else
-                    Value &= ~2;
-            }
+            if (value)
+                Value |= 2;
+            else
+                Value &= ~2;
         }
+    }
 
-        public bool Shift
+    public bool Shift
+    {
+        get => (Value & 4) != 0;
+        set
         {
-            get => (Value & 4) != 0;
-            set
-            {
-                if (value)
-                    Value |= 4;
-                else
-                    Value &= ~4;
-            }
+            if (value)
+                Value |= 4;
+            else
+                Value &= ~4;
         }
+    }
 
-        public bool Win
+    public bool Win
+    {
+        get => (Value & 8) != 0;
+        set
         {
-            get => (Value & 8) != 0;
-            set
-            {
-                if (value)
-                    Value |= 8;
-                else
-                    Value &= ~8;
-            }
+            if (value)
+                Value |= 8;
+            else
+                Value &= ~8;
         }
     }
 }

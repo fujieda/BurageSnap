@@ -13,46 +13,44 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
-using System.Linq;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+public class OptionContent
 {
-    public class OptionContent
+    public bool TopMost { get; set; }
+    public bool ResideInSystemTray { get; set; }
+    public bool Notify { get; set; }
+    public int Interval { get; set; }
+    public int RingBuffer { get; set; }
+    public ObservableCollection<string> WindowTitles { get; set; }
+    public string Folder { get; set; }
+    public bool DailyFolder { get; set; }
+    public OutputFormat Format { get; set; }
+    public int JpegQuality { get; set; }
+    public bool AnimationGif { get; set; }
+    public int HotKeyModifier { get; set; }
+    public string HotKey { get; set; } = "";
+
+    public OptionContent(Config config)
     {
-        public bool TopMost { get; set; }
-        public bool ResideInSystemTray { get; set; }
-        public bool Notify { get; set; }
-        public int Interval { get; set; }
-        public int RingBuffer { get; set; }
-        public ObservableCollection<string> WindowTitles { get; set; }
-        public string Folder { get; set; }
-        public bool DailyFolder { get; set; }
-        public OutputFormat Format { get; set; }
-        public int JpegQuality { get; set; }
-        public bool AnimationGif { get; set; }
-        public int HotKeyModifier { get; set; }
-        public string HotKey { get; set; } = "";
-
-        public OptionContent(Config config)
+        foreach (var dst in GetType().GetProperties())
         {
-            foreach (var dst in GetType().GetProperties())
-            {
-                var src = config.GetType().GetProperty(dst.Name);
-                if (src == null)
-                    continue;
-                dst.SetValue(this, src.GetValue(config, null), null);
-            }
-            WindowTitles = new ObservableCollection<string>(config.TitleHistory);
+            var src = config.GetType().GetProperty(dst.Name);
+            if (src == null)
+                continue;
+            dst.SetValue(this, src.GetValue(config, null), null);
         }
+        WindowTitles = new ObservableCollection<string>(config.TitleHistory);
+    }
 
-        public void ToConfig(Config config)
+    public void ToConfig(Config config)
+    {
+        foreach (var src in GetType().GetProperties())
         {
-            foreach (var src in GetType().GetProperties())
-            {
-                var dst = config.GetType().GetProperty(src.Name);
-                dst?.SetValue(config, src.GetValue(this, null), null);
-            }
-            config.TitleHistory = WindowTitles.ToArray();
+            var dst = config.GetType().GetProperty(src.Name);
+            dst?.SetValue(config, src.GetValue(this, null), null);
         }
+        config.TitleHistory = WindowTitles.ToArray();
     }
 }

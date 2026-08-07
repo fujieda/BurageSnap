@@ -15,29 +15,28 @@
 using System.Windows;
 using System.Windows.Forms;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+/// <summary>
+/// OptionView.xaml の相互作用ロジック
+/// </summary>
+public partial class OptionView
 {
-    /// <summary>
-    /// OptionView.xaml の相互作用ロジック
-    /// </summary>
-    public partial class OptionView
+    private readonly FolderBrowserDialog _browserDialog = new FolderBrowserDialog();
+
+    public OptionView()
     {
-        private readonly FolderBrowserDialog _browserDialog = new FolderBrowserDialog();
+        InitializeComponent();
+    }
 
-        public OptionView()
+    private void buttonFolderBrowser_Click(object sender, RoutedEventArgs e)
+    {
+        _browserDialog.SelectedPath = textBoxFolder.Text;
+        if (_browserDialog.ShowDialog() == DialogResult.OK)
         {
-            InitializeComponent();
-        }
-
-        private void buttonFolderBrowser_Click(object sender, RoutedEventArgs e)
-        {
-            _browserDialog.SelectedPath = textBoxFolder.Text;
-            if (_browserDialog.ShowDialog() == DialogResult.OK)
-            {
-                textBoxFolder.Text = _browserDialog.SelectedPath;
-                textBoxFolder.Focus();
-                textBoxFolder.CaretIndex = textBoxFolder.Text.Length;
-            }
+            textBoxFolder.Text = _browserDialog.SelectedPath;
+            textBoxFolder.Focus();
+            textBoxFolder.CaretIndex = textBoxFolder.Text.Length;
         }
     }
 }

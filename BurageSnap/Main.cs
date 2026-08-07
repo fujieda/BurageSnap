@@ -12,120 +12,118 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Diagnostics;
 using System.IO;
 using Prism.Mvvm;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+public class Main : BindableBase
 {
-    public class Main : BindableBase
+    private readonly Recorder _recorder;
+
+    public Config Config { get; } = Config.Load();
+
+    public Main()
     {
-        private readonly Recorder _recorder;
+        _recorder = new Recorder(Config) {ReportCaptureResult = ReportCaptureResult};
+    }
 
-        public Config Config { get; } = Config.Load();
-
-        public Main()
+    public void OneShot()
+    {
+        try
         {
-            _recorder = new Recorder(Config) {ReportCaptureResult = ReportCaptureResult};
+            _recorder.OneShot();
         }
-
-        public void OneShot()
+        catch (CaptureError e)
         {
-            try
-            {
-                _recorder.OneShot();
-            }
-            catch (CaptureError e)
-            {
-                CaptureResult = e.Summary;
-                throw;
-            }
+            CaptureResult = e.Summary;
+            throw;
         }
+    }
 
-        public void StartCapture()
+    public void StartCapture()
+    {
+        Capturing = true;
+        try
         {
-            Capturing = true;
-            try
-            {
-                _recorder.Start();
-            }
-            catch (CaptureError e)
-            {
-                CaptureResult = e.Summary;
-                Capturing = false;
-                throw;
-            }
+            _recorder.Start();
         }
-
-        public void StopCapture()
+        catch (CaptureError e)
         {
-            _recorder.Stop();
+            CaptureResult = e.Summary;
+            Capturing = false;
+            throw;
         }
+    }
 
-        public void SaveBuffer()
+    public void StopCapture()
+    {
+        _recorder.Stop();
+    }
+
+    public void SaveBuffer()
+    {
+        try
         {
-            try
-            {
-                _recorder.SaveBuffer();
-            }
-            catch (CaptureError e)
-            {
-                CaptureResult = e.Summary;
-                throw;
-            }
-            finally
-            {
-                Capturing = false;
-            }
+            _recorder.SaveBuffer();
         }
-
-        public void DiscardBuffer()
+        catch (CaptureError e)
         {
-            _recorder.DiscardBuffer();
+            CaptureResult = e.Summary;
+            throw;
+        }
+        finally
+        {
             Capturing = false;
         }
+    }
 
-        private string _windowTitle = "";
+    public void DiscardBuffer()
+    {
+        _recorder.DiscardBuffer();
+        Capturing = false;
+    }
 
-        public string WindowTitle
+    private string _windowTitle = "";
+
+    public string WindowTitle
+    {
+        get => _windowTitle;
+        private set => SetProperty(ref _windowTitle, value);
+    }
+
+    private string _captureResult = "00:00:00.000";
+
+    public string CaptureResult
+    {
+        get => _captureResult;
+        set => SetProperty(ref _captureResult, value);
+    }
+
+    private bool _capturing;
+
+    public bool Capturing
+    {
+        get => _capturing;
+        private set => SetProperty(ref _capturing, value);
+    }
+
+    private void ReportCaptureResult(string title, DateTime time)
+    {
+        WindowTitle = title;
+        CaptureResult = time.ToString("HH:mm:ss.fff");
+    }
+
+    public void OpenPictureFolder()
+    {
+        var dir = Config.Folder;
+        if (Config.DailyFolder)
         {
-            get => _windowTitle;
-            private set => SetProperty(ref _windowTitle, value);
+            var now = DateTime.Now;
+            dir = Path.Combine(Config.Folder, now.ToString(Recorder.DateFormat));
         }
-
-        private string _captureResult = "00:00:00.000";
-
-        public string CaptureResult
-        {
-            get => _captureResult;
-            set => SetProperty(ref _captureResult, value);
-        }
-
-        private bool _capturing;
-
-        public bool Capturing
-        {
-            get => _capturing;
-            private set => SetProperty(ref _capturing, value);
-        }
-
-        private void ReportCaptureResult(string title, DateTime time)
-        {
-            WindowTitle = title;
-            CaptureResult = time.ToString("HH:mm:ss.fff");
-        }
-
-        public void OpenPictureFolder()
-        {
-            var dir = Config.Folder;
-            if (Config.DailyFolder)
-            {
-                var now = DateTime.Now;
-                dir = Path.Combine(Config.Folder, now.ToString(Recorder.DateFormat));
-            }
-            Directory.CreateDirectory(dir);
-            Process.Start(dir);
-        }
+        Directory.CreateDirectory(dir);
+        Process.Start(dir);
     }
 }

@@ -1,13 +1,12 @@
-﻿namespace BurageSnap
+﻿namespace BurageSnap;
+
+/// <summary>
+/// ConfirmWindow.xaml の相互作用ロジック
+/// </summary>
+public partial class ConfirmView
 {
-    /// <summary>
-    /// ConfirmWindow.xaml の相互作用ロジック
-    /// </summary>
-    public partial class ConfirmView
+    public ConfirmView()
     {
-        public ConfirmView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

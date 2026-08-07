@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using BurageSnap.Properties;
@@ -24,253 +21,252 @@ using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
 using Prism.Mvvm;
 
-namespace BurageSnap
+namespace BurageSnap;
+
+public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDataErrorInfo
 {
-    public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDataErrorInfo
+    private INotification _notification;
+
+    public INotification Notification
     {
-        private INotification _notification;
-
-        public INotification Notification
+        get => _notification;
+        set
         {
-            get => _notification;
-            set
+            Options = (OptionContent)value.Content;
+            JpegQuality = Options.JpegQuality.ToString();
+            Interval = Options.Interval.ToString();
+            RingBuffer = Options.RingBuffer.ToString();
+            AnimationGif = Options.AnimationGif;
+            Modifier = new KeyModifier {Value = Options.HotKeyModifier};
+            HotKey = Options.HotKey;
+            SetProperty(ref _notification, value);
+        }
+    }
+
+    public Action FinishInteraction { get; set; }
+
+    private OptionContent _options;
+
+    public OptionContent Options
+    {
+        get => _options;
+        set => SetProperty(ref _options, value);
+    }
+
+    private string _interval;
+
+    public string Interval
+    {
+        get => _interval;
+        set
+        {
+            SetProperty(ref _interval, value);
+            if (!int.TryParse(_interval, out var result) || result < 10 || result > 1000 * 1000)
             {
-                Options = (OptionContent)value.Content;
-                JpegQuality = Options.JpegQuality.ToString();
-                Interval = Options.Interval.ToString();
-                RingBuffer = Options.RingBuffer.ToString();
-                AnimationGif = Options.AnimationGif;
-                Modifier = new KeyModifier {Value = Options.HotKeyModifier};
-                HotKey = Options.HotKey;
-                SetProperty(ref _notification, value);
+                SetError(Resources.OptionView_Validate_interval);
             }
-        }
-
-        public Action FinishInteraction { get; set; }
-
-        private OptionContent _options;
-
-        public OptionContent Options
-        {
-            get => _options;
-            set => SetProperty(ref _options, value);
-        }
-
-        private string _interval;
-
-        public string Interval
-        {
-            get => _interval;
-            set
+            else
             {
-                SetProperty(ref _interval, value);
-                if (!int.TryParse(_interval, out var result) || result < 10 || result > 1000 * 1000)
-                {
-                    SetError(Resources.OptionView_Validate_interval);
-                }
-                else
-                {
-                    ClearError();
-                }
-                _options.Interval = result;
+                ClearError();
             }
+            _options.Interval = result;
         }
+    }
 
-        private string _ringBuffer;
+    private string _ringBuffer;
 
-        public string RingBuffer
+    public string RingBuffer
+    {
+        get => _ringBuffer;
+        set
         {
-            get => _ringBuffer;
-            set
+            SetProperty(ref _ringBuffer, value);
+            if (!int.TryParse(value, out var result) || result < 0 || result > 100)
             {
-                SetProperty(ref _ringBuffer, value);
-                if (!int.TryParse(value, out var result) || result < 0 || result > 100)
-                {
-                    SetError(Resources.OptionView_Validate_ring_buffer);
-                }
-                else if (_options.AnimationGif && result < 2)
-                {
-                    SetError(Resources.OptionView_Validate_ring_buffer_for_animation_GIF);
-                }
-                else
-                {
-                    ClearError();
-                }
-                _options.RingBuffer = result;
+                SetError(Resources.OptionView_Validate_ring_buffer);
             }
-        }
-
-        private string _jpegQuality;
-
-        public string JpegQuality
-        {
-            get => _jpegQuality;
-            set
+            else if (_options.AnimationGif && result < 2)
             {
-                SetProperty(ref _jpegQuality, value);
-                if (!int.TryParse(value, out var result) || result < 0 || result > 100)
-                {
-                    SetError(Resources.OptionView_Validate_jpeg_quality);
-                }
-                else
-                {
-                    ClearError();
-                }
-                _options.JpegQuality = result;
+                SetError(Resources.OptionView_Validate_ring_buffer_for_animation_GIF);
             }
-        }
-
-        private bool _animationGif;
-
-        public bool AnimationGif
-        {
-            get => _animationGif;
-            set
+            else
             {
-                SetProperty(ref _animationGif, value);
-                if (value && _options.RingBuffer <= 1)
-                {
-                    // ReSharper disable once ExplicitCallerInfoArgument
-                    SetError(Resources.OptionView_Validate_ring_buffer_for_animation_GIF, nameof(RingBuffer));
-                }
-                else
-                {
-                    // ReSharper disable once ExplicitCallerInfoArgument
-                    ClearError(nameof(RingBuffer));
-                }
-                _options.AnimationGif = value;
+                ClearError();
             }
+            _options.RingBuffer = result;
         }
+    }
 
-        private string _title;
+    private string _jpegQuality;
 
-        public string Title
+    public string JpegQuality
+    {
+        get => _jpegQuality;
+        set
         {
-            get => _title;
-            set => SetProperty(ref _title, value);
-        }
-
-        public IEnumerable<string> KeyList => GlobalHotKey.KeyList;
-
-        private KeyModifier _modifier;
-
-        public KeyModifier Modifier
-        {
-            get => _modifier;
-            set => SetProperty(ref _modifier, value);
-        }
-
-        private string _hotKey;
-
-        public string HotKey
-        {
-            get => _hotKey;
-            set
+            SetProperty(ref _jpegQuality, value);
+            if (!int.TryParse(value, out var result) || result < 0 || result > 100)
             {
-                SetProperty(ref _hotKey, value);
-                if (value == "")
-                {
-                    Modifier.Value = 0;
-                    OnPropertyChanged(() => Modifier);
-                }
-                OnPropertyChanged(() => IsKeySelected);
+                SetError(Resources.OptionView_Validate_jpeg_quality);
             }
+            else
+            {
+                ClearError();
+            }
+            _options.JpegQuality = result;
         }
+    }
 
-        public bool IsKeySelected => HotKey != "";
+    private bool _animationGif;
 
-        private readonly ErrorsContainer<string> _errors;
-
-        public ICommand OkCommand { get; }
-        public ICommand CancelCommand { get; }
-        public ICommand SelectedCommand { get; }
-        public ICommand AddTitleCommand { get; }
-        public ICommand RemoveTitleCommand { get; }
-        public ICommand ChooseWindowCommand { get; }
-        public ICommand UnloadedCommand { get; }
-
-        public OptionViewModel()
+    public bool AnimationGif
+    {
+        get => _animationGif;
+        set
         {
-            _errors = new ErrorsContainer<string>(OnErrorsChanged);
-
-            OkCommand = new DelegateCommand(OkInteraction, () => !HasErrors);
-            CancelCommand = new DelegateCommand(CancelInteraction);
-            SelectedCommand = new DelegateCommand<object[]>(Selected);
-            AddTitleCommand = new DelegateCommand(AddTitle);
-            RemoveTitleCommand = new DelegateCommand(RemoveTitle);
-            ChooseWindowCommand = new DelegateCommand(ChooseWindow);
-            UnloadedCommand = new DelegateCommand(Unloaded);
-
-            WindowPicker.Picked += title => { Title = title; };
+            SetProperty(ref _animationGif, value);
+            if (value && _options.RingBuffer <= 1)
+            {
+                // ReSharper disable once ExplicitCallerInfoArgument
+                SetError(Resources.OptionView_Validate_ring_buffer_for_animation_GIF, nameof(RingBuffer));
+            }
+            else
+            {
+                // ReSharper disable once ExplicitCallerInfoArgument
+                ClearError(nameof(RingBuffer));
+            }
+            _options.AnimationGif = value;
         }
+    }
 
-        private void OkInteraction()
+    private string _title;
+
+    public string Title
+    {
+        get => _title;
+        set => SetProperty(ref _title, value);
+    }
+
+    public IEnumerable<string> KeyList => GlobalHotKey.KeyList;
+
+    private KeyModifier _modifier;
+
+    public KeyModifier Modifier
+    {
+        get => _modifier;
+        set => SetProperty(ref _modifier, value);
+    }
+
+    private string _hotKey;
+
+    public string HotKey
+    {
+        get => _hotKey;
+        set
         {
-            Options.HotKeyModifier = Modifier.Value;
-            Options.HotKey = HotKey;
-            ((IConfirmation)Notification).Confirmed = true;
-            FinishInteraction();
+            SetProperty(ref _hotKey, value);
+            if (value == "")
+            {
+                Modifier.Value = 0;
+                OnPropertyChanged(() => Modifier);
+            }
+            OnPropertyChanged(() => IsKeySelected);
         }
+    }
 
-        private void CancelInteraction()
-        {
-            ((IConfirmation)Notification).Confirmed = false;
-            FinishInteraction();
-        }
+    public bool IsKeySelected => HotKey != "";
 
-        private void Selected(object[] args)
-        {
-            var title = args.FirstOrDefault() as string;
-            if (title == null)
-                return;
-            Title = title;
-        }
+    private readonly ErrorsContainer<string> _errors;
 
-        private void AddTitle()
-        {
-            if (Options.WindowTitles.Contains(Title))
-                return;
-            Options.WindowTitles.Add(Title);
-        }
+    public ICommand OkCommand { get; }
+    public ICommand CancelCommand { get; }
+    public ICommand SelectedCommand { get; }
+    public ICommand AddTitleCommand { get; }
+    public ICommand RemoveTitleCommand { get; }
+    public ICommand ChooseWindowCommand { get; }
+    public ICommand UnloadedCommand { get; }
 
-        private void RemoveTitle()
-        {
-            Options.WindowTitles.Remove(Title);
-        }
+    public OptionViewModel()
+    {
+        _errors = new ErrorsContainer<string>(OnErrorsChanged);
 
-        private void ChooseWindow()
-        {
-            WindowPicker.Start();
-        }
+        OkCommand = new DelegateCommand(OkInteraction, () => !HasErrors);
+        CancelCommand = new DelegateCommand(CancelInteraction);
+        SelectedCommand = new DelegateCommand<object[]>(Selected);
+        AddTitleCommand = new DelegateCommand(AddTitle);
+        RemoveTitleCommand = new DelegateCommand(RemoveTitle);
+        ChooseWindowCommand = new DelegateCommand(ChooseWindow);
+        UnloadedCommand = new DelegateCommand(Unloaded);
 
-        private void Unloaded()
-        {
-            WindowPicker.Stop();
-        }
+        WindowPicker.Picked += title => { Title = title; };
+    }
 
-        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+    private void OkInteraction()
+    {
+        Options.HotKeyModifier = Modifier.Value;
+        Options.HotKey = HotKey;
+        ((IConfirmation)Notification).Confirmed = true;
+        FinishInteraction();
+    }
 
-        public bool HasErrors => _errors.HasErrors;
+    private void CancelInteraction()
+    {
+        ((IConfirmation)Notification).Confirmed = false;
+        FinishInteraction();
+    }
 
-        public IEnumerable GetErrors(string propertyName)
-        {
-            return _errors.GetErrors(propertyName);
-        }
+    private void Selected(object[] args)
+    {
+        var title = args.FirstOrDefault() as string;
+        if (title == null)
+            return;
+        Title = title;
+    }
 
-        private void OnErrorsChanged([CallerMemberName] string propertyName = null)
-        {
-            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-            ((DelegateCommand)OkCommand).RaiseCanExecuteChanged();
-        }
+    private void AddTitle()
+    {
+        if (Options.WindowTitles.Contains(Title))
+            return;
+        Options.WindowTitles.Add(Title);
+    }
 
-        private void SetError(string message, [CallerMemberName] string propertyName = null)
-        {
-            _errors.SetErrors(propertyName, new[] {message});
-        }
+    private void RemoveTitle()
+    {
+        Options.WindowTitles.Remove(Title);
+    }
 
-        private void ClearError([CallerMemberName] string propertyName = null)
-        {
-            _errors.ClearErrors(propertyName);
-        }
+    private void ChooseWindow()
+    {
+        WindowPicker.Start();
+    }
+
+    private void Unloaded()
+    {
+        WindowPicker.Stop();
+    }
+
+    public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+    public bool HasErrors => _errors.HasErrors;
+
+    public IEnumerable GetErrors(string propertyName)
+    {
+        return _errors.GetErrors(propertyName);
+    }
+
+    private void OnErrorsChanged([CallerMemberName] string propertyName = null)
+    {
+        ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        ((DelegateCommand)OkCommand).RaiseCanExecuteChanged();
+    }
+
+    private void SetError(string message, [CallerMemberName] string propertyName = null)
+    {
+        _errors.SetErrors(propertyName, new[] {message});
+    }
+
+    private void ClearError([CallerMemberName] string propertyName = null)
+    {
+        _errors.ClearErrors(propertyName);
     }
 }

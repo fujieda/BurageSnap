@@ -1,31 +1,28 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using BurageSnap;
 
-namespace CaptureTest
+namespace CaptureTest;
+
+internal static class Program
 {
-    internal static class Program
+    private static void Main(string[] args)
     {
-        private static void Main(string[] args)
+        if (args.Length == 0)
+            return;
+        var capture = new Capture();
+        using (var bmp = new Bitmap(args[0]))
         {
-            if (args.Length == 0)
-                return;
-            var capture = new Capture();
-            using (var bmp = new Bitmap(args[0]))
+            var rectangle = capture.DetectGameScreen(bmp);
+            if (rectangle.IsEmpty)
             {
-                var rectangle = capture.DetectGameScreen(bmp);
-                if (rectangle.IsEmpty)
-                {
-                    Console.WriteLine(@"extract error");
-                    return;
-                }
-                using (var file = File.Create(Path.Combine(Path.GetDirectoryName(args[0]) ?? "",
-                    Path.GetFileNameWithoutExtension(args[0]) + "_result" + Path.GetExtension(args[0]))))
-                using (var clipped = bmp.Clone(rectangle, bmp.PixelFormat))
-                    clipped.Save(file, ImageFormat.Png);
+                Console.WriteLine(@"extract error");
+                return;
             }
+            using (var file = File.Create(Path.Combine(Path.GetDirectoryName(args[0]) ?? "",
+                Path.GetFileNameWithoutExtension(args[0]) + "_result" + Path.GetExtension(args[0]))))
+            using (var clipped = bmp.Clone(rectangle, bmp.PixelFormat))
+                clipped.Save(file, ImageFormat.Png);
         }
     }
 }
