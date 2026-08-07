@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System.Windows.Input;
-using Prism.Commands;
-using Prism.Interactivity.InteractionRequest;
-using Prism.Mvvm;
+using BurageSnap.Interactivity;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace BurageSnap;
 
-public class ConfirmViewModel : BindableBase, IInteractionRequestAware
+public class ConfirmViewModel : ObservableObject, IInteractionRequestAware
 {
     public INotification Notification { get; set; }
     public Action FinishInteraction { get; set; }
@@ -29,8 +29,8 @@ public class ConfirmViewModel : BindableBase, IInteractionRequestAware
 
     public ConfirmViewModel()
     {
-        YesCommand = new DelegateCommand(YesInteraction);
-        NoCommand = new DelegateCommand(NoInteraction);
+        YesCommand = new RelayCommand(YesInteraction);
+        NoCommand = new RelayCommand(NoInteraction);
     }
 
     private void YesInteraction()

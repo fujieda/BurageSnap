@@ -16,14 +16,14 @@ using System.Collections;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using BurageSnap.Interactivity;
 using BurageSnap.Properties;
-using Prism.Commands;
-using Prism.Interactivity.InteractionRequest;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace BurageSnap;
 
-public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDataErrorInfo
+public class OptionViewModel : ObservableObject, IInteractionRequestAware, INotifyDataErrorInfo
 {
     private INotification _notification;
 
@@ -166,9 +166,9 @@ public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDa
             if (value == "")
             {
                 Modifier.Value = 0;
-                OnPropertyChanged(() => Modifier);
+                OnPropertyChanged(nameof(Modifier));
             }
-            OnPropertyChanged(() => IsKeySelected);
+            OnPropertyChanged(nameof(IsKeySelected));
         }
     }
 
@@ -188,13 +188,13 @@ public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDa
     {
         _errors = new ErrorsContainer<string>(OnErrorsChanged);
 
-        OkCommand = new DelegateCommand(OkInteraction, () => !HasErrors);
-        CancelCommand = new DelegateCommand(CancelInteraction);
-        SelectedCommand = new DelegateCommand<object[]>(Selected);
-        AddTitleCommand = new DelegateCommand(AddTitle);
-        RemoveTitleCommand = new DelegateCommand(RemoveTitle);
-        ChooseWindowCommand = new DelegateCommand(ChooseWindow);
-        UnloadedCommand = new DelegateCommand(Unloaded);
+        OkCommand = new RelayCommand(OkInteraction, () => !HasErrors);
+        CancelCommand = new RelayCommand(CancelInteraction);
+        SelectedCommand = new RelayCommand<object[]>(Selected);
+        AddTitleCommand = new RelayCommand(AddTitle);
+        RemoveTitleCommand = new RelayCommand(RemoveTitle);
+        ChooseWindowCommand = new RelayCommand(ChooseWindow);
+        UnloadedCommand = new RelayCommand(Unloaded);
 
         WindowPicker.Picked += title => { Title = title; };
     }
@@ -255,7 +255,7 @@ public class OptionViewModel : BindableBase, IInteractionRequestAware, INotifyDa
     private void OnErrorsChanged([CallerMemberName] string propertyName = null)
     {
         ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
-        ((DelegateCommand)OkCommand).RaiseCanExecuteChanged();
+        ((RelayCommand)OkCommand).NotifyCanExecuteChanged();
     }
 
     private void SetError(string message, [CallerMemberName] string propertyName = null)

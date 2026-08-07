@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System.Windows;
+using BurageSnap.Interactivity;
 using MahApps.Metro.Controls;
-using Prism.Interactivity;
+using Application = System.Windows.Application;
 
 namespace BurageSnap;
 

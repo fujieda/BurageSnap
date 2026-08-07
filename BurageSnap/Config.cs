@@ -27,7 +27,7 @@ public enum OutputFormat
 public class LocationPerMachine
 {
     public string MachineName { get; set; }
-    public Point Location { get; set; }
+    public System.Windows.Point Location { get; set; }
 }
 
 public class Config

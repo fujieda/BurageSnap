@@ -14,11 +14,11 @@
 
 using System.Diagnostics;
 using System.IO;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace BurageSnap;
 
-public class Main : BindableBase
+public class Main : ObservableObject
 {
     private readonly Recorder _recorder;
 

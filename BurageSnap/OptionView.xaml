@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BurageSnap"
              xmlns:properties="clr-namespace:BurageSnap.Properties"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:prism="http://www.codeplex.com/prism"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:interactivity="clr-namespace:BurageSnap.Interactivity"
              mc:Ignorable="d"
              FocusManager.FocusedElement="{Binding ElementName=buttonOk}" FontFamily="Meiryo UI">
     <UserControl.Resources>
@@ -113,7 +113,7 @@
                 <ListBox x:Name="listBox" ItemsSource="{Binding Options.WindowTitles}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="122" BorderThickness="1" Margin="0 0 0 2">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
-                            <prism:InvokeCommandAction Command="{Binding SelectedCommand}" TriggerParameterPath="AddedItems"/>
+                            <interactivity:InvokeCommandAction Command="{Binding SelectedCommand}" TriggerParameterPath="AddedItems"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <ListBox.ItemContainerStyle>
@@ -133,7 +133,7 @@
     </Grid>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Unloaded">
-            <prism:InvokeCommandAction Command="{Binding UnloadedCommand}"/>
+            <i:InvokeCommandAction Command="{Binding UnloadedCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
 </UserControl>

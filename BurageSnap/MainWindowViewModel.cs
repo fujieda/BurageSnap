@@ -16,14 +16,16 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
+using BurageSnap.Interactivity;
 using BurageSnap.Properties;
-using Prism.Commands;
-using Prism.Interactivity.InteractionRequest;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Application = System.Windows.Application;
+using Point = System.Windows.Point;
 
 namespace BurageSnap;
 
-internal class MainWindowViewModel : BindableBase
+internal class MainWindowViewModel : ObservableObject
 {
     public Main Main { get; }
     public ICommand LoadedCommand { get; }
@@ -45,7 +47,7 @@ internal class MainWindowViewModel : BindableBase
         set
         {
             Main.Config.Continuous = value;
-            OnPropertyChanged(() => CaptureButtonText);
+            OnPropertyChanged(nameof(CaptureButtonText));
         }
     }
 
@@ -98,17 +100,17 @@ internal class MainWindowViewModel : BindableBase
         {
             if (args.PropertyName == "Capturing")
             {
-                OnPropertyChanged(() => CaptureButtonText);
-                OnPropertyChanged(() => AllowChangeSettings);
+                OnPropertyChanged(nameof(CaptureButtonText));
+                OnPropertyChanged(nameof(AllowChangeSettings));
             }
         };
-        LoadedCommand = new DelegateCommand(Loaded);
-        ClosingCommand = new DelegateCommand<CancelEventArgs>(Closing);
-        BrowseCommand = new DelegateCommand(Main.OpenPictureFolder);
-        OptionCommand = new DelegateCommand(SelectOption);
-        CaptureCommand = new DelegateCommand(Capture);
-        NotifyIconOpenCommand = new DelegateCommand(() => { WindowState = WindowState.Normal; });
-        NotifyIconExitCommand = new DelegateCommand(() =>
+        LoadedCommand = new RelayCommand(Loaded);
+        ClosingCommand = new RelayCommand<CancelEventArgs>(Closing);
+        BrowseCommand = new RelayCommand(Main.OpenPictureFolder);
+        OptionCommand = new RelayCommand(SelectOption);
+        CaptureCommand = new RelayCommand(Capture);
+        NotifyIconOpenCommand = new RelayCommand(() => { WindowState = WindowState.Normal; });
+        NotifyIconExitCommand = new RelayCommand(() =>
         {
             Terminate();
             Application.Current.Shutdown();

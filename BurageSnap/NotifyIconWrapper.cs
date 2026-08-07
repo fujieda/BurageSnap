@@ -15,8 +15,8 @@
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Interactivity;
-using Prism.Interactivity.InteractionRequest;
+using BurageSnap.Interactivity;
+using Microsoft.Xaml.Behaviors;
 using Application = System.Windows.Application;
 
 namespace BurageSnap;
