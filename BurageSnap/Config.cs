@@ -44,10 +44,10 @@ public class Config
 
     public string[] TitleHistory { get; set; } =
     {
-        "艦隊これくしょん -艦これ- - オンラインゲーム - DMM GAMES",
+        "艦隊これくしょん -艦これ- - DMM GAMES",
         "千年戦争アイギス - DMM GAMES",
         "FLOWER KNIGHT GIRL - DMM GAMES",
-        "刀剣乱舞-ONLINE- - オンラインゲーム - DMM GAMES"
+        "刀剣乱舞ONLINE - DMM GAMES"
     };
 
     public string Folder { get; set; }
